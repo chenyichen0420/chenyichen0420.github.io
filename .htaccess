@@ -1,0 +1,3 @@
+<FilesMatch "\.py$">
+  SetHandler application/x-httpd-python
+</FilesMatch>
