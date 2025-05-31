@@ -1,3 +1,4 @@
+```python
 import requests
 head = {
     "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0",
@@ -18,3 +19,4 @@ if back.status_code == 206 or back.status_code == 200:
     with open("audio.mp3",'wb') as f:
         f.write(back.content)
 # VIP教师会员和本期电子版订户登录后下载 - out！
+```
