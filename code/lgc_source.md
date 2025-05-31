@@ -1,3 +1,4 @@
+```python
 import pyluog as pl
 import requests
 import time
@@ -64,3 +65,4 @@ for sub in fis:
     sht['B' + str(ipc)] = stat
     sht['D' + str(ipc)] = atim
 exl.save(filename = 'Record.xlsx')
+```
