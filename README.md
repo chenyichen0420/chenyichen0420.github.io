@@ -1,2 +1,3 @@
 # chenyichen0420.github.io
-Blogs only
+
+Some blogs, solution and other public software or something else.
