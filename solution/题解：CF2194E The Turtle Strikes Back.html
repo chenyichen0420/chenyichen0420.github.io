@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题解：CF2194E The Turtle Strikes Back</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f6f8fa;
+            box-sizing: border-box;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        .katex-error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        <h2>思路分析</h2>
+<p>好像在什么地方做过很类似的，总之是很经典的一个板题。</p>
+<p>我们考虑一下怎么求解更改单个点之后的全局最大值。</p>
+<p>显然，如果我强制指定你必须走过某一个点 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span>，那么答案就是从 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 走到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span> 的最大值，加上从 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span> 走到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> 的最大值，最后减去 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="mclose">)</span></span></span></span> 自己，因为被算了两次。</p>
+<p>也就是说如果我枚举改了哪个点，那么经过这个点的最大值我就知道了。但显然我也可以选择不经过这个点，对吧？</p>
+<p>我们再考虑一下能不能找到一个好处理的限制条件，使得我可以快速地求出不经过这个点的最优解？下面提供两种思路：</p>
+<ol>
+<li>同一斜线上的点必定经过且只经过 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 个。</li>
+</ol>
+<p>这里的斜线定义为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 的值相等的点，上面所说的结论正确性是显然的。</p>
+<p>于是我们枚举这个斜线，求出斜线上的最大值和次大值，然后顺次枚举换掉某一个点之后答案的最大值。</p>
+<p>考场代码如下：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int t, n, m, ans; vector&lt;pair&lt;int, int&gt;&gt;p, np;
+vector&lt;vector&lt;int&gt;&gt;a, dp[2];
+int v1, v2; pair&lt;int, int&gt;p1;
+inline void ins(int v, pair&lt;int, int&gt; p) {
+    if (v &gt;= v1) v2 = v1, v1 = v, p1 = p;
+    else if (v &gt; v2) v2 = v;
+}
+signed main() {
+    ios::sync_with_stdio(0);
+    for (cin &gt;&gt; t; t; t--) {
+        cin &gt;&gt; n &gt;&gt; m;
+        a = dp[0] = dp[1] = vector&lt;vector&lt;int&gt;&gt;
+            (n + 2, vector&lt;int&gt;(m + 2, 0xcfcfcfcfcfcfcfcf));
+        for (int i = 1; i &lt;= n; ++i)
+            for (int j = 1; j &lt;= m; ++j)
+                cin &gt;&gt; a[i][j];
+        dp[0][0][1] = dp[0][1][0] = 0;
+        for (int i = 1; i &lt;= n; ++i)
+            for (int j = 1; j &lt;= m; ++j)
+                dp[0][i][j] = max(dp[0][i - 1][j], dp[0][i][j - 1]) + a[i][j];
+        dp[1][n + 1][m] = dp[1][n][m + 1] = 0;
+        for (int i = n; i &gt;= 1; i--)
+            for (int j = m; j &gt;= 1; j--)
+                dp[1][i][j] = max(dp[1][i + 1][j], dp[1][i][j + 1]) + a[i][j];
+        p.emplace_back(1, 1); ans = 1e18;
+        while (p.size()) {
+            v1 = v2 = -1e18;
+            for (const auto&amp; pos : p)
+                ins(dp[0][pos.first][pos.second] + dp[1][pos.first][pos.second] - a[pos.first][pos.second], pos);
+            for (const auto&amp; pos : p)
+                if (pos == p1) ans = min(ans, max(v2, dp[0][pos.first][pos.second] + dp[1][pos.first][pos.second] - 3 * a[pos.first][pos.second]));
+                else ans = min(ans, max(v1, dp[0][pos.first][pos.second] + dp[1][pos.first][pos.second] - 3 * a[pos.first][pos.second]));
+            for (const auto&amp; pos : p)
+                if (pos.first != n) np.emplace_back(pos.first + 1, pos.second);
+            if (p.back().second != m) np.emplace_back(p.back().first, p.back().second + 1);
+            swap(p, np); np.clear();
+        }
+        cout &lt;&lt; ans &lt;&lt; endl;
+    }
+    return 0;
+}
+/*
+给定一个 n*m 的矩阵 a，你可以选择一个元素并将其变为相反数。
+求操作之后从 (1,1) 到 (n,m) 的路径的元素之和的最大值最小为多少。
+这里的路径指的是走恰好 (n+m-2) 步的路径，也就是只能向右或者向下。
+*/
+</code></pre>
+<p>事实上上述实现并不是特别优：显然只有更改最大值的那个位置严格优于其他的，我们只枚举那一个点就行，不过有一些细节，考场上没那么写。</p>
+<ol start="2">
+<li>经过右上角区域或左下角区域的覆盖所有不经过该点的路径。</li>
+</ol>
+<p>正确性同样显然，图示：</p>
+<p><img src="https://cdn.luogu.com.cn/upload/image_hosting/pebk65hb.png" alt=""></p>
+<p>我没实现代码，那就不贴了，不过应该这个会好实现一些，反正我想到的两种都糊了一遍了。</p>
+
+    </div>
+</body>
+</html>

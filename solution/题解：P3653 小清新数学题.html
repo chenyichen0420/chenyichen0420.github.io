@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题解：P3653 小清新数学题</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f6f8fa;
+            box-sizing: border-box;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        .katex-error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        <h2>思路分析</h2>
+<p>注意到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span></span></span></span> 并不大，显然是一个突破口。</p>
+<p>我们考虑一下 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">μ</span></span></span></span> 的计算中最核心的两个因素：平方因子存在性和质因子个数。</p>
+<p>我们思考一下：平方因子和质因子都有可能达到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">9</span></span></span></span></span></span></span></span></span></span></span> 量级，非常的大，没办法直接枚举，但是我们有没有希望将平方因子的范围压缩一下呢？</p>
+<p>我们考虑将这个数在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span> 范围内的质因子给全部除掉，此时他剩余的质因子必定是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span> 的。而显然，根据数据范围，这样的因子最多只有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 个不同的。</p>
+<p>那不就简单了吗？我们将所有的数的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span> 以下的质因数全部除掉，记录一下有没有平方因子以及质因子个数。</p>
+<p>随后，对于每一个仍然 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的数，先检验是不是完全平方数，然后使用 Miller-Rabin 检验是不是质数。</p>
+<p>代码如下：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int ud[] = { 2,3,5,7,11,13,17,37 };
+#ifdef _MSC_VER
+#define __int128 long long
+#endif
+inline int mul(int a, int b, int p) {
+    __int128 tmp = a; return tmp * b % p;
+}
+inline int qpow(__int128 a, int b, int p) {
+    __int128 ret = 1;
+    for (; b; b &gt;&gt;= 1, a = a * a % p)
+        (b &amp; 1) &amp;&amp; (ret = ret * a % p);
+    return ret;
+}
+inline bool isprm(int n) {
+    if (n &lt; 3 || n % 2 == 0) return n == 2;//特判
+    int u = n - 1, t = 0;
+    while (u % 2 == 0) u /= 2, ++t;
+    for (int a : ud) {
+        int v = qpow(a, u, n);
+        if (v == 1 || v == n - 1 || v == 0) continue;
+        for (int j = 1; j &lt;= t; j++) {
+            v = mul(v, v, n);
+            if (v == n - 1 &amp;&amp; j != t) { v = 1; break; }
+            if (v == 1) return 0;
+        }
+        if (v != 1) return 0;
+    }
+    return 1;
+}
+int l, r, v[2000005], c[2000005], p[2000005], pc, ans; bool isp[2000005];
+signed main() {
+    ios::sync_with_stdio(0); cin &gt;&gt; l &gt;&gt; r;
+    for (int i = l; i &lt;= r; ++i) v[i - l] = i, c[i - l] = 1;
+    for (int i = 2; i &lt;= 2e6; ++i) {
+        if (!isp[i]) p[++pc] = i;
+        for (int j = 1; j &lt;= pc &amp;&amp; i * p[j] &lt;= 2e6; ++j)
+            if (isp[i * p[j]] = 1, i% p[j] == 0)break;
+    }
+    for (int i = 1; i &lt;= pc; ++i) {
+        int pos = l / p[i] * p[i];
+        if (pos &lt; l) pos += p[i];
+        if (pos &gt; r) continue;
+        do {
+            v[pos - l] /= p[i]; c[pos - l] = -c[pos - l];
+            if (v[pos - l] % p[i] == 0) c[pos - l] = 0;
+            while (v[pos - l] % p[i] == 0) v[pos - l] /= p[i];
+        } while ((pos += p[i]) &lt;= r);
+    }
+    for (int i = l; i &lt;= r; ++i)
+        if (c[i - l] &amp;&amp; v[i - l] &gt; 1) {
+            int v1 = sqrt(v[i - l]);
+            if (v1 * v1 == v[i - l]) c[i - l] = 0;
+            else if (isprm(v[i - l])) c[i - l] = -c[i - l];
+        }
+    for (int i = l; i &lt;= r; ++i) ans += c[i - l];
+    cout &lt;&lt; ans &lt;&lt; endl;
+    return 0;
+}
+/*
+如果我将 10^6 及以下的因子全部除尽了，那么剩下的会是什么？
+他最多只能再被质数除两次了。
+也就是说，我们首先将其开根，检验是不是质数的平方
+随后检查他是不是质数。如果是那就 -\mu(x)，否则不动。
+快速检验一个大数是不是质数，使用 Miller-rabin。
+*/
+</code></pre>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题解：P9867 [POI 2021_2022 R2] kon</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f6f8fa;
+            box-sizing: border-box;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        .katex-error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        <h2>思路分析</h2>
+<p>考场上卡死在快速将节点 fork 出去，并尽可能地维护单点连边的怪圈里面了。</p>
+<p>首先，对于 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">Z</span></span></span></span> 类型的操作，我们其实可以选择考虑一下能不能干脆直接新建一个节点用实边挂在原先的那个节点上。</p>
+<p>既然如此，为了防止后来的对于原先的那个节点的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">W</span></span></span></span> 类型操作污染了其下的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">Z</span></span></span></span> 的数据，我们新建一个节点作为其最新状态标记，并在这个节点上面去用虚边挂新的节点。</p>
+<p>也就是说，操作完了之后我们会形成一棵实边的辅助森林。这个森林中的每一棵树代表了从某一个节点上不停的进行 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">Z</span></span></span></span> 操作得到的结构。其中父节点的新建时间早于子节点。</p>
+<p>结合上虚边，我们构成了一个辅助树，其中的虚边意味着在其父节点及实边树中这个节点以下的节点都和儿子节点及实边树中这个节点以下的节点之间连了边。实际意义：</p>
+<p><img src="https://www.helloimg.com/i/2026/01/31/697db9ef11657.png" alt=""></p>
+<p>说白了就是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0715em;">Z</span></span></span></span> 操作不改变在辅助树中跨过虚边的部分的连通性。</p>
+<p>于是问题变成了给你一些加点加边的操作，询问某一个点所在的实边连通块走一条虚边后到达的所有其他的实边连通块的大小之和。</p>
+<p>这是可做的。我们考虑离线下来，然后增加一个点就是在其实边辅助树的到根的部分全部 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">1</span></span></span></span>，在上一个实边辅助树的连接的节点的子树部分全部 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">1</span></span></span></span>。删除类似。</p>
+<p>查询的时候就是找其他的实边辅助树在这个点的贡献，以及这个实边辅助树在这个位置的贡献总和。</p>
+<p>代码如下：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+constexpr bool online = 0;
+constexpr int sz = 3e6 + 5;
+int n, ptr[sz], idp, idn, idq;
+constexpr int opqry = 0, opadd = 1, opdel = -1;
+struct oper { int v, op; }q[sz];
+vector&lt;int&gt;son[sz]; char op; int ov;
+int fa[sz], va[sz];
+inline static void lnkw(int p) {
+	son[ptr[p]].emplace_back(++idn);
+	q[++idq] = { ptr[p],opdel };
+	ptr[p] = idn; ptr[++idp] = ++idn;
+	q[++idq] = { ptr[idp],opadd };
+	q[++idq] = { ptr[p],opadd };
+	va[idn] = ptr[p];
+}
+inline static void lnkz(int p) {
+	son[ptr[p]].emplace_back(++idn);
+	ptr[++idp] = idn; fa[idn] = ptr[p];
+	q[++idq] = { idn,opadd };
+}
+int rt[sz], dfl[sz], dfr[sz], idd, ans;
+inline static void dfs(int p, int f) {
+	rt[p] = (f ? rt[f] : p); dfl[p] = ++idd;
+	for (int sp : son[p]) dfs(sp, p); dfr[p] = idd;
+}
+struct tree_array {
+	int v[sz];
+	inline void ins(int p, int t) {
+		do v[p] += t; while ((p += p &amp; ~p + 1) &lt;= idn);
+	}
+	inline int que(int p) {
+		int t = 0; do t += v[p]; while (p &amp;= p - 1); return t;
+	}
+	inline void ins(int l, int r, int t) {
+		ins(l, t); ins(r + 1, -t);
+	}
+	inline int que(int l, int r) {
+		return que(r) - que(l - 1);
+	}
+}my, oth;
+signed main() {
+	if (online)
+		freopen(&quot;ball.in&quot;, &quot;r&quot;, stdin),
+		freopen(&quot;ball.out&quot;, &quot;w&quot;, stdout);
+	ios::sync_with_stdio(0); cin &gt;&gt; n; ptr[1] = 1;
+	q[++idq] = { 1,opadd }; idp = idn = 1; lnkw(1);
+	for (int i = 1; i &lt;= n; ++i)
+		if (cin &gt;&gt; op &gt;&gt; ov, op == &#39;W&#39;) lnkw(ov);
+		else if (op == &#39;Z&#39;) lnkz(ov);
+		else q[++idq] = { ptr[ov],opqry };
+	for (int i = 1; i &lt;= idn; ++i) if (!rt[i]) dfs(i, 0);
+	for (int i = 1; i &lt;= idq; ++i)
+		if (q[i].op == opqry) {
+			ans = oth.que(dfl[q[i].v]);
+			if (q[i].v = va[rt[q[i].v]]) ans += my.que(dfl[q[i].v], dfr[q[i].v]);
+			cout &lt;&lt; ans &lt;&lt; endl;
+		}
+		else {
+			my.ins(dfl[q[i].v], q[i].op);
+			if (q[i].v = va[rt[q[i].v]])
+				oth.ins(dfl[q[i].v], dfr[q[i].v], q[i].op);
+		}
+}
+</code></pre>
+
+    </div>
+</body>
+</html>

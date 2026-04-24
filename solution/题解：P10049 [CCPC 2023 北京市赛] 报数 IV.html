@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题解：P10049 [CCPC 2023 北京市赛] 报数 IV</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f6f8fa;
+            box-sizing: border-box;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        .katex-error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        <h2>思路分析</h2>
+<p>简单题。</p>
+<p>首先，注意到变换次数较多，于是考虑一下能不能压缩变换的次数。</p>
+<p>变换一次，数最大为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">9000</span></span></span></span>，两次最大为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">35</span></span></span></span>，三次最大为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">11</span></span></span></span>，四次就变成一位数了，此后肯定不再变化。</p>
+<p>由此得出结论：<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">9000</span></span></span></span> 时答案为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，剩下的情况可以 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">(</span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span>。</p>
+<p>接下来考虑求解答案。不难想到计算出操作 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 次之后各种和的出现的次数，进而快速的计算出操作 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">4</span></span></span></span> 次时的答案。</p>
+<p>由于有上限，于是非常套路的考虑数位 DP。注意到紧贴上界的情况是简单的。当与上界分离的时候，本质上就是多次长度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 的数（可以有前导零）的数位和是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 的方案数。</p>
+<p>显然后者可以先进行一次 DP 预处理出来，然后再进行求解。</p>
+<p>时间复杂度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>，其中 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">10</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span></span></span></span>。代码如下：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod = 1e9 + 7;
+int t, m, k, ans[5][9005], dp[1005][9005]; string n;
+inline void gen(int p, int s) {
+	if (p == n.size()) {
+		ans[1][s]++; return;
+	}
+	for (int i = 0; i != (n[p] ^ 48); ++i) {
+		int ts = s + i, ws = n.size() - p - 1;
+		for (int j = 0; j &lt;= 9 * ws; ++j)
+			ans[1][ts + j] = (ans[1][ts + j] + dp[ws][j]) % mod;
+	}
+	gen(p + 1, s + (n[p] ^ 48));
+}
+inline int calc(int v) {
+	int ret = 0;
+	while (v) ret += v % 10, v /= 10;
+	return ret;
+}
+signed main() {
+	ios::sync_with_stdio(0); dp[0][0] = 1;
+	for (int i = 0; i != 1000; ++i)
+		for (int j = 0; j &lt;= 9 * i; ++j)
+			for (int k = 0; k != 10; ++k)
+				dp[i + 1][j + k] = (dp[i + 1][j + k] + dp[i][j]) % mod;
+	for (cin &gt;&gt; t; t; t--) {
+		cin &gt;&gt; n &gt;&gt; m &gt;&gt; k;
+		/*
+		1: 9000
+		2: 35
+		3: 11
+		4: 9
+		5: 9
+		...
+		*/
+		m = min(m, 4ll);
+		if (k &gt; 9000) {
+			cout &lt;&lt; 0 &lt;&lt; endl;
+			continue;
+		}
+		memset(ans, 0, sizeof ans);
+		gen(0, 0);
+		for (int i = 2; i &lt;= m; ++i)
+			for (int j = 0; j &lt;= 9000; ++j)
+				ans[i][calc(j)] = (ans[i][calc(j)] + ans[i - 1][j]) % mod;
+		cout &lt;&lt; ans[m][k] &lt;&lt; endl;
+	}
+}
+</code></pre>
+
+    </div>
+</body>
+</html>
