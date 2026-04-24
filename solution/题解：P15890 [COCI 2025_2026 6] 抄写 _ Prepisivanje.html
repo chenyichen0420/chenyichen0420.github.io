@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题解：P15890 [COCI 2025_2026 #6] 抄写 _ Prepisivanje</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f6f8fa;
+            box-sizing: border-box;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        .katex-error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        <h2>思路分析</h2>
+<p>不是哥们，2026 年了，这种板题还能干到 #6 来？</p>
+<p>这种互斥选择题目，一般考虑抓一种分界方式，使得“移动”一次之后点的类型改变，也就是染成二分图。然后经典结论：最大选点数为总点数减去最小割。我们同时也知道最小割就是最大匹配，然后就可以做了。</p>
+<p>或者直接考虑网络流，源点连到左部点，右部点连到汇点。有边的左右部点之间连一个无限的边表示不可断。这就解释了上面那个经典结论，同时直接网络流一跑就是对的。</p>
+<p>考虑染色，容易注意到，每一次操作都会导致 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 的奇偶性改变，于是按照 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 的奇偶性分类就行了。</p>
+<p>代码如下：</p>
+<pre><code class="language-cpp">#include&lt;iostream&gt;
+#include&lt;vector&gt;
+#include&lt;queue&gt;
+#include&lt;cstring&gt;
+using namespace std;
+int n, m, s, t, cnt; char c[85][85];
+struct dinic {
+	struct node { int p, f; }tmp;
+	vector&lt;node&gt;e; vector&lt;int&gt;h[6405];
+	inline void ins(int l, int r, int f) {
+		tmp = { r,f };
+		h[l].emplace_back(e.size());
+		e.emplace_back(tmp);
+		tmp = { l,0 };
+		h[r].emplace_back(e.size());
+		e.emplace_back(tmp);
+	}
+	int d[6405];
+	inline bool bfs() {
+		memset(d, 0x0f, sizeof d);
+		d[s] = 0; queue&lt;int&gt;q({ s });
+		while (q.size()) {
+			int p = q.front(); q.pop();
+			for (int i : h[p])
+				if (d[e[i].p] &gt; d[p] + 1 &amp;&amp; e[i].f)
+					d[e[i].p] = d[p] + 1,
+					q.emplace(e[i].p);
+		}
+		return d[t] &lt;= 1e6;
+	}
+	int c[6405];
+	inline int dfs(int p, int f) {
+		if (!f || p == t) return f;
+		int ret = 0, t;
+		for (int&amp; i = c[p];i != h[p].size();++i)
+			if (d[e[h[p][i]].p] == d[p] + 1 &amp;&amp; (t = dfs(e[h[p][i]].p, min(f, e[h[p][i]].f)))) {
+				f -= t; e[h[p][i]].f -= t; ret += t; e[h[p][i] ^ 1].f += t;
+				if (!f) return ret;
+			}
+		return ret;
+	}
+	inline int get() {
+		int ret = 0;
+		while (bfs())
+			memset(c, 0, sizeof c),
+			ret += dfs(s, 1e9);
+		return ret;
+	}
+}dc;
+inline int get(int x, int y) {
+	return (x - 1) * m + y;
+}
+signed main() {
+	ios::sync_with_stdio(0); cin &gt;&gt; n &gt;&gt; m;
+	for (int i = 1;i &lt;= n;++i)
+		for (int j = 1;j &lt;= m;++j)
+			cin &gt;&gt; c[i][j];
+	s = n * m + 1; t = n * m + 2;
+	for (int i = 1;i &lt;= n;++i)
+		for (int j = 1;j &lt;= m;++j)
+			if (c[i][j] == &#39;0&#39;)
+				if (c[i + 1][j] == &#39;2&#39; || c[i][j + 1] == &#39;2&#39; || c[i - 1][j] == &#39;2&#39; || c[i][j - 1] == &#39;2&#39;)
+					c[i][j] = &#39;1&#39;;
+	for (int i = 1;i &lt;= n;++i)
+		for (int j = 1;j &lt;= m;++j)
+			if ((i + j &amp; 1) &amp;&amp; c[i][j] == &#39;0&#39;) {
+				if (c[i + 1][j] == &#39;0&#39;) dc.ins(get(i, j), get(i + 1, j), 1);
+				if (c[i - 1][j] == &#39;0&#39;) dc.ins(get(i, j), get(i - 1, j), 1);
+				if (c[i][j + 1] == &#39;0&#39;) dc.ins(get(i, j), get(i, j + 1), 1);
+				if (c[i][j - 1] == &#39;0&#39;) dc.ins(get(i, j), get(i, j - 1), 1);
+			}
+	for (int i = 1;i &lt;= n;++i)
+		for (int j = 1;j &lt;= m;++j)
+			if (c[i][j] == &#39;0&#39;)
+				if (cnt++, i + j &amp; 1) dc.ins(s, get(i, j), 1);
+				else dc.ins(get(i, j), t, 1);
+			else if (c[i][j] == &#39;2&#39;) cnt++;
+	cout &lt;&lt; cnt - dc.get() &lt;&lt; endl;
+}
+</code></pre>
+
+    </div>
+</body>
+</html>

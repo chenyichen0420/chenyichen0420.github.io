@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题解：P14397 [JOISC 2016] 雇佣计划 _ Employment</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f6f8fa;
+            box-sizing: border-box;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        .katex-error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        <p>::::info[Hint]{open}<br>想一下以界线分开之后原序列会变成什么样：</p>
+<p><img src="https://www.helloimg.com/i/2025/11/03/6908a7d139e37.png" alt=""><br>::::</p>
+<p>::::success[Solution]<br>我们这样思考：</p>
+<p>我们先求解全部小于/大于等于分界线的极长部分。</p>
+<p>这似乎不好处理，但是我们直到这个问题等价于询问有几个 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span></span> 是将分界线包含在内了的，然后 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">1</span></span></span></span> 作为最终的答案。</p>
+<p>这样似乎就可以做了：我们无论初始状态下，还是进行更改，都维护 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span></span> 到底覆盖了哪些分界线。然后就变成了区间加，单点查，在线 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。<br>::::</p>
+<p>::::info[Implement]</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,m,a[200005],rt;
+struct seg_tree{
+    struct node{ int ls,rs,c; }re[400005&lt;&lt;6]; int cn;
+    inline node&amp;ls(int p){return re[re[p].ls];}
+    inline node&amp;rs(int p){return re[re[p].rs];}
+    inline void pud(int p){
+        if(!re[p].ls) re[p].ls=++cn;
+        if(!re[p].rs) re[p].rs=++cn;
+        ls(p).c+=re[p].c; rs(p).c+=re[p].c; re[p].c=0;
+    }
+    inline void ins(int cl,int cr,int cv,int l,int r,int&amp; p){
+        if(!p) p=++cn;
+        if(l&gt;=cl&amp;&amp;r&lt;=cr) return void(re[p].c+=cv);
+        pud(p); int mid=l+r&gt;&gt;1;
+        if(cl&lt;=mid) ins(cl,cr,cv,l,mid,re[p].ls);
+        if(cr&gt;mid) ins(cl,cr,cv,mid+1,r,re[p].rs);
+    }
+    inline int que(int qp,int l,int r,int p){
+        if(l==r) return re[p].c;
+        pud(p); int mid=l+r&gt;&gt;1;
+        if(qp&lt;=mid) return que(qp,l,mid,re[p].ls);
+        else return que(qp,mid+1,r,re[p].rs);
+    }
+}sgt;
+inline void chg(int l,int r,int v){
+    if(l==r) return; if(l&gt;r) swap(l,r);
+    sgt.ins(l+1,r,v,1,1e9,rt);
+}
+signed main(){
+    ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m;
+    for(int i=1;i&lt;=n;++i) cin&gt;&gt;a[i];
+    for(int i=1;i!=n;++i) chg(a[i],a[i+1],1);
+    for(int i=1,o,l,r;i&lt;=m;++i)
+        if(cin&gt;&gt;o&gt;&gt;l,o&amp;1){
+            int c=sgt.que(l,1,1e9,rt)+1;
+            if(a[1]&lt;l) cout&lt;&lt;(c&gt;&gt;1)&lt;&lt;endl;
+            else cout&lt;&lt;(c+1&gt;&gt;1)&lt;&lt;endl;
+        }
+        else{
+            cin&gt;&gt;r;
+            if(l!=n)chg(a[l],a[l+1],-1);
+            if(l!=1)chg(a[l-1],a[l],-1);
+            a[l]=r;
+            if(l!=n)chg(a[l],a[l+1],1);
+            if(l!=1)chg(a[l-1],a[l],1);
+        }
+}
+</code></pre>
+<p>::::</p>
+
+    </div>
+</body>
+</html>

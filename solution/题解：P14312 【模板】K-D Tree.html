@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题解：P14312 【模板】K-D Tree</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f6f8fa;
+            box-sizing: border-box;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        .katex-error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        <h2>思路分析</h2>
+<p>K-D Tree 是一种用来相对高效的处理高维对点信息维护的数据结构，一般来说支持在线动态加点加权值等操作。</p>
+<p>我们首先注意到这个数据结构是需要支持动态加点的，并且能够处理高维点信息。我们思考一个合理的数据结构形式。</p>
+<p>容易想到使用树形结构。并且为了能够动态扩容，我们可能会需要类似于二叉搜索树那样的组织形式。又因为要求高效，所以我们还是希望这个二叉搜索树能够尽可能地平衡。</p>
+<p>但是，棘手的地方在于我们需要处理高维点信息，这意味着一般的二叉搜索树或者平衡树并不能直接套到这个地方来。不过这不妨碍我们往这个方向去思考。</p>
+<p>注意到核心矛盾是平衡的结构与良好的高维性质。于是我们思考按照维度进行划分。一种非常自然但是有一些问题的想法是按照某一维的值作为主键值构建类似线段树的结构。</p>
+<p>问题就在于这一维的值有可能大量的重复，例如在二维情况下点分布呈 &quot;L&quot; 形。</p>
+<p>我们再次思考：既然抓住一维不放并不是很正确，那我让每一维轮着来呢？</p>
+<p>他会形成这样的结构（图片来自 oiwiki）：</p>
+<p><img src="https://oi-wiki.org/ds/images/kdt1.jpg" alt=""></p>
+<p><img src="https://oi-wiki.org/ds/images/kdt2.jpg" alt=""></p>
+<p>可见其实确实非常的平衡。虽然会有很多的点，但是树高能够被控制在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 级别。</p>
+<p>那么查询呢？不难想到我们可以对每一个点维护一个“支配区间”，这个“区间”就是他分管的最大范围。然后我们就可以快速地统计一个区间内的所有点的点权之和了。</p>
+<p>至于区间修改，也是几乎一样的，打好 tag，及时下传就行了。现在思考下一步：加点。</p>
+<p>按照原先的构建方式确实可以对静态的点集构造出相对平衡的树，但是只要我一直往一个小区域加点，你的树就会越来越不平衡，就假掉了。</p>
+<p>你可能会想到类似替罪羊树的不平衡重构。这样做确实能够在可以接受的时间复杂度内将树的高度维持在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 级别。但是很可惜，这是不正确的。</p>
+<p>当树高为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> 时，查询的时间复杂度是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.204em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-3.363em;margin-right:0.05em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8443em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span style="top:-3.2255em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.384em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.344em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 的，其中 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 为维度数，但是当树高退化到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 之后，这个复杂度也是不正确的，详见 oi-wiki 上面的<a href="https://oi-wiki.org/ds/kdt/#%E5%A4%8D%E6%9D%82%E5%BA%A6%E5%88%86%E6%9E%90">证明</a>与紧随其后的说明。</p>
+<p>我们需要能够快速正确维护新点的方式。幸运的是，我们有二进制分组大法。</p>
+<p>我们考虑维护若干棵 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 的自然数次幂的 K-D Tree。当插入一个新的点的时候，我们将其视为一个大小为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的 K-D Tree，并不断合并相同大小的子树。</p>
+<p>显然这个过程是类似于二进制 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">1</span></span></span></span> 进位的过程。容易分析出这样做的时间复杂度是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1484em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8984em;"><span style="top:-3.1473em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 的，因为 K-D Tree 的构建是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span> 的。</p>
+<p>这样子做查询是不是又带一个 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span></span></span></span> 呢？事实上，我们粗略的分析时间复杂度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3489em;vertical-align:-0.3949em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop"><span class="mop op-symbol small-op" style="position:relative;top:0em;">∑</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.162em;"><span style="top:-2.4003em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">≥</span><span class="mord mtight">0</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3949em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6954em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7571em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose"><span class="mclose">)</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-3.363em;margin-right:0.05em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8443em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span style="top:-3.2255em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.384em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.344em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.204em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.954em;"><span style="top:-3.363em;margin-right:0.05em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mbin mtight">−</span><span class="mord mtight"><span class="mopen nulldelimiter sizing reset-size3 size6"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8443em;"><span style="top:-2.656em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span style="top:-3.2255em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line mtight" style="border-bottom-width:0.049em;"></span></span><span style="top:-3.384em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.344em;"><span></span></span></span></span></span><span class="mclose nulldelimiter sizing reset-size3 size6"></span></span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>。所以其实时间复杂度没变。</p>
+<p>讲完了，剩下的就是写屎山然后成功调疯了。代码如下：</p>
+<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+inline void tmin(int&amp; l, const int r) { (l &gt; r) &amp;&amp; (l = r); }
+inline void tmax(int&amp; l, const int r) { (l &lt; r) &amp;&amp; (l = r); }
+using ini = initializer_list&lt;int&gt;;
+template&lt;const int wd&gt;
+struct pos {
+	int p[wd];
+	pos&lt;wd&gt;() { memset(p, 0, sizeof p); }
+	pos&lt;wd&gt;(ini pv) {
+		memcpy(p, pv.begin(), pv.size() &lt;&lt; 2);
+	}
+	inline bool operator&lt;(const pos&lt;wd&gt;&amp; r) const{
+		for (int i = 0;i != wd;++i)
+			if (p[i] != r.p[i]) return p[i] &lt; r.p[i];
+		return 1;
+	}
+	inline bool operator==(const pos&lt;wd&gt;&amp; r) const{
+		for (int i = 0;i != wd;++i)
+			if (p[i] != r.p[i]) return 0;
+		return 1;
+	}
+};
+template&lt;const int wd&gt;
+inline bool ninter(const pos&lt;wd&gt;&amp; alu, const pos&lt;wd&gt;&amp; ard, const pos&lt;wd&gt;&amp; blu, const pos&lt;wd&gt;&amp; brd) {
+	for (int i = 0;i != wd;++i)
+		if (blu.p[i] &gt; ard.p[i] || alu.p[i] &gt; brd.p[i]) return 1;
+	return 0;
+}
+template&lt;const int wd&gt;
+inline bool finter(const pos&lt;wd&gt;&amp; alu, const pos&lt;wd&gt;&amp; ard, const pos&lt;wd&gt;&amp; blu, const pos&lt;wd&gt;&amp; brd) {
+	for (int i = 0;i != wd;++i)
+		if (blu.p[i] &lt; alu.p[i] || brd.p[i] &gt; ard.p[i]) return 0;
+	return 1;
+}
+template&lt;const int wd,const int szs&gt;
+class kdtree {
+	struct node {
+		pos&lt;wd&gt; np, lu, rd; int ls, rs, v, sm, f, sz, ad;
+		node() :ls(0), rs(0), v(0), sm(0), f(0), sz(0), ad(0) {};
+		inline void add(int t){sm+=t*sz; ad+=t; v+=t;}
+	}re[szs];
+	int rt[20]; stack&lt;int&gt;ps;
+	vector&lt;pair&lt;pos&lt;wd&gt;, int&gt;&gt;mt;
+	inline void ret(int p) { ps.emplace(p); }
+	inline int get() {
+		int p = ps.top(); ps.pop();
+		memset(&amp;re[p], 0, sizeof(re[p]));
+		return p;
+	}
+	inline void pup(int p) {
+		re[p].sm = re[re[p].ls].sm + re[re[p].rs].sm + re[p].v;
+		re[p].sz = re[re[p].ls].sz + re[re[p].rs].sz + 1;
+		re[p].lu = re[p].rd = re[p].np;
+		for (int i = 0;i != wd;++i) {
+			if (re[p].ls)
+				tmin(re[p].lu.p[i], re[re[p].ls].lu.p[i]),
+				tmax(re[p].rd.p[i], re[re[p].ls].rd.p[i]);
+			if (re[p].rs)
+				tmin(re[p].lu.p[i], re[re[p].rs].lu.p[i]),
+				tmax(re[p].rd.p[i], re[re[p].rs].rd.p[i]);
+		}
+	}
+	inline void pud(int p){
+		int&amp;t=re[p].ad; if(!t) return;
+		if(re[p].ls) re[re[p].ls].add(t);
+		if(re[p].rs) re[re[p].rs].add(t);
+		t=0;
+	}
+	inline void getall(int p) {
+		mt.emplace_back(re[p].np, re[p].v);
+		ret(p); pud(p);
+		if (re[p].ls) getall(re[p].ls);
+		if (re[p].rs) getall(re[p].rs);
+	}
+	inline int build(int l, int r, int cf) {
+		if (l &gt; r) return 0; 
+		int p = get();
+		if (l == r) {
+			re[p].np = mt[l].first;
+			re[p].v = mt[l].second;
+			re[p].f = cf;
+			pup(p); 
+			return p;
+		}
+		int md = l + r &gt;&gt; 1;
+		nth_element(mt.begin() + l, mt.begin() + md, mt.begin() + r + 1,
+			[&amp;](const pair&lt;pos&lt;wd&gt;, int&gt;&amp; l, const pair&lt;pos&lt;wd&gt;, int&gt;&amp; r) {
+				return l.first.p[cf] &lt; r.first.p[cf];
+			});
+		re[p].np = mt[md].first;
+		re[p].v = mt[md].second;
+		re[p].f = cf; cf = (cf + 1) % wd;
+		re[p].ls = build(l, md - 1, cf);
+		re[p].rs = build(md + 1, r, cf);
+		pup(p);
+		return p;
+	}
+	inline int que(const pos&lt;wd&gt;&amp; lu, const pos&lt;wd&gt;&amp; rd, int p) {
+		if (!p || ninter(lu, rd, re[p].lu, re[p].rd)) return 0;
+		if (finter(lu, rd, re[p].lu, re[p].rd)) return re[p].sm;
+		int ret = 0; pud(p);
+		if (finter(lu, rd, re[p].np, re[p].np)) ret += re[p].v;
+		ret += que(lu, rd, re[p].ls); 
+		ret += que(lu, rd, re[p].rs);
+		return ret;
+	}
+	inline void add(const pos&lt;wd&gt;&amp; lu, const pos&lt;wd&gt;&amp; rd, int v,int p) {
+		if (!p || ninter(lu, rd, re[p].lu, re[p].rd)) return;
+		if (finter(lu, rd, re[p].lu, re[p].rd)) return re[p].add(v);
+		if (finter(lu, rd, re[p].np, re[p].np)) re[p].v+=v;
+		pud(p);
+		add(lu, rd, v, re[p].ls); 
+		add(lu, rd, v, re[p].rs);
+		pup(p);
+	}
+public:
+	inline void init() {
+		memset(rt, 0, sizeof rt);
+		for (int i = szs;i;i--) ret(i);
+	}
+	inline void ins(const pos&lt;wd&gt;&amp; p, int v) {
+		int lp = 0; mt.emplace_back(p, v);
+		while (rt[lp]) getall(rt[lp]), rt[lp] = 0, lp++;
+		sort(mt.begin(), mt.end());
+		rt[lp] = build(0, mt.size()-1, 0); mt.clear();
+	}
+	inline void add(const pos&lt;wd&gt;&amp;pa,const pos&lt;wd&gt;&amp;pb,int v){
+		for (int i = 0;i != 20;++i) add(pa, pb, v, rt[i]);
+	}
+	inline int que(const pos&lt;wd&gt;&amp;pa, const pos&lt;wd&gt;&amp;pb) {
+		int ret = 0;
+		for (int i = 0;i != 20;++i)
+			ret += que(pa, pb, rt[i]);
+		return ret;
+	}
+}; 
+namespace D2{
+	kdtree&lt;2,150000&gt;kdt; pos&lt;2&gt;p[2];
+}
+namespace D3{
+	kdtree&lt;3,100000&gt;kdt; pos&lt;3&gt;p[2];
+}
+int n,m; 
+signed main() {
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m;
+	if(n==2){
+		using namespace D2;
+		kdt.init();
+		for(int i=1,o,v,la=0;i&lt;=m;++i)
+			if(cin&gt;&gt;o,o==1){
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[0].p[j],p[0].p[j]^=la;
+				cin&gt;&gt;v; v^=la; kdt.ins(p[0],v);
+			}
+			else if(o==2){
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[0].p[j],p[0].p[j]^=la;
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[1].p[j],p[1].p[j]^=la;
+				cin&gt;&gt;v; v^=la; kdt.add(p[0],p[1],v);
+			}
+			else{
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[0].p[j],p[0].p[j]^=la;
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[1].p[j],p[1].p[j]^=la;
+				cout&lt;&lt;(la=kdt.que(p[0],p[1]))&lt;&lt;endl;
+			}
+	}
+	if(n==3){
+		using namespace D3;
+		kdt.init();
+		for(int i=1,o,v,la=0;i&lt;=m;++i)
+			if(cin&gt;&gt;o,o==1){
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[0].p[j],p[0].p[j]^=la;
+				cin&gt;&gt;v; v^=la; kdt.ins(p[0],v);
+			}
+			else if(o==2){
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[0].p[j],p[0].p[j]^=la;
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[1].p[j],p[1].p[j]^=la;
+				cin&gt;&gt;v; v^=la; kdt.add(p[0],p[1],v);
+			}
+			else{
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[0].p[j],p[0].p[j]^=la;
+				for(int j=0;j!=n;++j) cin&gt;&gt;p[1].p[j],p[1].p[j]^=la;
+				cout&lt;&lt;(la=kdt.que(p[0],p[1]))&lt;&lt;endl;
+			}
+	}
+}
+</code></pre>
+
+    </div>
+</body>
+</html>

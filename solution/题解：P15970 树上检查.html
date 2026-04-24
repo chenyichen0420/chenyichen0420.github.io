@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题解：P15970 树上检查</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f6f8fa;
+            box-sizing: border-box;
+        }
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .katex-display {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5em 0;
+        }
+        .katex-error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="markdown-body">
+        <h2>思路分析</h2>
+<p>观察性质，注意到 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8304em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span>，于是每一种选点方案的最少路径数量一定不会超过 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>。我们考虑直接统计出最少路径数为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的方案数。</p>
+<p>注意到，这样的选点方案中所有的点都在一条路径上。于是我们考虑在路径的 LCA 处统计贡献，使用 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9805em;vertical-align:-0.2861em;"></span><span class="mord mathnormal">d</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mpunct mtight">,</span><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 表示链顶在在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span> 位置，选择了 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 个节点的方案数。</p>
+<p>然后在每一个点合并信息并统计贡献就行了。注意处理 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>，并且注意 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9303em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-2.453em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span> 是可能爆 <code>unsigned long long</code> 的。代码如下：</p>
+<pre><code class="language-cpp">#include&lt;iostream&gt;
+#include&lt;vector&gt;
+#include&lt;queue&gt;
+#include&lt;cstring&gt;
+#include&lt;string&gt;
+#include&lt;algorithm&gt;
+#include&lt;cassert&gt;
+using namespace std;
+#define int long long
+constexpr int mod = 998244353;
+int t, n, m, dp[200005][5];
+vector&lt;int&gt;son[200005];
+#ifdef _MSC_VER
+#define __int128 long long
+#endif
+long long ans;
+inline void dfs(int p, int f) {
+	dp[p][1] = 1;
+	for (int sp : son[p]) if (sp != f) {
+		dfs(sp, p);
+		for (int i = 1;i &lt; m;++i)
+			ans -= dp[p][i] * dp[sp][m - i],
+			ans %= mod; 
+		for (int i = 1;i &lt;= m;++i)
+			dp[p][i] = (dp[p][i] + dp[sp][i]) % mod;
+		for (int i = 1;i &lt; m;++i)
+			dp[p][i] = (dp[p][i] + dp[sp][i - 1]) % mod;
+		ans %= mod;
+	}
+	if(m==1) ans--;
+}
+inline __int128 cvl(int n, int m) {
+	__int128 ret = 1;
+	for (int i = 0;i != m;++i) ret = ret * (n - i);
+	for (int i = 1;i &lt;= m;++i) ret /= i;
+	return ret % mod;
+}
+signed main() {
+	ios::sync_with_stdio(0);
+	for (cin &gt;&gt; t;t;t--) {
+		cin &gt;&gt; n &gt;&gt; m;
+        if(m&gt;n){
+            cout&lt;&lt;&quot;0\n&quot;;
+            continue;
+        }
+		memset(dp, 0, sizeof dp);
+		for (int i = 1, l, r;i != n;++i)
+			cin &gt;&gt; l &gt;&gt; r,
+			son[l].emplace_back(r),
+			son[r].emplace_back(l);
+		dfs(1, 0);
+		ans += cvl(n, m) * 2;
+		cout&lt;&lt;((ans % mod+mod)%mod)&lt;&lt;endl; putchar(&#39;\n&#39;); ans = 0;
+		for (int i = 1;i &lt;= n;++i) son[i].clear();
+	}
+}
+</code></pre>
+
+    </div>
+</body>
+</html>
