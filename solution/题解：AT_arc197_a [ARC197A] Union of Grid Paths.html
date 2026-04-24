@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>题解：AT_abc392_c [ABC392C] Bib</title>
+    <title>题解：AT_arc197_a [ARC197A] Union of Grid Paths</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
@@ -43,18 +43,36 @@
 <body>
     <div class="markdown-body">
         <h2>思路分析</h2>
-<p>只是题面有点绕，别的还好。重述一下题意：<strong>输出穿 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> 号马甲的人 所看的人 所穿的马甲 的编号</strong>。</p>
-<p>拿几个数组瞎维护一下就完了。代码如下：</p>
+<p>有一个结论很重要。我们不难发现，如果没有方向强制限制，那么每走一步所形成的阵线都是一条斜线。</p>
+<p>那么方向限制了什么呢？方向限制了你在这一步实际能到达的范围。但是不管你怎么限制，这条阵线都会是原先的那条线的<strong>一个子区间</strong>。</p>
+<p>其实也很显然，相邻两个之间可以通过两种方向的互换得到。二者不可达当且仅当互换后在某个方向上的操作个数小于强制要求个数，或者考虑上后面的强制操作后无法抵达终点。</p>
+<p>第二点很容易漏，但是只要考虑完整这两点，此题就可以迎刃而解了。代码如下：</p>
 <pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
-int n, a[300005], b[300005], vb[300005],ans[300005];
+int t, n, m, cd[800005], cr[800005], ans; string s;
+int dx, ux, dy, uy;
 signed main() {
 	ios::sync_with_stdio(0);
-	cin &gt;&gt; n;
-	for (int i = 1; i &lt;= n; ++i) cin &gt;&gt; a[i];
-	for (int i = 1; i &lt;= n; ++i) cin &gt;&gt; b[i], vb[b[i]] = i;
-	for (int i = 1; i &lt;= n; ++i) cout &lt;&lt; b[a[vb[i]]] &lt;&lt; &quot; &quot;;
+	for (cin &gt;&gt; t;t;t--) {
+		cin &gt;&gt; n &gt;&gt; m &gt;&gt; s; ans = 1;
+		for (int i = 1;i &lt;= s.size();++i)
+			cd[i] = cd[i - 1] + (s[i - 1] == &#39;D&#39;),
+			cr[i] = cr[i - 1] + (s[i - 1] == &#39;R&#39;);
+		dx = dy = ux = uy = 1;
+		for (int i = 1;i &lt;= s.size();++i) {
+			if (s[i - 1] == &#39;D&#39;) dy++, uy++;
+			else if (s[i - 1] == &#39;R&#39;) dx++, ux++;
+			else {
+				if (dy + (cd[s.size()] - cd[i]) + 1 &lt;= n) dy++;
+				else dx++;
+				if (ux + (cr[s.size()] - cr[i]) + 1 &lt;= m) ux++;
+				else uy++;
+			}
+			ans += (ux - dx + 1);
+		}
+		cout &lt;&lt; ans &lt;&lt; endl;
+	}
 }
 </code></pre>
 
