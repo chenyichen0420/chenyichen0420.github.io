@@ -2,47 +2,53 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P10932 Freda的传呼机</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>正好把圆方树的整理写了。显然就是一个狭义圆方树求仙人掌上两点之间的距离的板子题。</p>
 <p>先说一下什么是仙人掌：仙人掌就是一种特殊的图，满足每一个边最多在一个简单环上。</p>
 <p>我们会使用倍增 LCA 和树上前缀和来快速的求解树上的两点之间的距离。那如果我们可以将这个图转变成一棵树的话是不是就做完了？</p>
@@ -54,7 +60,7 @@
 <p>但是这样做有用吗？这样似乎并没有办法处理距离啊！</p>
 <p>错了，我们处理完后一定是一棵树。而树上除了根以外别的点都一定是有父节点的。只要我们指定一个圆点为根节点，那每一个这样的环都会有一个最靠上的节点。</p>
 <p>我们把这个节点视为这个环的起点，像任意方向绕着环转一圈，并把每个点的“距离”标记为第一次遇到他时走过的路程。</p>
-<p>接下来，我们把环的起点到这个环的方点的边权设置为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，把这个环的方点到其他点的权值设为本环的起点到那个点的<strong>最短路的长度</strong>。</p>
+<p>接下来，我们把环的起点到这个环的方点的边权设置为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，把这个环的方点到其他点的权值设为本环的起点到那个点的<strong>最短路的长度</strong>。</p>
 <p>这意味着我们还需要处理这个环的长度。因为最短路是这个点的“距离”和环长减去“距离”的最小值。就像这样：</p>
 <p><img src="https://www.helloimg.com/i/2025/05/17/6827fce24eb9d.png" alt=""></p>
 <p>看到这里，你可以停下来思考一下怎么去维护此题的答案了。</p>
@@ -65,7 +71,10 @@
 <p>这意味着这两个点不停往上跳，最后跳到了一个环的不同的两个点上。这时候我们要处理出二者在环上的最小距离。</p>
 <p>于是我们之前记录的信息就发挥作用了。两个点之间有两个不同的种路径，一种是按照“距离”的行走方向的那段弧，长度为二者的“距离”的差，另一种是走另一段弧，长度是环长减第一种的长度。</p>
 <p>至此，狭义圆方树求仙人掌上两点之间的距离讲解完毕。代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 struct node {
 	int p, v, id;
@@ -125,11 +134,129 @@ signed main() {
 		}
 		else cout &lt;&lt; dis[l] + dis[r] - dis[la] * 2 &lt;&lt; endl;
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span> {
+	<span class="hljs-type">int</span> p, v, id;
+	<span class="hljs-built_in">node</span>(<span class="hljs-type">int</span> pi = <span class="hljs-number">0</span>, <span class="hljs-type">int</span> vi = <span class="hljs-number">0</span>, <span class="hljs-type">int</span> ii = <span class="hljs-number">0</span>) :
+		<span class="hljs-built_in">p</span>(pi), <span class="hljs-built_in">v</span>(vi), <span class="hljs-built_in">id</span>(ii) { }
+}; vector&lt;node&gt;son[<span class="hljs-number">10005</span>], nsn[<span class="hljs-number">20005</span>];
+<span class="hljs-type">int</span> n, m, k, cnt, dfn[<span class="hljs-number">20005</span>], low[<span class="hljs-number">20005</span>], cln[<span class="hljs-number">20005</span>], dp[<span class="hljs-number">20005</span>];
+<span class="hljs-type">int</span> f[<span class="hljs-number">20005</span>][<span class="hljs-number">16</span>], v[<span class="hljs-number">20005</span>], fe[<span class="hljs-number">20005</span>], d[<span class="hljs-number">20005</span>], vcn, dis[<span class="hljs-number">20005</span>], fl, fr;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tmin</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l, <span class="hljs-type">int</span> r)</span> </span>{ (l &gt; r) &amp;&amp; (l = r); }
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mkcir</span><span class="hljs-params">(<span class="hljs-type">int</span> ep, <span class="hljs-type">int</span> sp, <span class="hljs-type">int</span> sv)</span> </span>{
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> p = sp; p != ep; p = f[p][<span class="hljs-number">0</span>]) d[p] = sv, sv += v[p];
+	d[ep] = cln[ep] = sv; nsn[ep].<span class="hljs-built_in">emplace_back</span>(++vcn);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> p = sp; p != ep; p = f[p][<span class="hljs-number">0</span>])
+		cln[p] = sv, nsn[vcn].<span class="hljs-built_in">emplace_back</span>(p, <span class="hljs-built_in">min</span>(d[p], sv - d[p]));
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tarjan</span><span class="hljs-params">(<span class="hljs-type">int</span> p, <span class="hljs-type">int</span> id)</span> </span>{
+	dfn[p] = low[p] = ++cnt;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> node&amp; sp : son[p])
+		<span class="hljs-keyword">if</span> (!dfn[sp.p]) {
+			f[sp.p][<span class="hljs-number">0</span>] = p; v[sp.p] = sp.v; fe[sp.p] = sp.id;
+			<span class="hljs-built_in">tarjan</span>(sp.p, sp.id), <span class="hljs-built_in">tmin</span>(low[p], low[sp.p]);
+			<span class="hljs-keyword">if</span> (dfn[p] &lt; low[sp.p]) nsn[p].<span class="hljs-built_in">emplace_back</span>(sp.p, sp.v);
+		}
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (id != sp.id) <span class="hljs-built_in">tmin</span>(low[p], dfn[sp.p]);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> node&amp; sp : son[p])
+		<span class="hljs-keyword">if</span> (dfn[p] &lt; dfn[sp.p] &amp;&amp; fe[sp.p] != sp.id)
+			<span class="hljs-built_in">mkcir</span>(p, sp.p, sp.v);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p, <span class="hljs-type">int</span> fa)</span> </span>{
+	f[p][<span class="hljs-number">0</span>] = fa; dp[p] = dp[fa] + <span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= <span class="hljs-number">15</span>;++i)
+		f[p][i] = f[f[p][i - <span class="hljs-number">1</span>]][i - <span class="hljs-number">1</span>];
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> node&amp; sp : nsn[p])
+		dis[sp.p] = dis[p] + sp.v, <span class="hljs-built_in">dfs</span>(sp.p, p);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">lca</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>{
+	<span class="hljs-keyword">if</span> (dp[l] &lt; dp[r]) <span class="hljs-built_in">swap</span>(l, r);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">15</span>;i &gt;= <span class="hljs-number">0</span>;i--)
+		(dp[f[l][i]] &gt;= dp[r]) &amp;&amp; (l = f[l][i]);
+	<span class="hljs-keyword">if</span> (l == r) <span class="hljs-keyword">return</span> l;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">15</span>;i &gt;= <span class="hljs-number">0</span>;i--)
+		(f[l][i] != f[r][i]) &amp;&amp; (l = f[l][i], r = f[r][i]);
+	<span class="hljs-keyword">return</span> fl = l, fr = r, f[l][<span class="hljs-number">0</span>];
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin &gt;&gt; n &gt;&gt; m &gt;&gt; k; vcn = n;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, l, r, v;i &lt;= m;++i)
+		cin &gt;&gt; l &gt;&gt; r &gt;&gt; v,
+		son[l].<span class="hljs-built_in">emplace_back</span>(r, v, i),
+		son[r].<span class="hljs-built_in">emplace_back</span>(l, v, i);
+	<span class="hljs-built_in">tarjan</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>); <span class="hljs-built_in">dfs</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, l, r, la;i &lt;= k;++i)
+		<span class="hljs-keyword">if</span> (cin &gt;&gt; l &gt;&gt; r, (la = <span class="hljs-built_in">lca</span>(l, r)) &gt; n) {
+			<span class="hljs-type">int</span> lln = <span class="hljs-built_in">abs</span>(d[fl] - d[fr]), rln = cln[fl] - lln;
+			cout &lt;&lt; (dis[l] - dis[fl]) + (dis[r] - dis[fr]) + <span class="hljs-built_in">min</span>(lln, rln) &lt;&lt; endl;
+		}
+		<span class="hljs-keyword">else</span> cout &lt;&lt; dis[l] + dis[r] - dis[la] * <span class="hljs-number">2</span> &lt;&lt; endl;
+}
 </code></pre>
+</div>
+</div>
 <p>同学提出了一个问题，我觉得有必要讲一下：一个点有可能会在多个环里，为什么我们不需要记录这个点在每一个环中的“距离”和环长？</p>
 <p>我们想一下我们询问的过程：首先如果 LCA 就是圆点的话那没什么影响，如果是方点的话那才会用到“距离”和环长。但是很显然，一个环的起点是骑在这个方点的上面的，也就是我们永远也不会用到一个环的起点在这个环上的信息。</p>
 <p>而很显然，我们在建树的过程中，一个点永远也不会成为多个环的“终点”，而且最后一次处理这个点就是在他是“终点”的那棵树上。故不需要记录一个点在每个环上的信息。</p>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

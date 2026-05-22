@@ -2,55 +2,64 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P10935 银河</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>显然是差分约束，但是直接跑死了的算法大概率会炸掉。所以我们考虑“手动”差分约束。</p>
-<p>这个差分约束有一个特点：有很多的边权为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0/1</span></span></span></span> 的边，总之恒非负。</p>
+<p>这个差分约束有一个特点：有很多的边权为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn><mi mathvariant="normal">/</mi><mn>1</mn></mrow><annotation encoding="application/x-tex">0/1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">0/1</span></span></span></span> 的边，总之恒非负。</p>
 <p>我们希望能 Dijkstra 跑最长路，问题在于可能有正权环。因此我们思考一下能不能缩点。</p>
-<p>显然如果有一个边权为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的边在一个强连通分量内的话，就一定无解。所以我们可以直接缩点。</p>
+<p>显然如果有一个边权为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的边在一个强连通分量内的话，就一定无解。所以我们可以直接缩点。</p>
 <p>缩完之后发现不存在这样的边的话就一定有解了。我们就可以愉快的跑 Dijkstra 了。</p>
 <p>其实别说正权环了，连一个环都没有，直接跑拓扑，复杂度是线性的。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
 int n, m, rd[100005], scn[100005], d[100005], ans;
@@ -113,8 +122,129 @@ signed main() {
 	}
 	cout &lt;&lt; ans &lt;&lt; endl;
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-type">int</span> n, m, rd[<span class="hljs-number">100005</span>], scn[<span class="hljs-number">100005</span>], d[<span class="hljs-number">100005</span>], ans;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span> {
+	<span class="hljs-type">int</span> p, v;
+	<span class="hljs-built_in">node</span>(<span class="hljs-type">int</span> pi = <span class="hljs-number">0</span>, <span class="hljs-type">int</span> vi = <span class="hljs-number">0</span>) :<span class="hljs-built_in">p</span>(pi), <span class="hljs-built_in">v</span>(vi) {};
+}; vector&lt;node&gt;son[<span class="hljs-number">100005</span>], nsn[<span class="hljs-number">100005</span>];
+<span class="hljs-type">int</span> dfn[<span class="hljs-number">100005</span>], low[<span class="hljs-number">100005</span>], cnt, scc[<span class="hljs-number">100005</span>], sct;
+<span class="hljs-type">bool</span> ins[<span class="hljs-number">100005</span>]; stack&lt;<span class="hljs-type">int</span>&gt;s; queue&lt;<span class="hljs-type">int</span>&gt;q;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tmin</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l, <span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span> </span>{ (l &gt; r) &amp;&amp; (l = r); }
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tmax</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l, <span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span> </span>{ (l &lt; r) &amp;&amp; (l = r); }
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tarjan</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span> </span>{
+	dfn[p] = low[p] = ++cnt; ins[p] = <span class="hljs-number">1</span>; s.<span class="hljs-built_in">emplace</span>(p);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> node&amp; sp : son[p])
+		<span class="hljs-keyword">if</span> (!dfn[sp.p]) <span class="hljs-built_in">tarjan</span>(sp.p), <span class="hljs-built_in">tmin</span>(low[p], low[sp.p]);
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ins[sp.p]) <span class="hljs-built_in">tmin</span>(low[p], dfn[sp.p]);
+	<span class="hljs-keyword">if</span> (dfn[p] == low[p]) {
+		scc[p] = ++sct;
+		<span class="hljs-keyword">while</span> (s.<span class="hljs-built_in">top</span>() != p)
+			scc[s.<span class="hljs-built_in">top</span>()] = sct,
+			ins[s.<span class="hljs-built_in">top</span>()] = <span class="hljs-number">0</span>, s.<span class="hljs-built_in">pop</span>();
+		s.<span class="hljs-built_in">pop</span>(); ins[p] = <span class="hljs-number">0</span>;
+	}
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin &gt;&gt; n &gt;&gt; m;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, t, l, r;i &lt;= m;++i) {
+		cin &gt;&gt; t &gt;&gt; l &gt;&gt; r;
+		<span class="hljs-keyword">if</span> (t == <span class="hljs-number">1</span>)
+			son[l].<span class="hljs-built_in">emplace_back</span>(r, <span class="hljs-number">0</span>),
+			son[r].<span class="hljs-built_in">emplace_back</span>(l, <span class="hljs-number">0</span>);
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (t == <span class="hljs-number">2</span>)
+			son[l].<span class="hljs-built_in">emplace_back</span>(r, <span class="hljs-number">1</span>);
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (t == <span class="hljs-number">3</span>)
+			son[r].<span class="hljs-built_in">emplace_back</span>(l, <span class="hljs-number">0</span>);
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (t == <span class="hljs-number">4</span>)
+			son[r].<span class="hljs-built_in">emplace_back</span>(l, <span class="hljs-number">1</span>);
+		<span class="hljs-keyword">else</span> son[l].<span class="hljs-built_in">emplace_back</span>(r, <span class="hljs-number">0</span>);
+	}
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= n;++i)
+		<span class="hljs-keyword">if</span> (!dfn[i]) <span class="hljs-built_in">tarjan</span>(i);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= n;++i) {
+		scn[scc[i]]++;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> node&amp; sp : son[i]) {
+			<span class="hljs-keyword">if</span> (scc[i] == scc[sp.p] &amp;&amp; sp.v) <span class="hljs-keyword">return</span> cout &lt;&lt; <span class="hljs-string">&quot;-1\n&quot;</span>, <span class="hljs-number">0</span>;
+			<span class="hljs-keyword">if</span> (scc[i] != scc[sp.p]) nsn[scc[i]].<span class="hljs-built_in">emplace_back</span>(scc[sp.p], sp.v), rd[scc[sp.p]]++;
+		}
+	}
+	<span class="hljs-built_in">memset</span>(d, <span class="hljs-number">0xcf</span>, <span class="hljs-keyword">sizeof</span> d);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= sct;++i)
+		<span class="hljs-keyword">if</span> (!rd[i]) q.<span class="hljs-built_in">emplace</span>(i), d[i] = <span class="hljs-number">1</span>;
+	<span class="hljs-keyword">while</span> (q.<span class="hljs-built_in">size</span>()) {
+		<span class="hljs-type">int</span> tp = q.<span class="hljs-built_in">front</span>(); q.<span class="hljs-built_in">pop</span>();
+		ans += d[tp] * scn[tp];
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> node&amp; sp : nsn[tp]) {
+			<span class="hljs-built_in">tmax</span>(d[sp.p], d[tp] + sp.v);
+			<span class="hljs-keyword">if</span> (!--rd[sp.p]) q.<span class="hljs-built_in">emplace</span>(sp.p);
+		}
+	}
+	cout &lt;&lt; ans &lt;&lt; endl;
+}
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

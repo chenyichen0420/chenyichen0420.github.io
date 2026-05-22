@@ -2,50 +2,59 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P10996 【MX-J3-T3】Tuple</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>暴力美学。</p>
 <p>看到的第一眼，就首先想了一个哈希的程序，如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 unordered_set&lt;long long&gt;s; int n,m,ans;
 inline long long gh(const int&amp;a,const int&amp;b,const int&amp;c){
@@ -72,14 +81,49 @@ signed main(){
 	}
 	cout&lt;&lt;ans&lt;&lt;endl;
 } 
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+unordered_set&lt;<span class="hljs-type">long</span> <span class="hljs-type">long</span>&gt;s; <span class="hljs-type">int</span> n,m,ans;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-title">gh</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">int</span>&amp;a,<span class="hljs-type">const</span> <span class="hljs-type">int</span>&amp;b,<span class="hljs-type">const</span> <span class="hljs-type">int</span>&amp;c)</span></span>{
+	<span class="hljs-keyword">return</span> (<span class="hljs-type">long</span> <span class="hljs-type">long</span>)a*n*n+b*n+c;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin&gt;&gt;n&gt;&gt;m;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r,x;i&lt;=m;++i){
+		cin&gt;&gt;l&gt;&gt;r&gt;&gt;x;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;l;++i)
+			<span class="hljs-keyword">if</span>(s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(i,l,r))&amp;&amp;s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(i,l,x))&amp;&amp;
+				s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(i,r,x))) ans++;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=l<span class="hljs-number">+1</span>;i&lt;r;++i)
+			<span class="hljs-keyword">if</span>(s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(l,i,r))&amp;&amp;s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(l,i,x))&amp;&amp;
+				s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(i,r,x))) ans++;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=r<span class="hljs-number">+1</span>;i&lt;x;++i)
+			<span class="hljs-keyword">if</span>(s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(l,r,i))&amp;&amp;s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(l,i,x))&amp;&amp;
+				s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(r,i,x))) ans++;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=x<span class="hljs-number">+1</span>;i&lt;=n;++i)
+			<span class="hljs-keyword">if</span>(s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(l,r,i))&amp;&amp;s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(l,x,i))&amp;&amp;
+				s.<span class="hljs-built_in">count</span>(<span class="hljs-built_in">gh</span>(r,x,i))) ans++;
+		s.<span class="hljs-built_in">insert</span>(<span class="hljs-built_in">gh</span>(l,r,x));
+	}
+	cout&lt;&lt;ans&lt;&lt;endl;
+} 
 </code></pre>
+</div>
+</div>
 <p>然而很遗憾，它并不能通过这道题（显然）。</p>
 <p>考虑一下优化，我们发现有大量的时间都用来枚举了，但实际有用的点并不多，这会导致大量的时间浪费。</p>
-<p>所以这时候，我们考虑换一种记录方式：对于 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">u</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，有哪些 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0269em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>。这个东西可以用 <code>set</code> 维护。</p>
+<p>所以这时候，我们考虑换一种记录方式：对于 $u_i,v_i$，有哪些 $w_i$。这个东西可以用 <code>set</code> 维护。</p>
 <p>但是还有问题，这样做最极限情况下仍然会把前面的点枚举完，复杂度退化为类似于哈希做法。</p>
 <p>其实，我们发现我们就是在枚举其中一个的点，验证另外两个中有没有。显然，我们如果枚举大小最小的那个，时间复杂度会更优。</p>
 <p>因此，我们就可以卡过这道题了。代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #ifdef _WIN32
 #define getchar_unlocked getchar
@@ -87,8 +131,8 @@ using namespace std;
 #endif
 inline int read() {
 	int r = 0; char c = getchar_unlocked();
-	while (c &lt; &#39;0&#39; || c&gt;&#39;9&#39;) c = getchar_unlocked();
-	while (c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;) r = r * 10 + (c ^ 48), c = getchar_unlocked();
+	while (c &lt; '0' || c&gt;'9') c = getchar_unlocked();
+	while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = getchar_unlocked();
 	return r;
 }
 int n,m,ans; set&lt;int&gt;v[4002001]; set&lt;int&gt;::iterator it;
@@ -123,9 +167,111 @@ signed main(){
 	}
 	cout&lt;&lt;ans&lt;&lt;endl;
 } 
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> _WIN32</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> getchar_unlocked getchar</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> putchar_unlocked putchar</span>
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+	<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">getchar_unlocked</span>();
+	<span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) c = <span class="hljs-built_in">getchar_unlocked</span>();
+	<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">getchar_unlocked</span>();
+	<span class="hljs-keyword">return</span> r;
+}
+<span class="hljs-type">int</span> n,m,ans; set&lt;<span class="hljs-type">int</span>&gt;v[<span class="hljs-number">4002001</span>]; set&lt;<span class="hljs-type">int</span>&gt;::iterator it;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">gh</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">int</span>&amp;a,<span class="hljs-type">const</span> <span class="hljs-type">int</span>&amp;b)</span></span>{
+	<span class="hljs-keyword">return</span> a*n+b;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	n=<span class="hljs-built_in">read</span>(); m=<span class="hljs-built_in">read</span>();
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r,x;i&lt;=m;++i){
+		l=<span class="hljs-built_in">read</span>(); r=<span class="hljs-built_in">read</span>(); x=<span class="hljs-built_in">read</span>();
+		<span class="hljs-type">const</span> set&lt;<span class="hljs-type">int</span>&gt;&amp;va=v[<span class="hljs-built_in">gh</span>(l,r)];
+		<span class="hljs-type">int</span> sa=va.<span class="hljs-built_in">size</span>();
+		<span class="hljs-type">const</span> set&lt;<span class="hljs-type">int</span>&gt;&amp;vb=v[<span class="hljs-built_in">gh</span>(l,x)];
+		<span class="hljs-type">int</span> sb=vb.<span class="hljs-built_in">size</span>();
+		<span class="hljs-type">const</span> set&lt;<span class="hljs-type">int</span>&gt;&amp;vc=v[<span class="hljs-built_in">gh</span>(r,x)];
+		<span class="hljs-type">int</span> sc=vc.<span class="hljs-built_in">size</span>();
+		<span class="hljs-keyword">if</span>(sa&lt;=sb&amp;&amp;sa&lt;=sc)
+			<span class="hljs-keyword">for</span>(it=va.<span class="hljs-built_in">begin</span>();it!=va.<span class="hljs-built_in">end</span>();++it){
+				<span class="hljs-keyword">if</span>(vb.<span class="hljs-built_in">count</span>(*it)&amp;&amp;vc.<span class="hljs-built_in">count</span>(*it)) ans++;
+			}
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(sb&lt;=sa&amp;&amp;sb&lt;=sc)
+			<span class="hljs-keyword">for</span>(it=vb.<span class="hljs-built_in">begin</span>();it!=vb.<span class="hljs-built_in">end</span>();++it){
+				<span class="hljs-keyword">if</span>(va.<span class="hljs-built_in">count</span>(*it)&amp;&amp;vc.<span class="hljs-built_in">count</span>(*it)) ans++;
+			}
+		<span class="hljs-keyword">else</span>
+			<span class="hljs-keyword">for</span>(it=vc.<span class="hljs-built_in">begin</span>();it!=vc.<span class="hljs-built_in">end</span>();++it){
+				<span class="hljs-keyword">if</span>(vb.<span class="hljs-built_in">count</span>(*it)&amp;&amp;va.<span class="hljs-built_in">count</span>(*it)) ans++;
+			}
+		v[<span class="hljs-built_in">gh</span>(l,r)].<span class="hljs-built_in">insert</span>(x);
+		v[<span class="hljs-built_in">gh</span>(l,x)].<span class="hljs-built_in">insert</span>(r);
+		v[<span class="hljs-built_in">gh</span>(r,x)].<span class="hljs-built_in">insert</span>(l);
+	}
+	cout&lt;&lt;ans&lt;&lt;endl;
+} 
 </code></pre>
-<p>时间复杂度我并不太会计算，但是因为所有的三元组之间互不相同，因此每轮枚举的数量是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> 级别的，可以通过。</p>
+</div>
+</div>
+<p>时间复杂度我并不太会计算，但是因为所有的三元组之间互不相同，因此每轮枚举的数量是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>log</mi><mo>⁡</mo><mi>m</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\log m)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">m</span><span class="mclose">)</span></span></span></span> 级别的，可以通过。</p>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>题解：CF2143F Increasing Xor</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
+</head>
+<body>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
+<p>注意到，我们可以从前向后扫描，每一个数字都取他能取到的最小值显然是不劣的：他完全不影响后面的数字可以取到哪些取值。第一个数字除外，不过第一个数字总是可以取到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 的。</p>
+<p>我们考虑后面的每一个数字可以取到多小？假设 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mrow><mi>p</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">a_{p-1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">p</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 的最小值为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span>，那么 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">a_p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 可以取到的最小值就是当前线性基下 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">a_p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 可以异或出来的大于 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 的最小值。</p>
+<p>显然我们可以考虑把 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">a_p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 插入线性基，把 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi></mrow><annotation encoding="application/x-tex">m</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span></span></span></span> 在当前的线性基中排名给搞出来，然后再找到排名恰好高 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的数字即可。</p>
+<p>于是直接暴力就是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mi>log</mi><mo>⁡</mo><mi>V</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2\log V)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mclose">)</span></span></span></span> 的了，显然无法通过。</p>
+<p>不过我们考虑一下将一些数字插入到不同线性基中会有什么样的性质：显然只有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">\log V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 个数字会插入成功，导致线性基发生变化。</p>
+<p>也就是说在这道题中，无论区间有多长，实际上不一样的线性基也只会有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo><mi>V</mi></mrow><annotation encoding="application/x-tex">\log V</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span></span></span></span> 个。</p>
+<p>能否利用这一点？我们可以考虑进行二分。具体的，我们维护出原序列的前缀线性基，然后每一次二分出线性基发生变化的位置，然后想办法直接移动过去。</p>
+<p>欸？怎么一次性移动很多个元素啊？我们二分的东西保证了我们要尝试插入的东西不会改变线性基，于是我们获取到前一个元素的排名，这段区间的数字就会从小到大向后再分配若干个排名。</p>
+<p>此题可解，时间复杂度 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><msup><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>2</mn></msup><mi>V</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n\log^2V)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1484em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8984em;"><span style="top:-3.1473em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.2222em;">V</span><span class="mclose">)</span></span></span></span>，代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+//#pragma GCC optimize(2)
+using namespace std;
+//#define int long long
+constexpr bool online=0;
+#define _rw_file &quot;&quot;
+#define sipt //signed-input
+#define sopt //signed-output
+struct IO {
+#define mxsz (1 &lt;&lt; 21)
+	char buf[mxsz], * p1, * p2;
+	char pbuf[mxsz], * pp; bool acc[128];
+	IO() : p1(buf), p2(buf), pp(pbuf) {}
+	~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
+	inline char gc() {
+		if (p1 == p2) p2 = (p1 = buf) + fread(buf, 1, mxsz, stdin);
+		return p1 == p2 ? ' ' : *p1++;
+	}
+	inline void setacc(const char* c) { while (*c) acc[*c++] = 1; }
+	inline char getc() { char c; while (!acc[c = gc()]); return c; }
+#ifndef sipt
+	inline int read() {
+		int r = 0; char c = gc(); while (c &lt; '0' || c&gt;'9') c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return r;
+	}
+#else
+	inline int read() {
+		int r = 0; char c = gc(); bool rev = 0;
+		while (c &lt; '0' || c&gt;'9') rev |= (c == '-'), c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return rev ? ~r + 1 : r;
+	}
+#endif
+	inline void push(const char&amp; c) {
+		if (pp - pbuf == mxsz) fwrite(pbuf, 1, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	inline void write(int x) {
+		static char sta[22]; int top = 0;
+		do sta[top++] = x % 10, x /= 10; while (x);
+		while (top) push(sta[--top] ^ 48);
+	}
+	inline void write(int x, char opc) {
+#ifdef sopt
+		if (x &lt; 0) push('-'), x = ~x + 1;
+#endif
+		write(x), push(opc);
+	}
+	inline void puts(const char* c) { while (*c) push(*c++); }
+} io;
+int t,n,m,a[200005];
+struct liner_basis{
+	int v[22],t[22];
+	inline void ins(int a,int c){
+		for(int i=19;i&gt;=0;i--)
+			if(a&gt;&gt;i&amp;1)
+				if(!v[i]) return v[i]=a,void(t[i]=c);
+				else{
+					if(c&gt;t[i]) swap(c,t[i]),swap(a,v[i]);
+					a^=v[i];
+				}
+	}
+	inline int rank(int a,int l){
+		int cn=1,ca=0,rk=1;
+		for(int i=0;i!=20;++i)
+			if(t[i]&gt;=l) cn&lt;&lt;=1;
+		for(int i=19;i&gt;=0;i--)
+			if(t[i]&lt;l)continue;
+			else if(cn&gt;&gt;=1,ca&gt;&gt;i&amp;1)
+				if(a&gt;&gt;i&amp;1) rk+=cn;
+				else ca^=v[i];
+			else
+				if(a&gt;&gt;i&amp;1) rk+=cn,ca^=v[i];
+				else;
+		return rk;
+	}
+	inline bool diff(int l,liner_basis&amp;r){
+		int c1=0,c2=0;
+		for(int i=0;i!=20;++i)
+			c1+=(t[i]&lt;l),c2+=(r.t[i]&lt;l);
+		return c1!=c2;
+	}
+	inline int val(int a,int l){
+		int cn=1,ca=0; //cerr&lt;&lt;a&lt;&lt;endl;
+		for(int i=0;i!=20;++i)
+			if(t[i]&gt;=l) cn&lt;&lt;=1;
+		if(a&gt;=cn) return -2;
+		for(int i=19;i&gt;=0;i--)
+			if(t[i]&lt;l) continue;
+			else if(cn&gt;&gt;=1,ca&gt;&gt;i&amp;1)
+				if(a&gt;=cn) a-=cn;
+				else ca^=v[i];
+			else
+				if(a&gt;=cn) ca^=v[i],a-=cn;
+				else;
+		return ca;
+	}
+}lib[200005];
+signed main(){
+	if(online)
+		freopen(_rw_file &quot;.in&quot;,&quot;r&quot;,stdin),
+		freopen(_rw_file &quot;.out&quot;,&quot;w&quot;,stdout);
+    ios::sync_with_stdio(0);
+	for(t=io.read();t;t--){
+		n=io.read(); m=io.read();
+		for(int i=1;i&lt;=n;++i)
+			lib[i]=lib[i-1], lib[i].ins(io.read(),i);
+		for(int i=1,l,r;i&lt;=m;++i){
+			l=io.read(); r=io.read();
+			int cur=-1,lp,rp,mid,p=l;
+			while(p&lt;=r){
+				lp=p,rp=r;
+				while(lp!=rp){
+					mid=lp+rp+1&gt;&gt;1;
+					if(lib[mid].diff(l,lib[p])) rp=mid-1;
+					else lp=mid;
+				}
+				int rk=((cur&gt;=0)?lib[p].rank(cur,l):0);
+				int rkn=rk+lp-p;
+				cur=lib[p].val(rkn,l);
+				//cerr&lt;&lt;lp&lt;&lt;&quot; &quot;&lt;&lt;cur&lt;&lt;endl;
+				if(cur&lt;-1){
+					puts(&quot;NO&quot;);
+					break;
+				}
+				p=lp+1;
+			}
+			if(cur&gt;=0) puts(&quot;YES&quot;);
+		}
+	}
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-comment">//#pragma GCC optimize(2)</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-comment">//#define int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> online=<span class="hljs-number">0</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> _rw_file <span class="hljs-string">&quot;&quot;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> sipt <span class="hljs-comment">//signed-input</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> sopt <span class="hljs-comment">//signed-output</span></span>
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">IO</span> {
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> mxsz (1 &lt;&lt; 21)</span>
+	<span class="hljs-type">char</span> buf[mxsz], * p1, * p2;
+	<span class="hljs-type">char</span> pbuf[mxsz], * pp; <span class="hljs-type">bool</span> acc[<span class="hljs-number">128</span>];
+	<span class="hljs-built_in">IO</span>() : <span class="hljs-built_in">p1</span>(buf), <span class="hljs-built_in">p2</span>(buf), <span class="hljs-built_in">pp</span>(pbuf) {}
+	~<span class="hljs-built_in">IO</span>() { <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, pp - pbuf, stdout); }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">gc</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">if</span> (p1 == p2) p2 = (p1 = buf) + <span class="hljs-built_in">fread</span>(buf, <span class="hljs-number">1</span>, mxsz, stdin);
+		<span class="hljs-keyword">return</span> p1 == p2 ? <span class="hljs-string">&#x27; &#x27;</span> : *p1++;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">setacc</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* c)</span> </span>{ <span class="hljs-keyword">while</span> (*c) acc[*c++] = <span class="hljs-number">1</span>; }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">getc</span><span class="hljs-params">()</span> </span>{ <span class="hljs-type">char</span> c; <span class="hljs-keyword">while</span> (!acc[c = <span class="hljs-built_in">gc</span>()]); <span class="hljs-keyword">return</span> c; }
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> sipt</span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-type">bool</span> rev = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) rev |= (c == <span class="hljs-string">&#x27;-&#x27;</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> rev ? ~r + <span class="hljs-number">1</span> : r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">push</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>&amp; c)</span> </span>{
+		<span class="hljs-keyword">if</span> (pp - pbuf == mxsz) <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> </span>{
+		<span class="hljs-type">static</span> <span class="hljs-type">char</span> sta[<span class="hljs-number">22</span>]; <span class="hljs-type">int</span> top = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">do</span> sta[top++] = x % <span class="hljs-number">10</span>, x /= <span class="hljs-number">10</span>; <span class="hljs-keyword">while</span> (x);
+		<span class="hljs-keyword">while</span> (top) <span class="hljs-built_in">push</span>(sta[--top] ^ <span class="hljs-number">48</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">char</span> opc)</span> </span>{
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> sopt</span>
+		<span class="hljs-keyword">if</span> (x &lt; <span class="hljs-number">0</span>) <span class="hljs-built_in">push</span>(<span class="hljs-string">&#x27;-&#x27;</span>), x = ~x + <span class="hljs-number">1</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-built_in">write</span>(x), <span class="hljs-built_in">push</span>(opc);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">puts</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* c)</span> </span>{ <span class="hljs-keyword">while</span> (*c) <span class="hljs-built_in">push</span>(*c++); }
+} io;
+<span class="hljs-type">int</span> t,n,m,a[<span class="hljs-number">200005</span>];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">liner_basis</span>{
+	<span class="hljs-type">int</span> v[<span class="hljs-number">22</span>],t[<span class="hljs-number">22</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> c)</span></span>{
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">19</span>;i&gt;=<span class="hljs-number">0</span>;i--)
+			<span class="hljs-keyword">if</span>(a&gt;&gt;i&amp;<span class="hljs-number">1</span>)
+				<span class="hljs-keyword">if</span>(!v[i]) <span class="hljs-keyword">return</span> v[i]=a,<span class="hljs-built_in">void</span>(t[i]=c);
+				<span class="hljs-keyword">else</span>{
+					<span class="hljs-keyword">if</span>(c&gt;t[i]) <span class="hljs-built_in">swap</span>(c,t[i]),<span class="hljs-built_in">swap</span>(a,v[i]);
+					a^=v[i];
+				}
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">rank</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> l)</span></span>{
+		<span class="hljs-type">int</span> cn=<span class="hljs-number">1</span>,ca=<span class="hljs-number">0</span>,rk=<span class="hljs-number">1</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">20</span>;++i)
+			<span class="hljs-keyword">if</span>(t[i]&gt;=l) cn&lt;&lt;=<span class="hljs-number">1</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">19</span>;i&gt;=<span class="hljs-number">0</span>;i--)
+			<span class="hljs-keyword">if</span>(t[i]&lt;l)<span class="hljs-keyword">continue</span>;
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(cn&gt;&gt;=<span class="hljs-number">1</span>,ca&gt;&gt;i&amp;<span class="hljs-number">1</span>)
+				<span class="hljs-keyword">if</span>(a&gt;&gt;i&amp;<span class="hljs-number">1</span>) rk+=cn;
+				<span class="hljs-keyword">else</span> ca^=v[i];
+			<span class="hljs-keyword">else</span>
+				<span class="hljs-keyword">if</span>(a&gt;&gt;i&amp;<span class="hljs-number">1</span>) rk+=cn,ca^=v[i];
+				<span class="hljs-keyword">else</span>;
+		<span class="hljs-keyword">return</span> rk;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">diff</span><span class="hljs-params">(<span class="hljs-type">int</span> l,liner_basis&amp;r)</span></span>{
+		<span class="hljs-type">int</span> c1=<span class="hljs-number">0</span>,c2=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">20</span>;++i)
+			c1+=(t[i]&lt;l),c2+=(r.t[i]&lt;l);
+		<span class="hljs-keyword">return</span> c1!=c2;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">val</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> l)</span></span>{
+		<span class="hljs-type">int</span> cn=<span class="hljs-number">1</span>,ca=<span class="hljs-number">0</span>; <span class="hljs-comment">//cerr&lt;&lt;a&lt;&lt;endl;</span>
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">20</span>;++i)
+			<span class="hljs-keyword">if</span>(t[i]&gt;=l) cn&lt;&lt;=<span class="hljs-number">1</span>;
+		<span class="hljs-keyword">if</span>(a&gt;=cn) <span class="hljs-keyword">return</span> <span class="hljs-number">-2</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">19</span>;i&gt;=<span class="hljs-number">0</span>;i--)
+			<span class="hljs-keyword">if</span>(t[i]&lt;l) <span class="hljs-keyword">continue</span>;
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(cn&gt;&gt;=<span class="hljs-number">1</span>,ca&gt;&gt;i&amp;<span class="hljs-number">1</span>)
+				<span class="hljs-keyword">if</span>(a&gt;=cn) a-=cn;
+				<span class="hljs-keyword">else</span> ca^=v[i];
+			<span class="hljs-keyword">else</span>
+				<span class="hljs-keyword">if</span>(a&gt;=cn) ca^=v[i],a-=cn;
+				<span class="hljs-keyword">else</span>;
+		<span class="hljs-keyword">return</span> ca;
+	}
+}lib[<span class="hljs-number">200005</span>];
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">if</span>(online)
+		<span class="hljs-built_in">freopen</span>(_rw_file <span class="hljs-string">&quot;.in&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>,stdin),
+		<span class="hljs-built_in">freopen</span>(_rw_file <span class="hljs-string">&quot;.out&quot;</span>,<span class="hljs-string">&quot;w&quot;</span>,stdout);
+    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(t=io.<span class="hljs-built_in">read</span>();t;t--){
+		n=io.<span class="hljs-built_in">read</span>(); m=io.<span class="hljs-built_in">read</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+			lib[i]=lib[i<span class="hljs-number">-1</span>], lib[i].<span class="hljs-built_in">ins</span>(io.<span class="hljs-built_in">read</span>(),i);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i&lt;=m;++i){
+			l=io.<span class="hljs-built_in">read</span>(); r=io.<span class="hljs-built_in">read</span>();
+			<span class="hljs-type">int</span> cur=<span class="hljs-number">-1</span>,lp,rp,mid,p=l;
+			<span class="hljs-keyword">while</span>(p&lt;=r){
+				lp=p,rp=r;
+				<span class="hljs-keyword">while</span>(lp!=rp){
+					mid=lp+rp<span class="hljs-number">+1</span>&gt;&gt;<span class="hljs-number">1</span>;
+					<span class="hljs-keyword">if</span>(lib[mid].<span class="hljs-built_in">diff</span>(l,lib[p])) rp=mid<span class="hljs-number">-1</span>;
+					<span class="hljs-keyword">else</span> lp=mid;
+				}
+				<span class="hljs-type">int</span> rk=((cur&gt;=<span class="hljs-number">0</span>)?lib[p].<span class="hljs-built_in">rank</span>(cur,l):<span class="hljs-number">0</span>);
+				<span class="hljs-type">int</span> rkn=rk+lp-p;
+				cur=lib[p].<span class="hljs-built_in">val</span>(rkn,l);
+				<span class="hljs-comment">//cerr&lt;&lt;lp&lt;&lt;&quot; &quot;&lt;&lt;cur&lt;&lt;endl;</span>
+				<span class="hljs-keyword">if</span>(cur&lt;<span class="hljs-number">-1</span>){
+					<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;NO&quot;</span>);
+					<span class="hljs-keyword">break</span>;
+				}
+				p=lp<span class="hljs-number">+1</span>;
+			}
+			<span class="hljs-keyword">if</span>(cur&gt;=<span class="hljs-number">0</span>) <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;YES&quot;</span>);
+		}
+	}
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
+
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
+</body>
+</html>

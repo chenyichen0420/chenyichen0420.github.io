@@ -2,60 +2,69 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P2116 城墙</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>障眼法，和<a href="https://www.luogu.com.cn/problem/P3829">信用卡凸包</a>本质相同，甚至还更良心一点。</p>
 <p>我们考虑一下凸包上的两个城堡之间的墙的形状：</p>
 <p><img src="https://cdn.luogu.com.cn/upload/image_hosting/qheclc2h.png" alt=""></p>
-<p>其实我们注意到，最后的形状无非就是将城堡本身的凸包的那些线段向外平移 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> 的长度，然后再使用圆弧围起来剩余的部分。</p>
+<p>其实我们注意到，最后的形状无非就是将城堡本身的凸包的那些线段向外平移 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> 的长度，然后再使用圆弧围起来剩余的部分。</p>
 <p>那么，直线的部分我们会求，圆弧的部分呢？</p>
-<p>首先，因为你维护的是凸包，因此其形状一定是一个凸多边形。这也就意味着其外角和就是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span></span></span></span>。</p>
+<p>首先，因为你维护的是凸包，因此其形状一定是一个凸多边形。这也就意味着其外角和就是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>π</mi></mrow><annotation encoding="application/x-tex">2\pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span></span></span></span>。</p>
 <p>我们再观察一个角：</p>
 <p><img src="https://cdn.luogu.com.cn/upload/image_hosting/n384qkla.png" alt=""></p>
-<p>显然，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6922em;"></span><span class="mord">∠</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span></span></span></span> 就是所谓的外角，而 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6922em;"></span><span class="mord">∠</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> 就是圆弧所对角。二者显然是相等的。</p>
-<p>因此，这些圆心角之和就是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span></span></span></span>。</p>
-<p>所以最终的答案就是城堡凸包的周长加上一个半径为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> 的圆的周长。</p>
+<p>显然，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∠</mi><mi>D</mi><mi>A</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">\angle DAE</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6922em;"></span><span class="mord">∠</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0576em;">E</span></span></span></span> 就是所谓的外角，而 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">∠</mi><mi>C</mi><mi>A</mi><mi>B</mi></mrow><annotation encoding="application/x-tex">\angle CAB</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6922em;"></span><span class="mord">∠</span><span class="mord mathnormal" style="margin-right:0.0715em;">C</span><span class="mord mathnormal">A</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> 就是圆弧所对角。二者显然是相等的。</p>
+<p>因此，这些圆心角之和就是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>π</mi></mrow><annotation encoding="application/x-tex">2\pi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span></span></span></span>。</p>
+<p>所以最终的答案就是城堡凸包的周长加上一个半径为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi></mrow><annotation encoding="application/x-tex">L</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> 的圆的周长。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 //#define int long long
 #define double long double
@@ -115,8 +124,126 @@ signed main() {
 	ans += acos(-1.0) * l * 2; printf(&quot;%.0Lf\n&quot;, ans);
 }
 //私は猫です
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-comment">//#define int long long</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> double long double</span>
+<span class="hljs-type">int</span> n, st[<span class="hljs-number">1000005</span>], pt, l; <span class="hljs-type">double</span> ans;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">vecor</span> {
+	<span class="hljs-type">double</span> x, y;
+	<span class="hljs-built_in">vecor</span>(<span class="hljs-type">const</span> <span class="hljs-type">double</span>&amp; xi = <span class="hljs-number">0</span>, <span class="hljs-type">const</span> <span class="hljs-type">double</span>&amp; yi = <span class="hljs-number">0</span>) :<span class="hljs-built_in">x</span>(xi), <span class="hljs-built_in">y</span>(yi) {}
+	<span class="hljs-keyword">friend</span> vecor <span class="hljs-keyword">operator</span>+(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> vecor&amp; r) {
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">vecor</span>(l.x + r.x, l.y + r.y);
+	}
+	<span class="hljs-keyword">friend</span> vecor <span class="hljs-keyword">operator</span>-(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> vecor&amp; r) {
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">vecor</span>(l.x - r.x, l.y - r.y);
+	}
+	<span class="hljs-keyword">friend</span> vecor <span class="hljs-keyword">operator</span>*(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> <span class="hljs-type">double</span>&amp; r) {
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">vecor</span>(l.x * r, l.y * r);
+	}
+	<span class="hljs-keyword">friend</span> vecor <span class="hljs-keyword">operator</span>/(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> <span class="hljs-type">double</span>&amp; r) {
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">vecor</span>(l.x / r, l.y / r);
+	}
+	<span class="hljs-keyword">friend</span> <span class="hljs-type">double</span> <span class="hljs-keyword">operator</span>*(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> vecor&amp; r) {
+		<span class="hljs-keyword">return</span> l.x * r.y - l.y * r.x;
+	}<span class="hljs-comment">//叉乘</span>
+	<span class="hljs-keyword">friend</span> <span class="hljs-type">double</span> <span class="hljs-keyword">operator</span>^(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> vecor&amp; r) {
+		<span class="hljs-keyword">return</span> l.x * r.x + l.y * r.y;
+	}<span class="hljs-comment">//点乘</span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">double</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">sqrt</span>(x * x + y * y);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">double</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span><span class="hljs-params">(<span class="hljs-type">int</span>)</span> </span>{
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">atan2</span>(y, x);
+	}
+	<span class="hljs-keyword">friend</span> <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>&lt;(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> vecor&amp; r) {
+		<span class="hljs-keyword">return</span> l.x != r.x ? l.x &lt; r.x: l.y &lt; r.y;
+	}
+}p[<span class="hljs-number">1000005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">double</span> <span class="hljs-title">slope</span><span class="hljs-params">(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> vecor&amp; r)</span> </span>{
+	<span class="hljs-keyword">return</span> l.x != r.x ? (l.y - r.y) / (l.x - r.x) : <span class="hljs-number">1e20</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">double</span> <span class="hljs-title">dis</span><span class="hljs-params">(<span class="hljs-type">const</span> vecor&amp; l, <span class="hljs-type">const</span> vecor&amp; r)</span> </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">sqrt</span>((l.x - r.x) * (l.x - r.x) + (l.y - r.y) * (l.y - r.y));
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin &gt;&gt; n &gt;&gt; l;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) cin &gt;&gt; p[i].x &gt;&gt; p[i].y;
+	<span class="hljs-built_in">sort</span>(p + <span class="hljs-number">1</span>, p + n + <span class="hljs-number">1</span>);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) {
+		<span class="hljs-keyword">while</span> (pt &gt; <span class="hljs-number">1</span> &amp;&amp; <span class="hljs-built_in">slope</span>(p[i], p[st[pt - <span class="hljs-number">1</span>]]) &lt; <span class="hljs-built_in">slope</span>(p[st[pt]], p[st[pt - <span class="hljs-number">1</span>]])) pt--;
+		st[++pt] = i;
+	}
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt; pt; ++i) ans += <span class="hljs-built_in">dis</span>(p[st[i]], p[st[i + <span class="hljs-number">1</span>]]); pt = <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = n; i &gt; <span class="hljs-number">0</span>; i--) {
+		<span class="hljs-keyword">while</span> (pt &gt; <span class="hljs-number">1</span> &amp;&amp; <span class="hljs-built_in">slope</span>(p[i], p[st[pt - <span class="hljs-number">1</span>]]) &lt; <span class="hljs-built_in">slope</span>(p[st[pt]], p[st[pt - <span class="hljs-number">1</span>]])) pt--;
+		st[++pt] = i;
+	}
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt; pt; ++i) ans += <span class="hljs-built_in">dis</span>(p[st[i]], p[st[i + <span class="hljs-number">1</span>]]);
+	ans += <span class="hljs-built_in">acos</span>(<span class="hljs-number">-1.0</span>) * l * <span class="hljs-number">2</span>; <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%.0Lf\n&quot;</span>, ans);
+}
+<span class="hljs-comment">//私は猫です</span>
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

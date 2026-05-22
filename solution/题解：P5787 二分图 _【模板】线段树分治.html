@@ -2,47 +2,53 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P5787 二分图 _【模板】线段树分治</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <p>老经典，老好用的一个算法了。</p>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><p>老经典，老好用的一个算法了。</p>
 <p>线段树分治经常用来处理在某一段时间内修改的不易回退的问题。比如动态图的二分图判定，也就是这道题。</p>
 <p>二分图判定有多种方法，常见的有染色法和并查集法。染色法因为图是动态的而难以维护，反观并查集则有较多的变种，因此我们选择从并查集判定二分图的角度入手解决这道题目。</p>
 <p>对于只有插入边的操作，这个问题是简单的。现在的问题是我们需要尝试支持删边操作就可以了。然而，我们发现这很困难，虽然可做。</p>
@@ -63,9 +69,12 @@
 <p>显然在这道题当中，我们只能选择第二种。那你又问了：你这不是还要撤销吗？难撤销的问题没解决啊！</p>
 <p>其实我们不难发现，如果某一次我们合并失败了，那也就意味着这一整个时间段内这个图恒不是一个二分图。因为同一时间段内不涉及撤销操作。</p>
 <p>因此我们可以使用可撤销并查集依次进行合并，合并成功就记录一次合并操作，准备后面撤销。如果合并失败就直接将当前时间段内的答案标记为非二分图，并撤销当前时间段内所做的所有合并操作，直接回溯。</p>
-<p>时间复杂度是容易分析的：一个询问会被拆成至多 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span></span></span></span> 个修改操作。总的时间复杂度就是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span></span></span></span>，其中的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span> 是按秩合并可撤销并查集的均摊复杂度。 </p>
+<p>时间复杂度是容易分析的：一个询问会被拆成至多 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>log</mi><mo>⁡</mo><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\log k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span></span></span></span> 个修改操作。总的时间复杂度就是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>log</mi><mo>⁡</mo><mi>k</mi><mo stretchy="false">)</mo><mo>×</mo><mi>O</mi><mo stretchy="false">(</mo><mi>log</mi><mo>⁡</mo><mi>n</mi><mo stretchy="false">)</mo><mo>×</mo><mi>m</mi><mo>=</mo><mi>O</mi><mo stretchy="false">(</mo><mi>m</mi><mi>log</mi><mo>⁡</mo><mi>n</mi><mi>log</mi><mo>⁡</mo><mi>k</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(\log k)\times O(\log n)\times m=O(m\log n\log k)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mclose">)</span></span></span></span>，其中的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">\log n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">n</span></span></span></span> 是按秩合并可撤销并查集的均摊复杂度。 </p>
 <p>这其实并不麻烦。代码不算特别短，但是很好理解。代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 int n, m, k;
 class rev_mer_ser_set {
@@ -140,8 +149,141 @@ signed main() {
 		cin &gt;&gt; x &gt;&gt; y &gt;&gt; l &gt;&gt; r, sgt.ins(l + 1, r, x, y, 1);
 	sgt.solve(1);
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-type">int</span> n, m, k;
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">rev_mer_ser_set</span> {
+	<span class="hljs-keyword">struct</span> <span class="hljs-title class_">chg</span> {
+		<span class="hljs-type">int</span> l, v; <span class="hljs-built_in">chg</span>(<span class="hljs-type">int</span> l = <span class="hljs-number">0</span>, <span class="hljs-type">int</span> v = <span class="hljs-number">0</span>) : <span class="hljs-built_in">l</span>(l), <span class="hljs-built_in">v</span>(v) {};
+	}; stack&lt;chg&gt;bk; stack&lt;<span class="hljs-type">int</span>&gt;bs;
+	<span class="hljs-type">int</span> f[<span class="hljs-number">400005</span>], h[<span class="hljs-number">400005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">back</span><span class="hljs-params">(<span class="hljs-type">const</span> chg&amp; cg)</span> </span>{ h[f[cg.l]] -= cg.v; f[cg.l] = cg.l; }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span> </span>{ <span class="hljs-keyword">return</span> f[p] != p ? <span class="hljs-built_in">find</span>(f[p]) : p; }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tmerge</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>{
+		l = <span class="hljs-built_in">find</span>(l); r = <span class="hljs-built_in">find</span>(r);
+		<span class="hljs-keyword">if</span> (h[l] &gt; h[r]) <span class="hljs-built_in">swap</span>(l, r);
+		bk.<span class="hljs-built_in">emplace</span>(l, h[l] == h[r]);
+		f[l] = r; h[r] += (h[l] == h[r]);
+	}
+<span class="hljs-keyword">public</span>:
+	<span class="hljs-built_in">rev_mer_ser_set</span>() {
+		<span class="hljs-built_in">memset</span>(f, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span> f); <span class="hljs-built_in">memset</span>(h, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span> h);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">reset</span><span class="hljs-params">(<span class="hljs-type">int</span> sz)</span> </span>{
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= sz; ++i) h[f[i] = i] = <span class="hljs-number">1</span>;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>{
+		<span class="hljs-type">int</span> tl = <span class="hljs-built_in">find</span>(l), tr = <span class="hljs-built_in">find</span>(r);
+		<span class="hljs-keyword">if</span> (tl == tr) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+		<span class="hljs-built_in">tmerge</span>(l, r + n); <span class="hljs-built_in">tmerge</span>(l + n, r);
+		<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">pre_back</span><span class="hljs-params">()</span> </span>{ bs.<span class="hljs-built_in">emplace</span>(bk.<span class="hljs-built_in">size</span>()); }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">rol_back</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">while</span> (bk.<span class="hljs-built_in">size</span>() &gt; bs.<span class="hljs-built_in">top</span>()) <span class="hljs-built_in">back</span>(bk.<span class="hljs-built_in">top</span>()), bk.<span class="hljs-built_in">pop</span>();
+		bs.<span class="hljs-built_in">pop</span>();
+	}
+}rmss;
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">seg_tree</span> {
+	<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span> {
+		<span class="hljs-keyword">struct</span> <span class="hljs-title class_">edge</span> {
+			<span class="hljs-type">int</span> l, r; <span class="hljs-built_in">edge</span>(<span class="hljs-type">int</span> l = <span class="hljs-number">0</span>, <span class="hljs-type">int</span> r = <span class="hljs-number">0</span>) :<span class="hljs-built_in">l</span>(l), <span class="hljs-built_in">r</span>(r) {};
+		}; vector&lt;edge&gt;cg; <span class="hljs-type">int</span> l = <span class="hljs-number">0</span>, r = <span class="hljs-number">0</span>;
+		<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>{ cg.<span class="hljs-built_in">emplace_back</span>(l, r); }
+	}re[<span class="hljs-number">100005</span> &lt;&lt; <span class="hljs-number">4</span>];
+<span class="hljs-keyword">public</span>:
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">build</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r, <span class="hljs-type">int</span> p)</span> </span>{
+		re[p].l = l; re[p].r = r;
+		<span class="hljs-keyword">if</span> (l == r) <span class="hljs-keyword">return</span>;
+		<span class="hljs-built_in">build</span>(l, (l + r &gt;&gt; <span class="hljs-number">1</span>), p &lt;&lt; <span class="hljs-number">1</span>);
+		<span class="hljs-built_in">build</span>((l + r &gt;&gt; <span class="hljs-number">1</span>) + <span class="hljs-number">1</span>, r, p &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> tl, <span class="hljs-type">int</span> tr, <span class="hljs-type">int</span> pl, <span class="hljs-type">int</span> pr, <span class="hljs-type">int</span> p)</span> </span>{
+		<span class="hljs-keyword">if</span> (tl &gt; tr) <span class="hljs-keyword">return</span>;
+		<span class="hljs-keyword">if</span> (re[p].l &gt;= tl &amp;&amp; re[p].r &lt;= tr) <span class="hljs-keyword">return</span> re[p].<span class="hljs-built_in">ins</span>(pl, pr);
+		<span class="hljs-keyword">if</span> (tl &lt;= re[p &lt;&lt; <span class="hljs-number">1</span>].r) <span class="hljs-built_in">ins</span>(tl, tr, pl, pr, p &lt;&lt; <span class="hljs-number">1</span>);
+		<span class="hljs-keyword">if</span> (tr &gt; re[p &lt;&lt; <span class="hljs-number">1</span>].r) <span class="hljs-built_in">ins</span>(tl, tr, pl, pr, p &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">solve</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span> </span>{
+		<span class="hljs-type">bool</span> cn = <span class="hljs-number">1</span>; rmss.<span class="hljs-built_in">pre_back</span>();
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> node::edge&amp; cp : re[p].cg)
+			<span class="hljs-keyword">if</span> (!rmss.<span class="hljs-built_in">merge</span>(cp.l, cp.r)) {
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = re[p].l; i &lt;= re[p].r; ++i) cout &lt;&lt; <span class="hljs-string">&quot;No\n&quot;</span>;
+				cn = <span class="hljs-number">0</span>; <span class="hljs-keyword">break</span>;
+			}
+		<span class="hljs-keyword">if</span> (cn)
+			<span class="hljs-keyword">if</span> (re[p].l == re[p].r) cout &lt;&lt; <span class="hljs-string">&quot;Yes\n&quot;</span>;
+			<span class="hljs-keyword">else</span> <span class="hljs-built_in">solve</span>(p &lt;&lt; <span class="hljs-number">1</span>), <span class="hljs-built_in">solve</span>(p &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span>);
+		rmss.<span class="hljs-built_in">rol_back</span>();
+	}
+}sgt;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin &gt;&gt; n &gt;&gt; m &gt;&gt; k;
+	sgt.<span class="hljs-built_in">build</span>(<span class="hljs-number">1</span>, k, <span class="hljs-number">1</span>); rmss.<span class="hljs-built_in">reset</span>(n * <span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, x, y, l, r; i &lt;= m; ++i)
+		cin &gt;&gt; x &gt;&gt; y &gt;&gt; l &gt;&gt; r, sgt.<span class="hljs-built_in">ins</span>(l + <span class="hljs-number">1</span>, r, x, y, <span class="hljs-number">1</span>);
+	sgt.<span class="hljs-built_in">solve</span>(<span class="hljs-number">1</span>);
+}
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

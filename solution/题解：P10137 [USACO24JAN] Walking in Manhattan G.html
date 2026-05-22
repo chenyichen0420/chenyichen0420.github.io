@@ -2,56 +2,65 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P10137 [USACO24JAN] Walking in Manhattan G</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>思路真的非常的清奇，好题。部分参考<a href="/article/3qdyj2s2">这篇</a>题解。先提示一下，一种正解是倍增。</p>
 <p>这道题的突破口是奶牛转向的条件。从奶牛第一次转向起，如果他转向，那意味着它遇到了一条与他方向不同，正好出入的奇偶性不同不同的道路。</p>
-<p>到这里，我们仍然看不到倍增的影子。硬要说有的话，你可以选择找出所有的交叉点的下一个点。但是交叉点的个数是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 的，显然接受不了。</p>
+<p>到这里，我们仍然看不到倍增的影子。硬要说有的话，你可以选择找出所有的交叉点的下一个点。但是交叉点的个数是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 的，显然接受不了。</p>
 <p>但是我们容易发现，当奶牛下一次走向同方向的道路时，其奇偶性必然会发生改变。</p>
 <p>有了上面的结论，横纵就先对独立了，也就是说我们可以考虑倍增了。</p>
-<p>对于每一条边，记录出他的下 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span></span></span></span></span></span></span></span> 条与他间隔为奇数的道路出现的位置。由于上述性质，当在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 方向走到后 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span></span></span></span></span></span></span> 条边时，<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 方向也必然走到了后 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span></span></span></span></span></span></span> 条边的位置。</p>
+<p>对于每一条边，记录出他的下 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>j</mi></msup></mrow><annotation encoding="application/x-tex">2^j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span></span></span></span></span></span></span></span> 条与他间隔为奇数的道路出现的位置。由于上述性质，当在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> 方向走到后 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>i</mi></msup></mrow><annotation encoding="application/x-tex">2^i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span></span></span></span></span></span></span> 条边时，<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi></mrow><annotation encoding="application/x-tex">y</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">y</span></span></span></span> 方向也必然走到了后 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>2</mn><mi>i</mi></msup></mrow><annotation encoding="application/x-tex">2^i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span></span></span></span></span></span></span></span> 条边的位置。</p>
 <p>因此我们可以考虑先走到下一个路口上，然后倍增快速寻找最后一次能够走到二者均改变的路口。最后考虑一下剩余的距离对应的位移即可。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
 int n, m, r[200005][19], c[200005][19];
@@ -92,7 +101,7 @@ inline void query(int x, int y, int d) {
 signed main() {//写在前面：有参考3qdyj2s2的代码
 	ios::sync_with_stdio(0); cin &gt;&gt; n &gt;&gt; m;
 	for (int i = 1, p; i &lt;= n; ++i)
-		(cin &gt;&gt; o &gt;&gt; p, o != &#39;V&#39; ? h : v).emplace_back(p);
+		(cin &gt;&gt; o &gt;&gt; p, o != 'V' ? h : v).emplace_back(p);
 	sort(h.begin(), h.end()); sort(v.begin(), v.end());
 	h.emplace_back(2.1e9), v.emplace_back(2.1e9);
 	for (int i = 0; i != 19; i++)
@@ -113,8 +122,128 @@ signed main() {//写在前面：有参考3qdyj2s2的代码
 	for (int i = 1, x, y, d; i &lt;= m; ++i)
 		cin &gt;&gt; x &gt;&gt; y &gt;&gt; d, query(x, y, d);
 }//能快速想到这是倍增的题的人也是真的厉害
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-type">int</span> n, m, r[<span class="hljs-number">200005</span>][<span class="hljs-number">19</span>], c[<span class="hljs-number">200005</span>][<span class="hljs-number">19</span>];
+vector&lt;<span class="hljs-type">int</span>&gt; h, v; <span class="hljs-type">char</span> o;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">ps</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp; v, <span class="hljs-type">int</span> p)</span> </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">lower_bound</span>(v.<span class="hljs-built_in">begin</span>(), v.<span class="hljs-built_in">end</span>(), p) - v.<span class="hljs-built_in">begin</span>();
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">query</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y, <span class="hljs-type">int</span> d)</span> </span>{
+	<span class="hljs-type">int</span> hp = <span class="hljs-built_in">ps</span>(h, y), vp = <span class="hljs-built_in">ps</span>(v, x), a = <span class="hljs-number">0</span>, lp;
+	<span class="hljs-keyword">if</span> (y != h[hp])
+		<span class="hljs-keyword">if</span> (d + y &gt; h[hp]) d -= h[hp] - y, a += h[hp] - y;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(cout &lt;&lt; x &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; d + y &lt;&lt; endl);
+	<span class="hljs-keyword">if</span> (x != v[vp])
+		<span class="hljs-keyword">if</span> (d + x &gt; v[vp])d -= v[vp] - x, a += v[vp] - x;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(cout &lt;&lt; x + d &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; y &lt;&lt; endl);
+	<span class="hljs-comment">//正确性：题目保证了初始点在道路上，这也就意味着以上两个if至多会进入其中的一个。</span>
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> k = <span class="hljs-number">18</span>, ad; ~k; k--) {
+		<span class="hljs-type">int</span> nh = r[hp][k], nv = c[vp][k];
+		<span class="hljs-keyword">if</span> ((ad = v[nv] - v[vp] + h[nh] - h[hp]) &gt; d)<span class="hljs-keyword">continue</span>;
+		d -= ad, a += ad, hp = nh, vp = nv;
+		<span class="hljs-comment">//不管你先走v还是先走h，都一定会走到下一个奇偶性不同的十字路口</span>
+		<span class="hljs-comment">//因此，在这一步，可以优先保时复，直接向后跳就完事了</span>
+	}
+	<span class="hljs-comment">//此时已经跳到了最后一次能暴力走的路口，需要直接处理了。</span>
+	<span class="hljs-comment">//注意到我们一直在跳路口，现在的位置也是一个路口。</span>
+	<span class="hljs-keyword">if</span> (a &amp; <span class="hljs-number">1</span>)
+		<span class="hljs-comment">//奇数步，向北走</span>
+		<span class="hljs-comment">//如果走不到下一个奇偶性变化的点就在当前路</span>
+		<span class="hljs-comment">//否则在拐角后的某个位置</span>
+		<span class="hljs-keyword">if</span> ((v[lp = c[vp][<span class="hljs-number">0</span>]] - v[vp] &lt; d) &amp;&amp; (d -= v[lp] - v[vp]))
+			<span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(cout &lt;&lt; v[lp] &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; h[hp] + d &lt;&lt; endl);
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(cout &lt;&lt; v[vp] + d &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; h[hp] &lt;&lt; endl);
+	<span class="hljs-comment">//类似于向北走的思路</span>
+	<span class="hljs-keyword">if</span> ((h[lp = r[hp][<span class="hljs-number">0</span>]] - h[hp] &lt; d) &amp;&amp; (d -= h[lp] - h[hp]))
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(cout &lt;&lt; v[vp] + d &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; h[lp] &lt;&lt; endl);
+	<span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(cout &lt;&lt; v[vp] &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; h[hp] + d &lt;&lt; endl);
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{<span class="hljs-comment">//写在前面：有参考3qdyj2s2的代码</span>
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin &gt;&gt; n &gt;&gt; m;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, p; i &lt;= n; ++i)
+		(cin &gt;&gt; o &gt;&gt; p, o != <span class="hljs-string">&#x27;V&#x27;</span> ? h : v).<span class="hljs-built_in">emplace_back</span>(p);
+	<span class="hljs-built_in">sort</span>(h.<span class="hljs-built_in">begin</span>(), h.<span class="hljs-built_in">end</span>()); <span class="hljs-built_in">sort</span>(v.<span class="hljs-built_in">begin</span>(), v.<span class="hljs-built_in">end</span>());
+	h.<span class="hljs-built_in">emplace_back</span>(<span class="hljs-number">2.1e9</span>), v.<span class="hljs-built_in">emplace_back</span>(<span class="hljs-number">2.1e9</span>);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i != <span class="hljs-number">19</span>; i++)
+		r[h.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>][i] = h.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>,<span class="hljs-comment">//谨防越界</span>
+		c[v.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>][i] = v.<span class="hljs-built_in">size</span>() - <span class="hljs-number">1</span>;<span class="hljs-comment">//直接暴力跳回是好方法</span>
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = h.<span class="hljs-built_in">size</span>() - <span class="hljs-number">2</span>; i &gt;= <span class="hljs-number">0</span>; i--) {
+		r[i][<span class="hljs-number">0</span>] = (h[i] + h[i + <span class="hljs-number">1</span>] &amp; <span class="hljs-number">1</span> ? i + <span class="hljs-number">1</span> : r[i + <span class="hljs-number">1</span>][<span class="hljs-number">0</span>]);
+		<span class="hljs-comment">//检验是否 h[i] 与 h[i + 1] 奇偶性不同</span>
+		<span class="hljs-comment">//不同就是下一个点作为转折点</span>
+		<span class="hljs-comment">//否则就是下一个点的下一个奇偶性不同的点</span>
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j != <span class="hljs-number">19</span>; j++) r[i][j] = r[r[i][j - <span class="hljs-number">1</span>]][j - <span class="hljs-number">1</span>];
+	}
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = v.<span class="hljs-built_in">size</span>() - <span class="hljs-number">2</span>; i &gt;= <span class="hljs-number">0</span>; i--) {
+		c[i][<span class="hljs-number">0</span>] = (v[i] + v[i + <span class="hljs-number">1</span>] &amp; <span class="hljs-number">1</span> ? i + <span class="hljs-number">1</span> : c[i + <span class="hljs-number">1</span>][<span class="hljs-number">0</span>]);
+		<span class="hljs-comment">//道理同上</span>
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j != <span class="hljs-number">19</span>; j++) c[i][j] = c[c[i][j - <span class="hljs-number">1</span>]][j - <span class="hljs-number">1</span>];
+	}
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, x, y, d; i &lt;= m; ++i)
+		cin &gt;&gt; x &gt;&gt; y &gt;&gt; d, <span class="hljs-built_in">query</span>(x, y, d);
+}<span class="hljs-comment">//能快速想到这是倍增的题的人也是真的厉害</span>
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

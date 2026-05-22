@@ -2,52 +2,61 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P4843 清理雪道</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
-<p>一眼网络流，建模也容易：如果有一条 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> 的边，就在二者之间建一条下界为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的边。</p>
-<p>然后将所有入度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 的边视为源点，各从超级源点 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span> 那里牵一条无限流过来。</p>
-<p>将所有出度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 的边视为汇点，各向超级汇点 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> 那里连一条无限流过去。</p>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
+<p>一眼网络流，建模也容易：如果有一条 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>s</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(s,t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> 的边，就在二者之间建一条下界为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> 的边。</p>
+<p>然后将所有入度为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 的边视为源点，各从超级源点 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span> 那里牵一条无限流过来。</p>
+<p>将所有出度为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 的边视为汇点，各向超级汇点 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> 那里连一条无限流过去。</p>
 <p>最后跑一个上下界最小流就行了。代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
 constexpr int inf = 1e12;
@@ -135,8 +144,154 @@ signed main() {
 	net.dellast(yt, ys); t = ys, s = yt;
 	cout &lt;&lt; net.minflow() &lt;&lt; endl;
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> inf = <span class="hljs-number">1e12</span>;
+<span class="hljs-type">int</span> n, m, s, t, rd[<span class="hljs-number">205</span>], sm, ans, lv[<span class="hljs-number">205</span>], ys, yt, tr[<span class="hljs-number">205</span>], tc[<span class="hljs-number">205</span>];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">ULBNF</span> {
+	<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span> { <span class="hljs-type">int</span> p, f, v; }tmp; <span class="hljs-comment">//强制兼容费用流了，先不管吧</span>
+	vector&lt;node&gt;e; vector&lt;<span class="hljs-type">int</span>&gt;h[<span class="hljs-number">205</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r, <span class="hljs-type">int</span> f, <span class="hljs-type">int</span> v)</span> </span>{
+		h[l].<span class="hljs-built_in">emplace_back</span>(e.<span class="hljs-built_in">size</span>());
+		tmp.p = r; tmp.f = f; tmp.v = v;
+		e.<span class="hljs-built_in">emplace_back</span>(tmp);
+		h[r].<span class="hljs-built_in">emplace_back</span>(e.<span class="hljs-built_in">size</span>());
+		tmp.p = l; tmp.f = <span class="hljs-number">0</span>; tmp.v = -v;
+		e.<span class="hljs-built_in">emplace_back</span>(tmp);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dellast</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r)</span> </span>{
+		h[l].<span class="hljs-built_in">pop_back</span>(); e.<span class="hljs-built_in">pop_back</span>();
+		h[r].<span class="hljs-built_in">pop_back</span>(); e.<span class="hljs-built_in">pop_back</span>();
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">del</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span> </span>{ h[p].<span class="hljs-built_in">clear</span>(); }
+	<span class="hljs-type">int</span> d[<span class="hljs-number">205</span>]; <span class="hljs-type">bool</span> vis[<span class="hljs-number">205</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">bfs</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-built_in">memset</span>(vis, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span> vis);
+		vis[s] = d[s] = <span class="hljs-number">1</span>;
+		queue&lt;<span class="hljs-type">int</span>&gt;q; q.<span class="hljs-built_in">push</span>(s);
+		<span class="hljs-keyword">while</span> (q.<span class="hljs-built_in">size</span>()) {
+			<span class="hljs-type">int</span> tp = q.<span class="hljs-built_in">front</span>();q.<span class="hljs-built_in">pop</span>();
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>;i != h[tp].<span class="hljs-built_in">size</span>();++i) {
+				node&amp; sp = e[h[tp][i]];
+				<span class="hljs-keyword">if</span> (!vis[sp.p] &amp;&amp; sp.f)
+					d[sp.p] = d[tp] + <span class="hljs-number">1</span>,
+					vis[sp.p] = <span class="hljs-number">1</span>, q.<span class="hljs-built_in">push</span>(sp.p);
+			}
+		}
+		<span class="hljs-keyword">return</span> vis[t];
+	}
+	<span class="hljs-type">int</span> cur[<span class="hljs-number">205</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p, <span class="hljs-type">int</span> a)</span> </span>{
+		<span class="hljs-keyword">if</span> (p == t || a == <span class="hljs-number">0</span>)  <span class="hljs-keyword">return</span> a; <span class="hljs-type">int</span> ret = <span class="hljs-number">0</span>, f;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span>&amp; i = cur[p]; i != h[p].<span class="hljs-built_in">size</span>(); ++i) {
+			node&amp; sp = e[h[p][i]];
+			<span class="hljs-keyword">if</span> (d[sp.p] == d[p] + <span class="hljs-number">1</span> &amp;&amp; (f = <span class="hljs-built_in">dfs</span>(sp.p, <span class="hljs-built_in">min</span>(a, sp.f))) &gt; <span class="hljs-number">0</span>) {
+				sp.f -= f; e[h[p][i] ^ <span class="hljs-number">1</span>].f += f;
+				ret += f; <span class="hljs-keyword">if</span> ((a -= f) == <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;
+			}
+		}
+		<span class="hljs-keyword">return</span> ret;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">dneflow</span><span class="hljs-params">(<span class="hljs-type">int</span> sm)</span> </span>{
+		ans = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (<span class="hljs-built_in">bfs</span>())
+			<span class="hljs-built_in">fill</span>(cur, cur + n + <span class="hljs-number">4</span>, <span class="hljs-number">0</span>),
+			ans += <span class="hljs-built_in">dfs</span>(s, <span class="hljs-number">1e15</span>);
+		<span class="hljs-keyword">return</span> ans != sm;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">maxflow</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">while</span> (<span class="hljs-built_in">bfs</span>())
+			<span class="hljs-built_in">fill</span>(cur, cur + n + <span class="hljs-number">4</span>, <span class="hljs-number">0</span>),
+			ans += <span class="hljs-built_in">dfs</span>(s, <span class="hljs-number">1e15</span>);
+		<span class="hljs-keyword">return</span> ans;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">minflow</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">while</span> (<span class="hljs-built_in">bfs</span>())
+			<span class="hljs-built_in">fill</span>(cur, cur + n + <span class="hljs-number">4</span>, <span class="hljs-number">0</span>),
+			ans -= <span class="hljs-built_in">dfs</span>(s, <span class="hljs-number">1e15</span>);
+		<span class="hljs-keyword">return</span> ans;
+	}
+}net; <span class="hljs-comment">//upper-lower bound network flow</span>
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin &gt;&gt; n;
+	ys = n + <span class="hljs-number">1</span>; yt = n + <span class="hljs-number">2</span>; s = n + <span class="hljs-number">3</span>; t = n + <span class="hljs-number">4</span>;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, c, p;i &lt;= n;++i)
+		<span class="hljs-keyword">for</span> (cin &gt;&gt; c;c;c--)
+			cin &gt;&gt; p, net.<span class="hljs-built_in">ins</span>(i, p, inf, <span class="hljs-number">0</span>),
+			rd[i]--, rd[p]++, tc[i]++, tr[p]++;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= n;++i)
+		<span class="hljs-keyword">if</span> (!tr[i]) net.<span class="hljs-built_in">ins</span>(ys, i, inf, <span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= n;++i)
+		<span class="hljs-keyword">if</span> (!tc[i]) net.<span class="hljs-built_in">ins</span>(i, yt, inf, <span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= yt;++i)
+		<span class="hljs-keyword">if</span> (rd[i] &gt; <span class="hljs-number">0</span>) sm += rd[i], net.<span class="hljs-built_in">ins</span>(s, i, rd[i], <span class="hljs-number">0</span>);
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (rd[i]) net.<span class="hljs-built_in">ins</span>(i, t, -rd[i], <span class="hljs-number">0</span>);
+	net.<span class="hljs-built_in">ins</span>(yt, ys, <span class="hljs-number">1e15</span>, <span class="hljs-number">0</span>); net.<span class="hljs-built_in">dneflow</span>(sm);
+	ans = net.e.<span class="hljs-built_in">back</span>().f;
+	net.<span class="hljs-built_in">dellast</span>(yt, ys); t = ys, s = yt;
+	cout &lt;&lt; net.<span class="hljs-built_in">minflow</span>() &lt;&lt; endl;
+}
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

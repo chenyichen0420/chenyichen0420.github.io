@@ -2,55 +2,64 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P2950 [USACO09OPEN] Bovine Embroidery G</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>题意</h2>
-<p>在平面当中，有一个以原点为圆心的圆，半径为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span>。还有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 条直线，每条直线的解析式已给出。问有几对直线相交且交点在圆内？</p>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>题意</h2>
+<p>在平面当中，有一个以原点为圆心的圆，半径为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi></mrow><annotation encoding="application/x-tex">d</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span>。还有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 条直线，每条直线的解析式已给出。问有几对直线相交且交点在圆内？</p>
 <h2>思路分析</h2>
 <p>分两步，先将圆上的问题化为在线段上的问题。再考虑求解。</p>
 <p>我们将这个圆从纵轴负半轴切开，展平成为一条线段，并将那些直线原本在其中的部分保留，并和这个圆一起拉伸（自行脑补），原本相交的一对线段显然在被拉伸后变为两个相交的区间。这时候，我们就将原问题转化为了相交的区间的对数问题。</p>
 <p>这也是难点，不过代码中有推式子的过程，这里就不详讲了。</p>
 <p>剩下的就简单了，用树状数组统计一下重叠区间对数就好了。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
 int n, d, cnt, ans; double a, b, c, x2v, x1v, x0v, xa, ya, xb, yb, delta;
@@ -123,8 +132,139 @@ signed main() {
 	cout &lt;&lt; ans &lt;&lt; endl;
 	return 0;
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-type">int</span> n, d, cnt, ans; <span class="hljs-type">double</span> a, b, c, x2v, x1v, x0v, xa, ya, xb, yb, delta;
+vector&lt;pair&lt;<span class="hljs-type">double</span>, <span class="hljs-type">double</span>&gt;&gt;v; vector&lt;<span class="hljs-type">double</span>&gt; vl;<span class="hljs-type">double</span> lnp, rnp;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">double</span> <span class="hljs-title">linepos</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">double</span> xp, <span class="hljs-type">const</span> <span class="hljs-type">double</span> yp)</span> </span>{
+	<span class="hljs-keyword">return</span> (yp &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">-1</span> : <span class="hljs-number">1</span>) * (d + xp);
+}
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">tree_array</span> {
+	<span class="hljs-type">int</span> vl[<span class="hljs-number">100005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> ps)</span> </span>{
+		<span class="hljs-type">int</span> tmp = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (ps) tmp += vl[ps], ps -= (ps &amp; -ps);
+		<span class="hljs-keyword">return</span> tmp;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-type">int</span> ps)</span> </span>{
+		<span class="hljs-keyword">while</span> (ps &lt;= n * <span class="hljs-number">2</span>) vl[ps]++, ps += (ps &amp; -ps);
+	}
+}qr;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin &gt;&gt; n &gt;&gt; d;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) {
+		cin &gt;&gt; a &gt;&gt; b &gt;&gt; c;
+		<span class="hljs-comment">//ax+by+c=0</span>
+		<span class="hljs-comment">//x^2+y^2=d^2</span>
+		<span class="hljs-comment">/*
+		specialize if a=0 or b=0
+		so y=-(ax+c)/b
+		so x^2+((ax+c)^2)/(b^2)=d^2
+		so x^2+(a^2*x^2+2acx+c^2)/(b^2)=d^2
+		so ((a^2+b^2)/(b^2))*x^2+(2ac/(b^2))*x+(c^2-(b^2)*(d^2))/(b^2)=0
+		because b*b!=0
+		so (a^2+b^2)*x^2+2ac*x+c^2-b^2*d^2=0
+		*/</span>
+		<span class="hljs-keyword">if</span> (a == <span class="hljs-number">0</span>) {
+			<span class="hljs-comment">//by+c=0 =&gt; y=-c/b</span>
+			ya = yb = -c / b;
+			delta = d * d - ya * ya;
+			<span class="hljs-keyword">if</span> (delta &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;
+			xa = <span class="hljs-built_in">sqrt</span>(delta); xb = -<span class="hljs-built_in">sqrt</span>(delta);
+		}
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (b == <span class="hljs-number">0</span>) {
+			<span class="hljs-comment">//ax+c=0 =&gt; x=-c/a</span>
+			xa = xb = -c / a;
+			delta = d * d - xa * xa;
+			<span class="hljs-keyword">if</span> (delta &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;
+			ya = <span class="hljs-built_in">sqrt</span>(delta); yb = -<span class="hljs-built_in">sqrt</span>(delta);
+		}
+		<span class="hljs-keyword">else</span> {
+			x2v = (a * a + b * b), x1v = (<span class="hljs-number">2</span> * a * c),
+				x0v = (c * c - b * b * d * d);
+			delta = x1v * x1v - <span class="hljs-number">4</span> * x2v * x0v;
+			<span class="hljs-keyword">if</span> (delta &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">continue</span>;
+			<span class="hljs-comment">//x1=(-x1v+sqrt(delta))/2a,x2=(-x1v-sqrt(delta))/2a</span>
+			xa = (-x1v + <span class="hljs-built_in">sqrt</span>(delta)) / (<span class="hljs-number">2</span> * x2v), xb = (-x1v - <span class="hljs-built_in">sqrt</span>(delta)) / (<span class="hljs-number">2</span> * x2v);
+			ya = -(a * xa + c) / b, yb = -(a * xb + c) / b;
+		}
+		lnp = <span class="hljs-built_in">linepos</span>(xa, ya); rnp = <span class="hljs-built_in">linepos</span>(xb, yb);
+		<span class="hljs-keyword">if</span> (lnp &gt; rnp) <span class="hljs-built_in">swap</span>(lnp, rnp);
+		v.<span class="hljs-built_in">push_back</span>(<span class="hljs-built_in">make_pair</span>(lnp, rnp));
+		vl.<span class="hljs-built_in">push_back</span>(lnp);
+		vl.<span class="hljs-built_in">push_back</span>(rnp);
+	}
+	<span class="hljs-built_in">sort</span>(v.<span class="hljs-built_in">begin</span>(), v.<span class="hljs-built_in">end</span>()); <span class="hljs-built_in">sort</span>(vl.<span class="hljs-built_in">begin</span>(), vl.<span class="hljs-built_in">end</span>());
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i ^ v.<span class="hljs-built_in">size</span>(); ++i) {
+		<span class="hljs-type">int</span> lp = <span class="hljs-built_in">lower_bound</span>(vl.<span class="hljs-built_in">begin</span>(), vl.<span class="hljs-built_in">end</span>(), v[i].first) - vl.<span class="hljs-built_in">begin</span>(),
+			rp = <span class="hljs-built_in">lower_bound</span>(vl.<span class="hljs-built_in">begin</span>(), vl.<span class="hljs-built_in">end</span>(), v[i].second) - vl.<span class="hljs-built_in">begin</span>();
+		ans += qr.<span class="hljs-built_in">que</span>(rp + <span class="hljs-number">1</span>) - qr.<span class="hljs-built_in">que</span>(lp); qr.<span class="hljs-built_in">add</span>(rp + <span class="hljs-number">1</span>);
+	}
+	cout &lt;&lt; ans &lt;&lt; endl;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>
