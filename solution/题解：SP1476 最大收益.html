@@ -2,54 +2,63 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：SP1476 最大收益</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>最大权闭合子图的常见模型。建图方式：</p>
 <p>每一个点向汇点建立相当于建立基站的建立费用的流量的边。</p>
 <p>每一组收益，先从源点向一个辅助点连流量为收益的边，然后从这个点分别向两个基站连一条容量无限的边。实际上最大流量也就是此次收益，所以取为此次收益也无妨。</p>
 <p>为什么正确呢？最大流等于最小割。而最小割是最小的被抛弃的收益+建基站的费用。</p>
 <p>实际上答案正好是所有收益-被抛弃的收益-建基站的费用。而最小割求出了被减的部分的最小值，整体就是最大值了。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 //#define int long long
 #pragma GCC optimize(2)
@@ -175,8 +184,192 @@ signed main() {
 	}
 	return 0;
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-comment">//#define int long long</span>
+<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> GCC optimize(2)</span>
+<span class="hljs-type">int</span> n, m, s, t, ans, mxf;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> common_match</span>
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> common_match</span>
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">dinic</span> {
+	<span class="hljs-keyword">struct</span> <span class="hljs-title class_">edge</span> { <span class="hljs-type">int</span> p, v; }tmp;
+	vector&lt;edge&gt;e; vector&lt;<span class="hljs-type">int</span>&gt;h[<span class="hljs-number">60005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r, <span class="hljs-type">int</span> v)</span> </span>{
+		h[l].<span class="hljs-built_in">push_back</span>(e.<span class="hljs-built_in">size</span>());
+		tmp.p = r; tmp.v = v;
+		e.<span class="hljs-built_in">push_back</span>(tmp);
+		h[r].<span class="hljs-built_in">push_back</span>(e.<span class="hljs-built_in">size</span>());
+		tmp.p = l; tmp.v = <span class="hljs-number">0</span>;
+		e.<span class="hljs-built_in">push_back</span>(tmp);
+	}
+	<span class="hljs-type">int</span> d[<span class="hljs-number">60005</span>]; <span class="hljs-type">bool</span> vis[<span class="hljs-number">60005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">bfs</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-built_in">memset</span>(vis, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span> vis);
+		vis[s] = d[s] = <span class="hljs-number">1</span>;
+		queue&lt;<span class="hljs-type">int</span>&gt;q; q.<span class="hljs-built_in">push</span>(s);
+		<span class="hljs-keyword">while</span> (q.<span class="hljs-built_in">size</span>()) {
+			<span class="hljs-type">int</span> tp = q.<span class="hljs-built_in">front</span>(); q.<span class="hljs-built_in">pop</span>();
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i != h[tp].<span class="hljs-built_in">size</span>(); ++i) {
+				edge&amp; sp = e[h[tp][i]];
+				<span class="hljs-keyword">if</span> (!vis[sp.p] &amp;&amp; sp.v)
+					d[sp.p] = d[tp] + <span class="hljs-number">1</span>,
+					vis[sp.p] = <span class="hljs-number">1</span>, q.<span class="hljs-built_in">push</span>(sp.p);
+			}
+		}
+		<span class="hljs-keyword">return</span> vis[t];
+	}
+	<span class="hljs-type">int</span> cur[<span class="hljs-number">60005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p, <span class="hljs-type">int</span> a)</span> </span>{
+		<span class="hljs-keyword">if</span> (p == t || a == <span class="hljs-number">0</span>)  <span class="hljs-keyword">return</span> a; <span class="hljs-type">int</span> ret = <span class="hljs-number">0</span>, f;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span>&amp; i = cur[p]; i != h[p].<span class="hljs-built_in">size</span>(); ++i) {
+			edge&amp; sp = e[h[p][i]];
+			<span class="hljs-keyword">if</span> (d[sp.p] == d[p] + <span class="hljs-number">1</span> &amp;&amp; (f = <span class="hljs-built_in">dfs</span>(sp.p, <span class="hljs-built_in">min</span>(a, sp.v))) &gt; <span class="hljs-number">0</span>) {
+				sp.v -= f; e[h[p][i] ^ <span class="hljs-number">1</span>].v += f;
+				ret += f; <span class="hljs-keyword">if</span> ((a -= f) == <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;
+			}
+		}
+		<span class="hljs-keyword">return</span> ret;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">maxflow</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> ret = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (<span class="hljs-built_in">bfs</span>())
+			<span class="hljs-built_in">memset</span>(cur, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span> cur),
+			ret += <span class="hljs-built_in">dfs</span>(s, <span class="hljs-number">0x3f3f3f3f</span>);
+		<span class="hljs-keyword">return</span> ret;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">reset</span><span class="hljs-params">()</span> </span>{
+		e.<span class="hljs-built_in">clear</span>(); <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt;= t; ++i) h[i].<span class="hljs-built_in">clear</span>();
+	}
+}din;
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">SSP</span> {
+	<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span> { <span class="hljs-type">int</span> p, f, v; }tmp;
+	vector&lt;node&gt;e; vector&lt;<span class="hljs-type">int</span>&gt;h[<span class="hljs-number">5005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r, <span class="hljs-type">int</span> f, <span class="hljs-type">int</span> v)</span> </span>{
+		tmp.p = r; tmp.f = f; tmp.v = v;
+		h[l].<span class="hljs-built_in">emplace_back</span>(e.<span class="hljs-built_in">size</span>());
+		e.<span class="hljs-built_in">emplace_back</span>(tmp);
+		tmp.p = l; tmp.f = <span class="hljs-number">0</span>; tmp.v = -v;
+		h[r].<span class="hljs-built_in">emplace_back</span>(e.<span class="hljs-built_in">size</span>());
+		e.<span class="hljs-built_in">emplace_back</span>(tmp);
+	}
+	<span class="hljs-type">int</span> d[<span class="hljs-number">5005</span>]; bitset&lt;5005&gt;vis;
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">spfa</span><span class="hljs-params">()</span> </span>{
+		vis.<span class="hljs-built_in">reset</span>(); <span class="hljs-built_in">fill</span>(d + <span class="hljs-number">1</span>, d + t + <span class="hljs-number">1</span>, <span class="hljs-number">0x3f3f3f3f3f3f3f3f</span>);
+		queue&lt;<span class="hljs-type">int</span>&gt;q; q.<span class="hljs-built_in">emplace</span>(s); d[s] = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (q.<span class="hljs-built_in">size</span>()) {
+			<span class="hljs-type">int</span> tp = q.<span class="hljs-built_in">front</span>(); q.<span class="hljs-built_in">pop</span>(); vis[tp] = <span class="hljs-number">0</span>;
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i : h[tp])
+				<span class="hljs-keyword">if</span> (e[i].f &amp;&amp; d[e[i].p] &gt; d[tp] + e[i].v)
+					<span class="hljs-keyword">if</span> (d[e[i].p] = d[tp] + e[i].v, !vis[e[i].p])
+						q.<span class="hljs-built_in">emplace</span>(e[i].p), vis[e[i].p] = <span class="hljs-number">1</span>;
+		}
+		<span class="hljs-keyword">return</span> d[t] != <span class="hljs-number">0x3f3f3f3f3f3f3f3f</span>;
+	}
+	<span class="hljs-type">int</span> pr[<span class="hljs-number">5005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p, <span class="hljs-type">int</span> f)</span> </span>{
+		<span class="hljs-keyword">if</span> (p == t || !f) <span class="hljs-keyword">return</span> f;
+		<span class="hljs-type">int</span> ret = <span class="hljs-number">0</span>, v; vis[p] = <span class="hljs-number">1</span>;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span>&amp; i = pr[p]; i != h[p].<span class="hljs-built_in">size</span>(); ++i) {
+			node&amp; sp = e[h[p][i]];
+			<span class="hljs-keyword">if</span> (!vis[sp.p] &amp;&amp; sp.f &amp;&amp; d[sp.p] == d[p] + sp.v) {
+				v = <span class="hljs-built_in">dfs</span>(sp.p, <span class="hljs-built_in">min</span>(f, sp.f));
+				<span class="hljs-keyword">if</span> (!v) d[sp.p] = <span class="hljs-number">0x3f3f3f3f3f3f3f3f</span>;
+				sp.f -= v; e[h[p][i] ^ <span class="hljs-number">1</span>].f += v;
+				ret += v; f -= v; ans += v * sp.v;
+				<span class="hljs-keyword">if</span> (!f) <span class="hljs-keyword">return</span> ret;
+			}
+		}
+		vis[p] = <span class="hljs-number">0</span>; <span class="hljs-keyword">return</span> ret;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">que</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">while</span> (<span class="hljs-built_in">spfa</span>()) {
+			<span class="hljs-built_in">fill</span>(pr + <span class="hljs-number">1</span>, pr + t + <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> v; v = <span class="hljs-built_in">dfs</span>(s, <span class="hljs-number">0x3f3f3f3f3f3f3f3f</span>);) mxf += v;
+		}
+		<span class="hljs-keyword">return</span> ans;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">clear</span><span class="hljs-params">()</span> </span>{
+		e.<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= t; ++i) h[i].<span class="hljs-built_in">clear</span>();
+	}
+}ssp;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin &gt;&gt; n;
+	<span class="hljs-keyword">while</span> (cin &gt;&gt; n &gt;&gt; m) {
+		s = n + m + <span class="hljs-number">1</span>; t = s + <span class="hljs-number">1</span>; din.<span class="hljs-built_in">reset</span>(); mxf = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, v; i &lt;= n; ++i)
+			cin &gt;&gt; v, din.<span class="hljs-built_in">ins</span>(i, t, v);
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, l, r, v; i &lt;= m; ++i)
+			cin &gt;&gt; l &gt;&gt; r &gt;&gt; v, mxf += v,
+			din.<span class="hljs-built_in">ins</span>(s, i + n, v),
+			din.<span class="hljs-built_in">ins</span>(i + n, l, v),
+			din.<span class="hljs-built_in">ins</span>(i + n, r, v);
+		cout &lt;&lt; mxf - din.<span class="hljs-built_in">maxflow</span>() &lt;&lt; endl;
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

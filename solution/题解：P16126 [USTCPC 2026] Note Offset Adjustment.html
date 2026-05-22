@@ -2,58 +2,67 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：P16126 [USTCPC 2026] Note Offset Adjustment</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>一看，像是一种二分的题目，但是不好直接二分：区间太长了！</p>
 <p>与是一个很自然的想法是先将答案限制在一个长度可以接受的范围之内，然后在考虑怎么二分。</p>
-<p>巧了！一次查询可以确定一个数字在不在某一个长度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">180</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">360</span></span></span></span> 的区间内。于是我们只需要 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 次操作就可以确认一个数字大致处在哪一个区间内了，这个区间的长度最长为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">360</span></span></span></span>。</p>
-<p>考虑一个最基础的二分：对于区间 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">]</span></span></span></span>，我们查询 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">180</span></span></span></span> 就可以知道答案是在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">]</span></span></span></span> 还是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span> 了。</p>
-<p>但是，你发现这样做总共最多需要 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">12</span></span></span></span> 次！通过不了，于是你考虑优化：前面的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">80</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">160</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">180</span></span></span></span> 是干什么的呢？</p>
-<p>欸！注意到区间长度最长不超过 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">180</span></span></span></span>。如果我第一次查询 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">120</span></span></span></span>，那么如果返回 <code>Good</code>，那么说明答案在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">40</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">40</span><span class="mclose">]</span></span></span></span> 间。如果返回 <code>Perfect</code>，那么说明在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">40</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">]</span></span></span></span>。剩下的就是在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">40</span><span class="mclose">]</span></span></span></span>！</p>
-<p>我们做到了单次将区间长度砍到原区间的 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 左右，但是细细推算仍需要 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">11</span></span></span></span> 次左右。</p>
-<p>不过上面的方法已经启发了我们：对于第一次分治得到的区间，我们再查询一下 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">170</span></span></span></span>，那么就只可能在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">10</span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">10</span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">10</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">]</span></span></span></span> 当中选择一个区间了。</p>
-<p>我们对于这种分治执行两次，此时不难推出来剩余区间的长度最长为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">20</span></span></span></span>。此时再进行朴素的二分只需要 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span> 次，总共不超过 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> 次。</p>
+<p>巧了！一次查询可以确定一个数字在不在某一个长度为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mo>×</mo><mn>180</mn><mo>=</mo><mn>360</mn></mrow><annotation encoding="application/x-tex">2\times 180=360</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">180</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">360</span></span></span></span> 的区间内。于是我们只需要 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn></mrow><annotation encoding="application/x-tex">2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span> 次操作就可以确认一个数字大致处在哪一个区间内了，这个区间的长度最长为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>360</mn></mrow><annotation encoding="application/x-tex">360</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">360</span></span></span></span>。</p>
+<p>考虑一个最基础的二分：对于区间 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>l</mi><mo separator="true">,</mo><mi>r</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[l,r]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">]</span></span></span></span>，我们查询 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mi>i</mi><mi>d</mi><mo>+</mo><mn>180</mn></mrow><annotation encoding="application/x-tex">mid+180</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">180</span></span></span></span> 就可以知道答案是在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo separator="true">,</mo><mi>r</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[mid,r]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">]</span></span></span></span> 还是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>l</mi><mo separator="true">,</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>−</mo><mn>1</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[l,mid-1]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">]</span></span></span></span> 了。</p>
+<p>但是，你发现这样做总共最多需要 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>12</mn></mrow><annotation encoding="application/x-tex">12</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">12</span></span></span></span> 次！通过不了，于是你考虑优化：前面的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>80</mn><mo separator="true">,</mo><mn>160</mn><mo separator="true">,</mo><mn>180</mn></mrow><annotation encoding="application/x-tex">80,160,180</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">80</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">160</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">180</span></span></span></span> 是干什么的呢？</p>
+<p>欸！注意到区间长度最长不超过 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>180</mn></mrow><annotation encoding="application/x-tex">180</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">180</span></span></span></span>。如果我第一次查询 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mi>i</mi><mi>d</mi><mo>+</mo><mn>120</mn></mrow><annotation encoding="application/x-tex">mid+120</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">120</span></span></span></span>，那么如果返回 <code>Good</code>，那么说明答案在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>−</mo><mn>40</mn><mo separator="true">,</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>+</mo><mn>40</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[mid-40,mid+40]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">40</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">40</span><span class="mclose">]</span></span></span></span> 间。如果返回 <code>Perfect</code>，那么说明在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>+</mo><mn>40</mn><mo separator="true">,</mo><mi>r</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[mid+40,r]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">40</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">]</span></span></span></span>。剩下的就是在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>l</mi><mo separator="true">,</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>−</mo><mn>40</mn><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[l,mid-40]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">40</span><span class="mclose">]</span></span></span></span>！</p>
+<p>我们做到了单次将区间长度砍到原区间的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow><annotation encoding="application/x-tex">\frac{1}{3}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> 左右，但是细细推算仍需要 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>11</mn></mrow><annotation encoding="application/x-tex">11</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">11</span></span></span></span> 次左右。</p>
+<p>不过上面的方法已经启发了我们：对于第一次分治得到的区间，我们再查询一下 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>m</mi><mi>i</mi><mi>d</mi><mo>+</mo><mn>170</mn></mrow><annotation encoding="application/x-tex">mid+170</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">170</span></span></span></span>，那么就只可能在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mi>l</mi><mo separator="true">,</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>−</mo><mn>10</mn><mo stretchy="false">]</mo><mo separator="true">,</mo><mo stretchy="false">[</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>−</mo><mn>10</mn><mo separator="true">,</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>+</mo><mn>10</mn><mo stretchy="false">]</mo><mo separator="true">,</mo><mo stretchy="false">[</mo><mi>m</mi><mi>i</mi><mi>d</mi><mo>+</mo><mn>10</mn><mo separator="true">,</mo><mi>r</mi><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[l,mid-10],[mid-10,mid+10],[mid+10,r]</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.0197em;">l</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">10</span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord">10</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">10</span><span class="mclose">]</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">[</span><span class="mord mathnormal">mi</span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">10</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span><span class="mclose">]</span></span></span></span> 当中选择一个区间了。</p>
+<p>我们对于这种分治执行两次，此时不难推出来剩余区间的长度最长为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>20</mn></mrow><annotation encoding="application/x-tex">20</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">20</span></span></span></span>。此时再进行朴素的二分只需要 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>5</mn></mrow><annotation encoding="application/x-tex">5</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">5</span></span></span></span> 次，总共不超过 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>10</mn></mrow><annotation encoding="application/x-tex">10</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">10</span></span></span></span> 次。</p>
 <p>此题可解，考场代码如下：</p>
-<pre><code class="language-cpp">#include &lt;iostream&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include &lt;iostream&gt;
 #include &lt;vector&gt;
 #include &lt;string&gt;
 #include &lt;cmath&gt;
@@ -208,8 +217,221 @@ int main() {
 	}
 	return 0;
 }
-</code></pre>
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cmath&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-type">int</span> t, l, r, mid;
+string s[<span class="hljs-number">12</span>]; <span class="hljs-type">int</span> a[<span class="hljs-number">12</span>];
+<span class="hljs-type">int</span> ans, cnt;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> string <span class="hljs-title">query</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span> </span>{
+	cerr &lt;&lt; <span class="hljs-string">&quot;[&quot;</span> &lt;&lt; l &lt;&lt; <span class="hljs-string">&quot;,&quot;</span> &lt;&lt; r &lt;&lt; <span class="hljs-string">&quot;]: Querying &quot;</span> &lt;&lt; p &lt;&lt; endl;
+	cnt++;
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">abs</span>(p - ans) &lt;= <span class="hljs-number">80</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Perfect&quot;</span>;
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">abs</span>(p - ans) &lt;= <span class="hljs-number">160</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Good&quot;</span>;
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">abs</span>(p - ans) &lt;= <span class="hljs-number">180</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Bad&quot;</span>;
+	<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Miss&quot;</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">search</span><span class="hljs-params">()</span> </span>{
+	<span class="hljs-keyword">while</span> (l != r) {
+		mid = l + r + <span class="hljs-number">1</span> &gt;&gt; <span class="hljs-number">1</span>;
+		a[<span class="hljs-number">0</span>] = mid + <span class="hljs-number">180</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+		cout &lt;&lt; <span class="hljs-string">&quot;? &quot;</span> &lt;&lt; a[<span class="hljs-number">0</span>] &lt;&lt; endl;
+		cin &gt;&gt; s[<span class="hljs-number">0</span>];
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+		s[<span class="hljs-number">0</span>] = <span class="hljs-built_in">query</span>(a[<span class="hljs-number">0</span>]);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-keyword">if</span> (s[<span class="hljs-number">0</span>] == <span class="hljs-string">&quot;Miss&quot;</span>) r = mid - <span class="hljs-number">1</span>;
+		<span class="hljs-keyword">else</span> l = mid;
+	}
+	<span class="hljs-keyword">return</span> l;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">verify</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span> </span>{
+	<span class="hljs-keyword">if</span> (p != ans) cerr &lt;&lt; p &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; ans &lt;&lt; endl, <span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);
+	<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cnt &gt; <span class="hljs-number">10</span>) cerr &lt;&lt; p &lt;&lt; endl, <span class="hljs-built_in">exit</span>(<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">else</span> cout &lt;&lt; <span class="hljs-string">&quot;Pass\n&quot;</span>;
+}
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-built_in">srand</span>((<span class="hljs-type">unsigned</span>)<span class="hljs-built_in">time</span>(<span class="hljs-number">0</span>));
+	<span class="hljs-keyword">for</span> (cin &gt;&gt; t;t;t--) {
+		<span class="hljs-comment">/*
+		首先通过两次询问，我们可以将答案限制在一个长度为 360 的区间内。
+		具体来说，我们选择两个查询点，
+		一个的 Bad 区间正好包含左
+		一个的 Bad 区间正好包含右
+		中间没有覆盖到的部分长度是不超过 360 的。
 
-    </div>
+		接下来，有一种基础的二分：
+		假设区间在 [l,r]，中点为 mid
+		那么我查询 mid+180 就可以知道答案在 [l,mid-1] 还是 [mid,r] 了。
+		直接做最大查询次数是 11 次，已经很好了但是还需要优化(限 10 次)。
+
+		我们注意这样一件事情：
+		第一次的区间长度只有 360。
+		对于 [l,r] 的区间，中点为 mid
+		如果我查询 mid+120，那么：
+		如果是 perfect，那么答案限制在自己这边，并且左端点可以直接限制到 mid+40。
+		如果是 Good，那么答案限制在 [mid-40,mid+40]，区间长度直接缩到了 80，肯定没问题。
+		剩下的情况都是另一边了，并且右端点可以限制到 mid-40。
+
+		注意到第一轮这样操作之后，最大可能出现的区间是 60+80=140，此时直接二分仍然是不够通过的。
+		我们还能继续减少次数：
+		我们查询 mid+170，那么：
+		如果是 Perfect 或者 Good，那么答案限制在自己这边。
+		如果是 Bad，那么答案限制在 [mid-10,mid+10]，区间长度直接缩到了 20，肯定没问题。
+		剩下的情况都是另一边了，并且右端点可以直接限制到 mid-10。
+		注意到第二轮这样操作之后，最大可能出现的区间是 60 的，直接二分已经可过了。
+		此题可解。
+		*/</span>
+		ans = <span class="hljs-built_in">rand</span>() % <span class="hljs-number">1001</span> - <span class="hljs-number">400</span>;
+		cnt = <span class="hljs-number">0</span>;
+
+		l = <span class="hljs-number">-400</span>, r = <span class="hljs-number">600</span>;
+		a[<span class="hljs-number">1</span>] = <span class="hljs-number">-220</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+		cout &lt;&lt; <span class="hljs-string">&quot;? &quot;</span> &lt;&lt; a[<span class="hljs-number">1</span>] &lt;&lt; endl;
+		cin &gt;&gt; s[<span class="hljs-number">1</span>];
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+		s[<span class="hljs-number">1</span>] = <span class="hljs-built_in">query</span>(a[<span class="hljs-number">1</span>]);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-keyword">if</span> (s[<span class="hljs-number">1</span>] != <span class="hljs-string">&quot;Miss&quot;</span>) r = a[<span class="hljs-number">1</span>] + <span class="hljs-number">180</span>;
+		<span class="hljs-keyword">else</span> l = a[<span class="hljs-number">1</span>] + <span class="hljs-number">181</span>;
+		a[<span class="hljs-number">2</span>] = <span class="hljs-number">420</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+		cout &lt;&lt; <span class="hljs-string">&quot;? &quot;</span> &lt;&lt; a[<span class="hljs-number">2</span>] &lt;&lt; endl;
+		cin &gt;&gt; s[<span class="hljs-number">2</span>];
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+		s[<span class="hljs-number">2</span>] = <span class="hljs-built_in">query</span>(a[<span class="hljs-number">2</span>]);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-keyword">if</span> (s[<span class="hljs-number">2</span>] != <span class="hljs-string">&quot;Miss&quot;</span>) l = <span class="hljs-built_in">max</span>(l, a[<span class="hljs-number">2</span>] - <span class="hljs-number">180</span>);
+		<span class="hljs-keyword">else</span> r = <span class="hljs-built_in">min</span>(a[<span class="hljs-number">2</span>] - <span class="hljs-number">181</span>, r);
+		<span class="hljs-comment">//一轮特殊缩减</span>
+		mid = l + r &gt;&gt; <span class="hljs-number">1</span>;
+		a[<span class="hljs-number">3</span>] = mid + <span class="hljs-number">120</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+		cout &lt;&lt; <span class="hljs-string">&quot;? &quot;</span> &lt;&lt; a[<span class="hljs-number">3</span>] &lt;&lt; endl;
+		cin &gt;&gt; s[<span class="hljs-number">3</span>];
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+		s[<span class="hljs-number">3</span>] = <span class="hljs-built_in">query</span>(a[<span class="hljs-number">3</span>]);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-keyword">if</span> (s[<span class="hljs-number">3</span>] == <span class="hljs-string">&quot;Good&quot;</span>) l = mid - <span class="hljs-number">40</span>, r = mid + <span class="hljs-number">40</span>;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (s[<span class="hljs-number">3</span>] != <span class="hljs-string">&quot;Perfect&quot;</span>) r = mid - <span class="hljs-number">40</span>;
+		<span class="hljs-keyword">else</span> l = mid + <span class="hljs-number">40</span>;
+		<span class="hljs-comment">//二轮特殊缩减</span>
+		mid = l + r &gt;&gt; <span class="hljs-number">1</span>;
+		a[<span class="hljs-number">4</span>] = mid + <span class="hljs-number">170</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+		cout &lt;&lt; <span class="hljs-string">&quot;? &quot;</span> &lt;&lt; a[<span class="hljs-number">4</span>] &lt;&lt; endl;
+		cin &gt;&gt; s[<span class="hljs-number">4</span>];
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+		s[<span class="hljs-number">4</span>] = <span class="hljs-built_in">query</span>(a[<span class="hljs-number">4</span>]);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-keyword">if</span> (s[<span class="hljs-number">4</span>] == <span class="hljs-string">&quot;Bad&quot;</span>) {
+			l = mid - <span class="hljs-number">10</span>; r = mid + <span class="hljs-number">10</span>;
+			<span class="hljs-type">int</span> ans = <span class="hljs-built_in">search</span>();
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+			cout &lt;&lt; <span class="hljs-string">&quot;! &quot;</span> &lt;&lt; ans &lt;&lt; endl;
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+			<span class="hljs-built_in">verify</span>(ans);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+			<span class="hljs-keyword">continue</span>;
+		}
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (s[<span class="hljs-number">4</span>] == <span class="hljs-string">&quot;Miss&quot;</span>) r = mid - <span class="hljs-number">10</span>;
+		<span class="hljs-keyword">else</span> l = mid + <span class="hljs-number">10</span>;
+		<span class="hljs-comment">//三轮特殊缩减</span>
+		mid = l + r &gt;&gt; <span class="hljs-number">1</span>;
+		a[<span class="hljs-number">5</span>] = mid + <span class="hljs-number">170</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+		cout &lt;&lt; <span class="hljs-string">&quot;? &quot;</span> &lt;&lt; a[<span class="hljs-number">5</span>] &lt;&lt; endl;
+		cin &gt;&gt; s[<span class="hljs-number">5</span>];
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+		s[<span class="hljs-number">5</span>] = <span class="hljs-built_in">query</span>(a[<span class="hljs-number">5</span>]);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-keyword">if</span> (s[<span class="hljs-number">5</span>] == <span class="hljs-string">&quot;Bad&quot;</span>) {
+			l = mid - <span class="hljs-number">10</span>; r = mid + <span class="hljs-number">10</span>;
+			<span class="hljs-type">int</span> ans = <span class="hljs-built_in">search</span>();
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+			cout &lt;&lt; <span class="hljs-string">&quot;! &quot;</span> &lt;&lt; ans &lt;&lt; endl;
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+			<span class="hljs-built_in">verify</span>(ans);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+			<span class="hljs-keyword">continue</span>;
+		}
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (s[<span class="hljs-number">5</span>] == <span class="hljs-string">&quot;Miss&quot;</span>) r = mid - <span class="hljs-number">10</span>;
+		<span class="hljs-keyword">else</span> l = mid + <span class="hljs-number">10</span>;
+		<span class="hljs-type">int</span> ans = <span class="hljs-built_in">search</span>();
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> _MSC_VER</span>
+		cout &lt;&lt; <span class="hljs-string">&quot;! &quot;</span> &lt;&lt; ans &lt;&lt; endl;
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+		<span class="hljs-built_in">verify</span>(ans);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-keyword">continue</span>;
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
+
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>
