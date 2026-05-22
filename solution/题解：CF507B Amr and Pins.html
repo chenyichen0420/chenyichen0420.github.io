@@ -2,48 +2,54 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题目大意</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h1>题目大意</h1>
-<p>给你一个初始位置在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，半径为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> 的圆，请问，每次选取圆上的一点并围绕其旋转任意度数，最少需要多少次才能转到终点 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>？</p>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h1>题目大意</h1>
+<p>给你一个初始位置在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo separator="true">,</mo><msub><mi>y</mi><mn>1</mn></msub></mrow><annotation encoding="application/x-tex">x_1,y_1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>，半径为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">r</span></span></span></span> 的圆，请问，每次选取圆上的一点并围绕其旋转任意度数，最少需要多少次才能转到终点 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>2</mn></msub><mo separator="true">,</mo><msub><mi>y</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">x_2,y_2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>？</p>
 <h1>解法分析</h1>
 <p>其实特别简单，就是一个障眼法。</p>
 <p>假想有一个起始的圆和一个在终点的圆，那么每一次分两种情况：</p>
@@ -51,11 +57,14 @@
 <li>暂时还没有交点。</li>
 <li>已经有了至少一个交点。</li>
 </ol>
-<p>对于第一个情况，两圆是相离的，即 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>，这时转一次一定无法重合，那么我们在两圆圆心的连线与当前圆的交点处翻转半圈，就可以将他们的距离缩短 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>。</p>
-<p>对于第二个情况，即 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>，在它们的任意一个交点旋转适当角度就可以使得圆心重合，即达成目标。</p>
-<p>综上，我们得到移动的步数为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌈</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mclose">)⌉</span></span></span></span>。</p>
+<p>对于第一个情况，两圆是相离的，即 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>&gt;</mo><mi>R</mi><mo>×</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">D&gt;R\times2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>，这时转一次一定无法重合，那么我们在两圆圆心的连线与当前圆的交点处翻转半圈，就可以将他们的距离缩短 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mo>×</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">R\times2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>。</p>
+<p>对于第二个情况，即 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>≤</mo><mi>R</mi><mo>×</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">D\leq R\times2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>，在它们的任意一个交点旋转适当角度就可以使得圆心重合，即达成目标。</p>
+<p>综上，我们得到移动的步数为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">⌈</mo><mi>D</mi><mo>÷</mo><mo stretchy="false">(</mo><mi>R</mi><mo>×</mo><mn>2</mn><mo stretchy="false">)</mo><mo stretchy="false">⌉</mo></mrow><annotation encoding="application/x-tex">\lceil D\div(R\times2)\rceil</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">⌈</span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">÷</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mclose">)⌉</span></span></span></span>。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 int main(){
 	int r,a,b,c,d;
@@ -64,8 +73,75 @@ int main(){
 	cout&lt;&lt;ceil(dis/(r*2))&lt;&lt;endl;
 	return 0;
 } 
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-type">int</span> r,a,b,c,d;
+	cin&gt;&gt;r&gt;&gt;a&gt;&gt;b&gt;&gt;c&gt;&gt;d;
+	<span class="hljs-type">double</span> dis=<span class="hljs-built_in">sqrt</span>((a-c)*<span class="hljs-number">1ll</span>*(a-c)+(b-d)*<span class="hljs-number">1ll</span>*(b-d));
+	cout&lt;&lt;<span class="hljs-built_in">ceil</span>(dis/(r*<span class="hljs-number">2</span>))&lt;&lt;endl;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+} 
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

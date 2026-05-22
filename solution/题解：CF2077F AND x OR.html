@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>题解：CF2077F AND x OR</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
+</head>
+<body>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
+<p>这道题要求 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span> 内部通过位运算得到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span>，于是显然我们也只能从判定入手：什么样的 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo separator="true">,</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a,b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span></span></span></span> 是满足要求的？</p>
+<p>一个显然可行的方式是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a=b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span>，但是还有没有别的呢？我们需要思考 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span> 内部的变化的本质特征：</p>
+<p>如果想要选择一个 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">a_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 保持不变，那么我们选择一个 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">a_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的超集，并将这个集合或到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">a_j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 上；或者选择 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">a_i</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> 的子集，并将这个集合与到 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">a_j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 上。</p>
+<p>不难证明：如果同时使得 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>a</mi><mi>i</mi></msub><mo separator="true">,</mo><msub><mi>a</mi><mi>j</mi></msub></mrow><annotation encoding="application/x-tex">a_i,a_j</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7167em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0572em;">j</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span> 变化的话，那么可以只使用上述两种操作凑出来。</p>
+<p>关注第二种操作，他告诉我们我可以将任意一个数变成 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，关注第一种操作，他告诉我们我可以将任意一个数变成另一个数的超集。</p>
+<p>也就是说，如果在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> 中存在子集关系，那么就有解。具体来说，我们将超集元素设置为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，利用 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 将其他元素先变成 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>，再变成目标。最后我们利用子集元素将超集还原到想要的状态。</p>
+<p>容易注意到变成 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> 的操作空间显然是严格强于另外的任何数的，因此，这种构造在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo mathvariant="normal">≠</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">a\neq b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mspace nobreak"></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> 的条件下是充要的。</p>
+<p>于是此题就变成了使 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi></mrow><annotation encoding="application/x-tex">b</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span> 中的某个元素变成另外某个元素的子集或者超集的最小代价。</p>
+<p>这个代价怎么算呢？我们可以先将一个元素增大，得到某一个元素增大到某一个位置的最小代价，然后将这个代价向子集与超集分别扩张，就求完了。</p>
+<p>此题可解，时间复杂度是单个 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo></mrow><annotation encoding="application/x-tex">\log</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span></span></span></span>，代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+//#pragma GCC optimize(2)
+using namespace std;
+//#define int long long
+constexpr bool online=0;
+#define _rw_file &quot;&quot;
+#define sipt //signed-input
+#define sopt //signed-output
+struct IO {
+#define mxsz (1 &lt;&lt; 21)
+	char buf[mxsz], * p1, * p2;
+	char pbuf[mxsz], * pp; bool acc[128];
+	IO() : p1(buf), p2(buf), pp(pbuf) {}
+	~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
+	inline char gc() {
+		if (p1 == p2) p2 = (p1 = buf) + fread(buf, 1, mxsz, stdin);
+		return p1 == p2 ? ' ' : *p1++;
+	}
+	inline void setacc(const char* c) { while (*c) acc[*c++] = 1; }
+	inline char getc() { char c; while (!acc[c = gc()]); return c; }
+#ifndef sipt
+	inline int read() {
+		int r = 0; char c = gc(); while (c &lt; '0' || c&gt;'9') c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return r;
+	}
+#else
+	inline int read() {
+		int r = 0; char c = gc(); bool rev = 0;
+		while (c &lt; '0' || c&gt;'9') rev |= (c == '-'), c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return rev ? ~r + 1 : r;
+	}
+#endif
+	inline void push(const char&amp; c) {
+		if (pp - pbuf == mxsz) fwrite(pbuf, 1, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	inline void write(int x) {
+		static char sta[22]; int top = 0;
+		do sta[top++] = x % 10, x /= 10; while (x);
+		while (top) push(sta[--top] ^ 48);
+	}
+	inline void write(int x, char opc) {
+#ifdef sopt
+		if (x &lt; 0) push('-'), x = ~x + 1;
+#endif
+		write(x), push(opc);
+	}
+	inline void puts(const char* c) { while (*c) push(*c++); }
+} io;
+int t,n,m,a[1ll&lt;&lt;22|2],b[1ll&lt;&lt;22|2],ans,tt;
+struct minval{
+	int v1,p1,v2,p2;
+	inline void emplace(int p,int v){
+		if(!p) return;
+		if(p1==p){
+			if(v&lt;v1) v1=v;
+			return;
+		}
+		if(v&lt;=v1) v2=v1,p2=p1,v1=v,p1=p;
+		else if(v&lt;v2) v2=v,p2=p;
+	}
+}v[1ll&lt;&lt;22|2],v2[1ll&lt;&lt;22|2],v3[1ll&lt;&lt;22|2];
+signed main(){
+    if(online)
+        freopen(_rw_file &quot;.in&quot;,&quot;r&quot;,stdin),
+        freopen(_rw_file &quot;.out&quot;,&quot;w&quot;,stdout);
+    ios::sync_with_stdio(0);
+	/*
+	@2030
+	首先，较为套路的，我们先考虑怎么检验 a,b 是合法的？
+	我们可以将一个 a 置为 0，后续再去恢复他。
+	恢复方式：找到一个目标值的子集目标值，然后就可以恢复了。
+	也就是说，基本上，如果在 b 中存在子集关系，那么就是可行的。
+	不过显然这并不是充要的。比如说二者直接相等了。
+	@2051 give up
+  &lt;- 不是哪个神人想到的？这东西能是对的？？？
+	*/
+	for(tt=t=io.read();t;t--){
+		n=io.read(); m=io.read(); ans=0;
+		for(int i=1;i&lt;=n;++i) a[i]=io.read();
+		for(int i=1;i&lt;=n;++i) b[i]=io.read();
+		m=pow(2,1+ceil(log2(m)));
+		for(int i=0;i!=m;++i)
+			v[i].v1=v[i].v2=1e9,v[i].p1=v[i].p2=0;
+		for(int i=1;i&lt;=n&amp;&amp;ans&lt;=m;++i) ans+=abs(a[i]-b[i]);
+		for(int i=1;i&lt;=n;++i) v[b[i]].emplace(i,0);
+		for(int i=1;i!=m;++i)
+			v[i].emplace(v[i-1].p1,v[i-1].v1+1),
+			v[i].emplace(v[i-1].p2,v[i-1].v2+1);
+		// for(int i=0;i!=m;++i){
+		// 	cerr&lt;&lt;i&lt;&lt;&quot;:&quot;;
+		// 	if(v[i].p1) cerr&lt;&lt;v[i].p1&lt;&lt;&quot; &quot;&lt;&lt;v[i].v1&lt;&lt;&quot;  &quot;;
+		// 	if(v[i].p2) cerr&lt;&lt;v[i].p2&lt;&lt;&quot; &quot;&lt;&lt;v[i].v2&lt;&lt;&quot;  &quot;;
+		// 	cerr&lt;&lt;endl;
+		// }
+		memcpy(v2,v,sizeof(minval)*m);
+		memcpy(v3,v,sizeof(minval)*m);
+		for(int d=21;d&gt;=0;d--)
+			for(int i=0;i!=m;++i)
+				if(!(i&gt;&gt;d&amp;1))
+					v2[i|(1ll&lt;&lt;d)].emplace(v2[i].p1,v2[i].v1),
+					v2[i|(1ll&lt;&lt;d)].emplace(v2[i].p2,v2[i].v2);
+		// for(int i=0;i!=m;++i){
+		// 	cerr&lt;&lt;i&lt;&lt;&quot;:&quot;;
+		// 	if(v2[i].p1) cerr&lt;&lt;v2[i].p1&lt;&lt;&quot; &quot;&lt;&lt;v2[i].v1&lt;&lt;&quot;  &quot;;
+		// 	if(v2[i].p2) cerr&lt;&lt;v2[i].p2&lt;&lt;&quot; &quot;&lt;&lt;v2[i].v2&lt;&lt;&quot;  &quot;;
+		// 	cerr&lt;&lt;endl;
+		// }
+		for(int d=21;d&gt;=0;d--)
+			for(int i=0;i!=m;++i)
+				if(i&gt;&gt;d&amp;1)
+					v3[i^(1ll&lt;&lt;d)].emplace(v3[i].p1,v3[i].v1),
+					v3[i^(1ll&lt;&lt;d)].emplace(v3[i].p2,v3[i].v2);
+		// for(int i=0;i!=m;++i){
+		// 	cerr&lt;&lt;i&lt;&lt;&quot;:&quot;;
+		// 	if(v3[i].p1) cerr&lt;&lt;v3[i].p1&lt;&lt;&quot; &quot;&lt;&lt;v3[i].v1&lt;&lt;&quot;  &quot;;
+		// 	if(v3[i].p2) cerr&lt;&lt;v3[i].p2&lt;&lt;&quot; &quot;&lt;&lt;v3[i].v2&lt;&lt;&quot;  &quot;;
+		// 	cerr&lt;&lt;endl;
+		// }
+		for(int i=1;i&lt;=n;++i){
+			if(v2[b[i]].p1!=i) ans=min(ans,v2[b[i]].v1); 
+			if(v2[b[i]].p2!=i) ans=min(ans,v2[b[i]].v2); 
+		}
+		for(int i=1;i&lt;=n;++i){
+			if(v3[b[i]].p1!=i) ans=min(ans,v3[b[i]].v1); 
+			if(v3[b[i]].p2!=i) ans=min(ans,v3[b[i]].v2); 
+		}
+		io.write(ans,'\n');
+	}
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-comment">//#pragma GCC optimize(2)</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-comment">//#define int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> online=<span class="hljs-number">0</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> _rw_file <span class="hljs-string">&quot;&quot;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> sipt <span class="hljs-comment">//signed-input</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> sopt <span class="hljs-comment">//signed-output</span></span>
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">IO</span> {
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> mxsz (1 &lt;&lt; 21)</span>
+	<span class="hljs-type">char</span> buf[mxsz], * p1, * p2;
+	<span class="hljs-type">char</span> pbuf[mxsz], * pp; <span class="hljs-type">bool</span> acc[<span class="hljs-number">128</span>];
+	<span class="hljs-built_in">IO</span>() : <span class="hljs-built_in">p1</span>(buf), <span class="hljs-built_in">p2</span>(buf), <span class="hljs-built_in">pp</span>(pbuf) {}
+	~<span class="hljs-built_in">IO</span>() { <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, pp - pbuf, stdout); }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">gc</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">if</span> (p1 == p2) p2 = (p1 = buf) + <span class="hljs-built_in">fread</span>(buf, <span class="hljs-number">1</span>, mxsz, stdin);
+		<span class="hljs-keyword">return</span> p1 == p2 ? <span class="hljs-string">&#x27; &#x27;</span> : *p1++;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">setacc</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* c)</span> </span>{ <span class="hljs-keyword">while</span> (*c) acc[*c++] = <span class="hljs-number">1</span>; }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">getc</span><span class="hljs-params">()</span> </span>{ <span class="hljs-type">char</span> c; <span class="hljs-keyword">while</span> (!acc[c = <span class="hljs-built_in">gc</span>()]); <span class="hljs-keyword">return</span> c; }
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> sipt</span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-type">bool</span> rev = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) rev |= (c == <span class="hljs-string">&#x27;-&#x27;</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> rev ? ~r + <span class="hljs-number">1</span> : r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">push</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>&amp; c)</span> </span>{
+		<span class="hljs-keyword">if</span> (pp - pbuf == mxsz) <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> </span>{
+		<span class="hljs-type">static</span> <span class="hljs-type">char</span> sta[<span class="hljs-number">22</span>]; <span class="hljs-type">int</span> top = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">do</span> sta[top++] = x % <span class="hljs-number">10</span>, x /= <span class="hljs-number">10</span>; <span class="hljs-keyword">while</span> (x);
+		<span class="hljs-keyword">while</span> (top) <span class="hljs-built_in">push</span>(sta[--top] ^ <span class="hljs-number">48</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">char</span> opc)</span> </span>{
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> sopt</span>
+		<span class="hljs-keyword">if</span> (x &lt; <span class="hljs-number">0</span>) <span class="hljs-built_in">push</span>(<span class="hljs-string">&#x27;-&#x27;</span>), x = ~x + <span class="hljs-number">1</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-built_in">write</span>(x), <span class="hljs-built_in">push</span>(opc);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">puts</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* c)</span> </span>{ <span class="hljs-keyword">while</span> (*c) <span class="hljs-built_in">push</span>(*c++); }
+} io;
+<span class="hljs-type">int</span> t,n,m,a[<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">22</span>|<span class="hljs-number">2</span>],b[<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">22</span>|<span class="hljs-number">2</span>],ans,tt;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">minval</span>{
+	<span class="hljs-type">int</span> v1,p1,v2,p2;
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">emplace</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> v)</span></span>{
+		<span class="hljs-keyword">if</span>(!p) <span class="hljs-keyword">return</span>;
+		<span class="hljs-keyword">if</span>(p1==p){
+			<span class="hljs-keyword">if</span>(v&lt;v1) v1=v;
+			<span class="hljs-keyword">return</span>;
+		}
+		<span class="hljs-keyword">if</span>(v&lt;=v1) v2=v1,p2=p1,v1=v,p1=p;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(v&lt;v2) v2=v,p2=p;
+	}
+}v[<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">22</span>|<span class="hljs-number">2</span>],v2[<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">22</span>|<span class="hljs-number">2</span>],v3[<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">22</span>|<span class="hljs-number">2</span>];
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+    <span class="hljs-keyword">if</span>(online)
+        <span class="hljs-built_in">freopen</span>(_rw_file <span class="hljs-string">&quot;.in&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>,stdin),
+        <span class="hljs-built_in">freopen</span>(_rw_file <span class="hljs-string">&quot;.out&quot;</span>,<span class="hljs-string">&quot;w&quot;</span>,stdout);
+    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-comment">/*
+	@2030
+	首先，较为套路的，我们先考虑怎么检验 a,b 是合法的？
+	我们可以将一个 a 置为 0，后续再去恢复他。
+	恢复方式：找到一个目标值的子集目标值，然后就可以恢复了。
+	也就是说，基本上，如果在 b 中存在子集关系，那么就是可行的。
+	不过显然这并不是充要的。比如说二者直接相等了。
+	@2051 give up
+  &lt;- 不是哪个神人想到的？这东西能是对的？？？
+	*/</span>
+	<span class="hljs-keyword">for</span>(tt=t=io.<span class="hljs-built_in">read</span>();t;t--){
+		n=io.<span class="hljs-built_in">read</span>(); m=io.<span class="hljs-built_in">read</span>(); ans=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) a[i]=io.<span class="hljs-built_in">read</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) b[i]=io.<span class="hljs-built_in">read</span>();
+		m=<span class="hljs-built_in">pow</span>(<span class="hljs-number">2</span>,<span class="hljs-number">1</span>+<span class="hljs-built_in">ceil</span>(<span class="hljs-built_in">log2</span>(m)));
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=m;++i)
+			v[i].v1=v[i].v2=<span class="hljs-number">1e9</span>,v[i].p1=v[i].p2=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n&amp;&amp;ans&lt;=m;++i) ans+=<span class="hljs-built_in">abs</span>(a[i]-b[i]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) v[b[i]].<span class="hljs-built_in">emplace</span>(i,<span class="hljs-number">0</span>);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=m;++i)
+			v[i].<span class="hljs-built_in">emplace</span>(v[i<span class="hljs-number">-1</span>].p1,v[i<span class="hljs-number">-1</span>].v1<span class="hljs-number">+1</span>),
+			v[i].<span class="hljs-built_in">emplace</span>(v[i<span class="hljs-number">-1</span>].p2,v[i<span class="hljs-number">-1</span>].v2<span class="hljs-number">+1</span>);
+		<span class="hljs-comment">// for(int i=0;i!=m;++i){</span>
+		<span class="hljs-comment">// 	cerr&lt;&lt;i&lt;&lt;&quot;:&quot;;</span>
+		<span class="hljs-comment">// 	if(v[i].p1) cerr&lt;&lt;v[i].p1&lt;&lt;&quot; &quot;&lt;&lt;v[i].v1&lt;&lt;&quot;  &quot;;</span>
+		<span class="hljs-comment">// 	if(v[i].p2) cerr&lt;&lt;v[i].p2&lt;&lt;&quot; &quot;&lt;&lt;v[i].v2&lt;&lt;&quot;  &quot;;</span>
+		<span class="hljs-comment">// 	cerr&lt;&lt;endl;</span>
+		<span class="hljs-comment">// }</span>
+		<span class="hljs-built_in">memcpy</span>(v2,v,<span class="hljs-built_in">sizeof</span>(minval)*m);
+		<span class="hljs-built_in">memcpy</span>(v3,v,<span class="hljs-built_in">sizeof</span>(minval)*m);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> d=<span class="hljs-number">21</span>;d&gt;=<span class="hljs-number">0</span>;d--)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=m;++i)
+				<span class="hljs-keyword">if</span>(!(i&gt;&gt;d&amp;<span class="hljs-number">1</span>))
+					v2[i|(<span class="hljs-number">1ll</span>&lt;&lt;d)].<span class="hljs-built_in">emplace</span>(v2[i].p1,v2[i].v1),
+					v2[i|(<span class="hljs-number">1ll</span>&lt;&lt;d)].<span class="hljs-built_in">emplace</span>(v2[i].p2,v2[i].v2);
+		<span class="hljs-comment">// for(int i=0;i!=m;++i){</span>
+		<span class="hljs-comment">// 	cerr&lt;&lt;i&lt;&lt;&quot;:&quot;;</span>
+		<span class="hljs-comment">// 	if(v2[i].p1) cerr&lt;&lt;v2[i].p1&lt;&lt;&quot; &quot;&lt;&lt;v2[i].v1&lt;&lt;&quot;  &quot;;</span>
+		<span class="hljs-comment">// 	if(v2[i].p2) cerr&lt;&lt;v2[i].p2&lt;&lt;&quot; &quot;&lt;&lt;v2[i].v2&lt;&lt;&quot;  &quot;;</span>
+		<span class="hljs-comment">// 	cerr&lt;&lt;endl;</span>
+		<span class="hljs-comment">// }</span>
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> d=<span class="hljs-number">21</span>;d&gt;=<span class="hljs-number">0</span>;d--)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=m;++i)
+				<span class="hljs-keyword">if</span>(i&gt;&gt;d&amp;<span class="hljs-number">1</span>)
+					v3[i^(<span class="hljs-number">1ll</span>&lt;&lt;d)].<span class="hljs-built_in">emplace</span>(v3[i].p1,v3[i].v1),
+					v3[i^(<span class="hljs-number">1ll</span>&lt;&lt;d)].<span class="hljs-built_in">emplace</span>(v3[i].p2,v3[i].v2);
+		<span class="hljs-comment">// for(int i=0;i!=m;++i){</span>
+		<span class="hljs-comment">// 	cerr&lt;&lt;i&lt;&lt;&quot;:&quot;;</span>
+		<span class="hljs-comment">// 	if(v3[i].p1) cerr&lt;&lt;v3[i].p1&lt;&lt;&quot; &quot;&lt;&lt;v3[i].v1&lt;&lt;&quot;  &quot;;</span>
+		<span class="hljs-comment">// 	if(v3[i].p2) cerr&lt;&lt;v3[i].p2&lt;&lt;&quot; &quot;&lt;&lt;v3[i].v2&lt;&lt;&quot;  &quot;;</span>
+		<span class="hljs-comment">// 	cerr&lt;&lt;endl;</span>
+		<span class="hljs-comment">// }</span>
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+			<span class="hljs-keyword">if</span>(v2[b[i]].p1!=i) ans=<span class="hljs-built_in">min</span>(ans,v2[b[i]].v1); 
+			<span class="hljs-keyword">if</span>(v2[b[i]].p2!=i) ans=<span class="hljs-built_in">min</span>(ans,v2[b[i]].v2); 
+		}
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+			<span class="hljs-keyword">if</span>(v3[b[i]].p1!=i) ans=<span class="hljs-built_in">min</span>(ans,v3[b[i]].v1); 
+			<span class="hljs-keyword">if</span>(v3[b[i]].p2!=i) ans=<span class="hljs-built_in">min</span>(ans,v3[b[i]].v2); 
+		}
+		io.<span class="hljs-built_in">write</span>(ans,<span class="hljs-string">&#x27;\n&#x27;</span>);
+	}
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
+
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
+</body>
+</html>

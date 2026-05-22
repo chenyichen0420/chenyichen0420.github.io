@@ -2,54 +2,63 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：AT_abc141_f [ABC141F] Xor Sum 3</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>首先，遇到这种二进制相关的题，我们就要考虑从二进制位的角度按位分析。</p>
 <p>先看一下每一位为一的数的个数。最简单的情况就是奇数个。因为无论你怎么分，总是有一边有，有一边没有，可以提前统计了，然后消除掉这些位。</p>
 <p>偶数个的最难搞：你不一定能够保证左右都可以分到一，有的位甚至是因为没有数才是偶数个！</p>
-<p>这有点难搞，但是实际上我们可以发现一个性质：当一边最优的时候另一边一定也最优。为什么呢？你想想，每一位的个数都是偶数个，所以异或起来的值就是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>。然后左右两边都是通过异或得到的，也就是说两边的数异或起来就是 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>。所以两边相等啊！</p>
-<p>好了，现在要做的就是从数组 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span> 中选出一些数，使得其异或值最大。熟悉吗？线性基板子。</p>
+<p>这有点难搞，但是实际上我们可以发现一个性质：当一边最优的时候另一边一定也最优。为什么呢？你想想，每一位的个数都是偶数个，所以异或起来的值就是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>。然后左右两边都是通过异或得到的，也就是说两边的数异或起来就是 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>。所以两边相等啊！</p>
+<p>好了，现在要做的就是从数组 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi></mrow><annotation encoding="application/x-tex">a</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span></span></span></span> 中选出一些数，使得其异或值最大。熟悉吗？线性基板子。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
 int n, v[100005], cnt[60], lib[60], ans;
@@ -83,8 +92,100 @@ signed main() {
 	cout &lt;&lt; ans + (que(0) &lt;&lt; 1) &lt;&lt; endl;
 	return 0;
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-type">int</span> n, v[<span class="hljs-number">100005</span>], cnt[<span class="hljs-number">60</span>], lib[<span class="hljs-number">60</span>], ans;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">int</span>&amp; v)</span> </span>{
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">60</span>; ++i)
+		cnt[i]^=((v&gt;&gt;i)&amp;<span class="hljs-number">1</span>);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span> </span>{
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">59</span>; i &gt;= <span class="hljs-number">0</span>; i--)
+		<span class="hljs-keyword">if</span> (v &amp; (<span class="hljs-number">1ll</span> &lt;&lt; i))
+			<span class="hljs-keyword">if</span> (lib[i]) v ^= lib[i];
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(lib[i] = v);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span> </span>{
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">59</span>; i &gt;= <span class="hljs-number">0</span>; i--)
+		<span class="hljs-keyword">if</span> ((v ^ lib[i]) &gt; v) v ^= lib[i];
+	<span class="hljs-keyword">return</span> v;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin &gt;&gt; n;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i)
+		cin &gt;&gt; v[i], <span class="hljs-built_in">add</span>(v[i]);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">60</span>; ++i)
+		<span class="hljs-keyword">if</span> (cnt[i]) {
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= n; ++j)
+				<span class="hljs-keyword">if</span> (v[j] &amp; (<span class="hljs-number">1ll</span> &lt;&lt; i)) v[j] ^= (<span class="hljs-number">1ll</span> &lt;&lt; i);
+			ans |= (<span class="hljs-number">1ll</span> &lt;&lt; i);
+		}
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) <span class="hljs-built_in">ins</span>(v[i]);
+	cout &lt;&lt; ans + (<span class="hljs-built_in">que</span>(<span class="hljs-number">0</span>) &lt;&lt; <span class="hljs-number">1</span>) &lt;&lt; endl;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

@@ -2,63 +2,72 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题目大意</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h1>题目大意</h1>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h1>题目大意</h1>
 <p>题目够简洁了吧？不给。</p>
 <h1>解法分析</h1>
-<p>其实是水题一道。我们可以按照这些花到第一个喷泉的距离排序，然后枚举第一个喷泉覆盖到哪里，剩下的可以暴力枚举离第二个喷泉的距离最远的花在哪里并计算 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 或者用倒序的前缀和数组优化为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。总复杂度为 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">n</span></span><span class="mclose">)</span></span></span></span>。</p>
+<p>其实是水题一道。我们可以按照这些花到第一个喷泉的距离排序，然后枚举第一个喷泉覆盖到哪里，剩下的可以暴力枚举离第二个喷泉的距离最远的花在哪里并计算 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><msup><mi>n</mi><mn>2</mn></msup><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n^2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> 或者用倒序的前缀和数组优化为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mclose">)</span></span></span></span>。总复杂度为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false">(</mo><mi>n</mi><mi>log</mi><mo>⁡</mo><mi>n</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">O(n\log{n})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">O</span><span class="mopen">(</span><span class="mord mathnormal">n</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">n</span></span><span class="mclose">)</span></span></span></span>。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
 inline int raed(){
 	register int r=0,s=1; register char c=getchar();
-	while(c &lt; &#39;0&#39; || c &gt; &#39;9&#39;) {if(c == &#39;-&#39;) s = -1;c = getchar();}
-	while(c&gt;=&#39;0&#39; &amp;&amp; c&lt;=&#39;9&#39;) r=(r&lt;&lt;3)+(r&lt;&lt;1)+(c^48),c=getchar();
+	while(c &lt; '0' || c &gt; '9') {if(c == '-') s = -1;c = getchar();}
+	while(c&gt;='0' &amp;&amp; c&lt;='9') r=(r&lt;&lt;3)+(r&lt;&lt;1)+(c^48),c=getchar();
 	return r*s;
 }
 inline void writen(int x){
 	if(x&gt;9) writen(x/10);
-	putchar(x%10+&#39;0&#39;);
+	putchar(x%10+'0');
 	return;
 }
 inline void read(){
@@ -92,8 +101,111 @@ signed main(){
 	ans=min(ans,di[1]); cout&lt;&lt;ans&lt;&lt;endl;
 	return 0;
 } 
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">raed</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">register</span> <span class="hljs-type">int</span> r=<span class="hljs-number">0</span>,s=<span class="hljs-number">1</span>; <span class="hljs-keyword">register</span> <span class="hljs-type">char</span> c=<span class="hljs-built_in">getchar</span>();
+	<span class="hljs-keyword">while</span>(c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c &gt; <span class="hljs-string">&#x27;9&#x27;</span>) {<span class="hljs-keyword">if</span>(c == <span class="hljs-string">&#x27;-&#x27;</span>) s = <span class="hljs-number">-1</span>;c = <span class="hljs-built_in">getchar</span>();}
+	<span class="hljs-keyword">while</span>(c&gt;=<span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c&lt;=<span class="hljs-string">&#x27;9&#x27;</span>) r=(r&lt;&lt;<span class="hljs-number">3</span>)+(r&lt;&lt;<span class="hljs-number">1</span>)+(c^<span class="hljs-number">48</span>),c=<span class="hljs-built_in">getchar</span>();
+	<span class="hljs-keyword">return</span> r*s;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">writen</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span></span>{
+	<span class="hljs-keyword">if</span>(x&gt;<span class="hljs-number">9</span>) <span class="hljs-built_in">writen</span>(x/<span class="hljs-number">10</span>);
+	<span class="hljs-built_in">putchar</span>(x%<span class="hljs-number">10</span>+<span class="hljs-string">&#x27;0&#x27;</span>);
+	<span class="hljs-keyword">return</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">read</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">return</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span>... Args&gt;
+<span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">read</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; val,Args&amp;... args)</span></span>{
+	val=<span class="hljs-built_in">raed</span>(); <span class="hljs-built_in">read</span>(args...);
+}
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">pnt</span>{
+	<span class="hljs-type">int</span> x,y;
+	<span class="hljs-built_in">pnt</span>(<span class="hljs-type">int</span> xi=<span class="hljs-number">0</span>,<span class="hljs-type">int</span> yi=<span class="hljs-number">0</span>){
+		x=xi,y=yi;
+	}
+}p1,p2;
+<span class="hljs-type">int</span> n; pnt p[<span class="hljs-number">2005</span>]; <span class="hljs-type">int</span> di[<span class="hljs-number">2005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">dis</span><span class="hljs-params">(pnt l,pnt r)</span></span>{
+	<span class="hljs-keyword">return</span> (l.x-r.x)*(l.x-r.x)+(l.y-r.y)*(l.y-r.y);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">cmp</span><span class="hljs-params">(pnt l,pnt r)</span></span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">dis</span>(l,p1)&lt;<span class="hljs-built_in">dis</span>(r,p1);
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-built_in">read</span>(n,p<span class="hljs-number">1.</span>x,p<span class="hljs-number">1.</span>y,p<span class="hljs-number">2.</span>x,p<span class="hljs-number">2.</span>y);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) <span class="hljs-built_in">read</span>(p[i].x,p[i].y);
+	<span class="hljs-built_in">sort</span>(p<span class="hljs-number">+1</span>,p+n<span class="hljs-number">+1</span>,cmp);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n;i;i--) di[i]=<span class="hljs-built_in">max</span>(di[i<span class="hljs-number">+1</span>],<span class="hljs-built_in">dis</span>(p[i],p2));
+	<span class="hljs-type">int</span> ans=<span class="hljs-number">0x3f3f3f3f3f3f3f3f</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) 
+		ans=<span class="hljs-built_in">min</span>(ans,<span class="hljs-built_in">dis</span>(p[i],p1)+di[i<span class="hljs-number">+1</span>]);
+	ans=<span class="hljs-built_in">min</span>(ans,di[<span class="hljs-number">1</span>]); cout&lt;&lt;ans&lt;&lt;endl;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+} 
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

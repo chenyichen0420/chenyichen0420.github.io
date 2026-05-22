@@ -2,57 +2,66 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：AT_abc166_f [ABC166F] Three Variables Game</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>首先，有一个比较正确的贪心思路：更改的二者中，选更小的加，更大的减。</p>
 <p>不过，这种贪心需要一点修正，就是在遇到二者相等的时候，比如 <code>2 1 1 0 AB BC</code>。</p>
-<p>如果按照上面的贪心的话，那么你可能会出现 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">200</span></span></span></span>，从而判无解，但实际上他是有解的。</p>
+<p>如果按照上面的贪心的话，那么你可能会出现 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>200</mn></mrow><annotation encoding="application/x-tex">2 0 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">200</span></span></span></span>，从而判无解，但实际上他是有解的。</p>
 <p>其实仔细一想，对于这一轮而言，因为二者相等，所以唯一的差别就在于这个选择对下一轮的影响。分两种情况：</p>
 <ol>
 <li>两次操作相同，则两次分别取不同的加即可。</li>
 <li>两次操作不同，其中一定有一个数被修改了两次。我们要尽可能地让后面的不被影响，所以这次给重合的数加，下次给另一个数加。</li>
 </ol>
 <p>其实思路还是比较简洁的，代码也偏短。如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 int n,v[4]; char t[100005][3],an[100005];
 inline void net(){
@@ -64,27 +73,78 @@ int main(){
 	cin&gt;&gt;n&gt;&gt;v[0]&gt;&gt;v[1]&gt;&gt;v[2];
 	for(int i=1;i&lt;=n;++i) cin&gt;&gt;t[i];
 	for(int i=1;i&lt;=n;++i){
-		int cl=t[i][0]-&#39;A&#39;,cr=t[i][1]-&#39;A&#39;;
-		if(v[cl]&gt;v[cr]) v[cl]--,v[cr]++,an[i]=cr+&#39;A&#39;;
-		else if(v[cl]&lt;v[cr]) v[cr]--,v[cl]++,an[i]=cl+&#39;A&#39;;
+		int cl=t[i][0]-'A',cr=t[i][1]-'A';
+		if(v[cl]&gt;v[cr]) v[cl]--,v[cr]++,an[i]=cr+'A';
+		else if(v[cl]&lt;v[cr]) v[cr]--,v[cl]++,an[i]=cl+'A';
 		else{
 			if(!v[cl]) net();
-			int ccl=t[i+1][0]-&#39;A&#39;,ccr=t[i+1][1]-&#39;A&#39;;
-			if(cl==ccl&amp;&amp;cr==ccr) an[i]=cl+&#39;A&#39;,an[i+1]=cr+&#39;A&#39;;
-			else if(cl==ccl) an[i]=cl+&#39;A&#39;,an[i+1]=ccr+&#39;A&#39;,v[cr]--,v[ccr]++;
-			else if(cr==ccr) an[i]=cr+&#39;A&#39;,an[i+1]=ccl+&#39;A&#39;,v[cl]--,v[ccl]++;
-			else if(cl==ccr) an[i]=&#39;B&#39;,an[i+1]=&#39;A&#39;,v[2]--,v[0]++;  //BC-AB
-			else if(cr==ccl) an[i]=&#39;B&#39;,an[i+1]=&#39;C&#39;,v[2]++,v[0]--;
-			else an[i]=cl+&#39;A&#39;,v[cl]++,v[cr]--; i++;
+			int ccl=t[i+1][0]-'A',ccr=t[i+1][1]-'A';
+			if(cl==ccl&amp;&amp;cr==ccr) an[i]=cl+'A',an[i+1]=cr+'A';
+			else if(cl==ccl) an[i]=cl+'A',an[i+1]=ccr+'A',v[cr]--,v[ccr]++;
+			else if(cr==ccr) an[i]=cr+'A',an[i+1]=ccl+'A',v[cl]--,v[ccl]++;
+			else if(cl==ccr) an[i]='B',an[i+1]='A',v[2]--,v[0]++;  //BC-AB
+			else if(cr==ccl) an[i]='B',an[i+1]='C',v[2]++,v[0]--;
+			else an[i]=cl+'A',v[cl]++,v[cr]--; i++;
 		}
 		if(v[0]&lt;0||v[1]&lt;0||v[2]&lt;0) net();
 	}
 	cout&lt;&lt;&quot;Yes\n&quot;;
 	for(int i=1;i&lt;=n;++i)cout&lt;&lt;an[i]&lt;&lt;&quot;\n&quot;;
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-type">int</span> n,v[<span class="hljs-number">4</span>]; <span class="hljs-type">char</span> t[<span class="hljs-number">100005</span>][<span class="hljs-number">3</span>],an[<span class="hljs-number">100005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">net</span><span class="hljs-params">()</span></span>{
+	cout&lt;&lt;<span class="hljs-string">&quot;No\n&quot;</span>;
+	<span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>);
+}
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin&gt;&gt;n&gt;&gt;v[<span class="hljs-number">0</span>]&gt;&gt;v[<span class="hljs-number">1</span>]&gt;&gt;v[<span class="hljs-number">2</span>];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;t[i];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+		<span class="hljs-type">int</span> cl=t[i][<span class="hljs-number">0</span>]-<span class="hljs-string">&#x27;A&#x27;</span>,cr=t[i][<span class="hljs-number">1</span>]-<span class="hljs-string">&#x27;A&#x27;</span>;
+		<span class="hljs-keyword">if</span>(v[cl]&gt;v[cr]) v[cl]--,v[cr]++,an[i]=cr+<span class="hljs-string">&#x27;A&#x27;</span>;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(v[cl]&lt;v[cr]) v[cr]--,v[cl]++,an[i]=cl+<span class="hljs-string">&#x27;A&#x27;</span>;
+		<span class="hljs-keyword">else</span>{
+			<span class="hljs-keyword">if</span>(!v[cl]) <span class="hljs-built_in">net</span>();
+			<span class="hljs-type">int</span> ccl=t[i<span class="hljs-number">+1</span>][<span class="hljs-number">0</span>]-<span class="hljs-string">&#x27;A&#x27;</span>,ccr=t[i<span class="hljs-number">+1</span>][<span class="hljs-number">1</span>]-<span class="hljs-string">&#x27;A&#x27;</span>;
+			<span class="hljs-keyword">if</span>(cl==ccl&amp;&amp;cr==ccr) an[i]=cl+<span class="hljs-string">&#x27;A&#x27;</span>,an[i<span class="hljs-number">+1</span>]=cr+<span class="hljs-string">&#x27;A&#x27;</span>;
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(cl==ccl) an[i]=cl+<span class="hljs-string">&#x27;A&#x27;</span>,an[i<span class="hljs-number">+1</span>]=ccr+<span class="hljs-string">&#x27;A&#x27;</span>,v[cr]--,v[ccr]++;
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(cr==ccr) an[i]=cr+<span class="hljs-string">&#x27;A&#x27;</span>,an[i<span class="hljs-number">+1</span>]=ccl+<span class="hljs-string">&#x27;A&#x27;</span>,v[cl]--,v[ccl]++;
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(cl==ccr) an[i]=<span class="hljs-string">&#x27;B&#x27;</span>,an[i<span class="hljs-number">+1</span>]=<span class="hljs-string">&#x27;A&#x27;</span>,v[<span class="hljs-number">2</span>]--,v[<span class="hljs-number">0</span>]++;  <span class="hljs-comment">//BC-AB</span>
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(cr==ccl) an[i]=<span class="hljs-string">&#x27;B&#x27;</span>,an[i<span class="hljs-number">+1</span>]=<span class="hljs-string">&#x27;C&#x27;</span>,v[<span class="hljs-number">2</span>]++,v[<span class="hljs-number">0</span>]--;
+			<span class="hljs-keyword">else</span> an[i]=cl+<span class="hljs-string">&#x27;A&#x27;</span>,v[cl]++,v[cr]--; i++;
+		}
+		<span class="hljs-keyword">if</span>(v[<span class="hljs-number">0</span>]&lt;<span class="hljs-number">0</span>||v[<span class="hljs-number">1</span>]&lt;<span class="hljs-number">0</span>||v[<span class="hljs-number">2</span>]&lt;<span class="hljs-number">0</span>) <span class="hljs-built_in">net</span>();
+	}
+	cout&lt;&lt;<span class="hljs-string">&quot;Yes\n&quot;</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)cout&lt;&lt;an[i]&lt;&lt;<span class="hljs-string">&quot;\n&quot;</span>;
+}
 </code></pre>
+</div>
+</div>
 <p>附赠一组自造的数据：</p>
-<pre><code class="language-txt">9 1 0 1
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">TXT</span>
+    <button class="copy-btn" data-code="9 1 0 1
+BC
+AB
+BC
+BC
+AB
+AB
+AC
+AB
+AB
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-txt">9 1 0 1
 BC
 AB
 BC
@@ -95,7 +155,62 @@ AC
 AB
 AB
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

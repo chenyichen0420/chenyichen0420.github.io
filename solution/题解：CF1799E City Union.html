@@ -2,47 +2,53 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：CF1799E City Union</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>大致分为以下两步：</p>
 <ol>
 <li>将框住两个连通块的最小矩形连起来；</li>
@@ -52,17 +58,20 @@
 <p>完全不相交的时候，我们直接在两个矩形最接近的点之间一横一竖连起来就完事了。最省填充数量。</p>
 <p>显然这样子花费在第一步的新填充数是最少的，考虑第二步，也就是哪些是一定要填充的。</p>
 <p>我们发现如果一个点的上面和下面都有点的话，那为了保证凸性，就不得不填上了。左右同理。同时我们也发现第一部的操作方法正好可以不在第二步浪费格子。</p>
-<p>但是只做一次是有问题的，我们可能有三个点在 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mclose">)</span></span></span></span>，那么因枚举顺序不同可能无法填上 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">)</span></span></span></span>。不过因为是针对连通块在进行填充，所以第一次一定会填完行或者列，只需要填两次就行了。</p>
+<p>但是只做一次是有问题的，我们可能有三个点在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>3</mn><mo separator="true">,</mo><mn>1</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(1,1),(3,1),(2,3)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mclose">)</span></span></span></span>，那么因枚举顺序不同可能无法填上 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>2</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(2,2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">)</span></span></span></span>。不过因为是针对连通块在进行填充，所以第一次一定会填完行或者列，只需要填两次就行了。</p>
 <p>代码如下：</p>
-<pre><code class="language-cpp">#include&lt;bits/stdc++.h&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 struct pos { int x, y; }ep[4];
 int t, n, m, f; char mp[55][55]; vector&lt;pos&gt;p[2];
 constexpr int dx[] = { 0,0,1,-1 }, dy[] = { -1,1,0,0 };
 inline void dfs(int x, int y) {
-	p[f].push_back({ x,y }); mp[x][y] = &#39;.&#39;;
+	p[f].push_back({ x,y }); mp[x][y] = '.';
 	for (int i = 0; i != 4; ++i)
-		if (mp[x + dx[i]][y + dy[i]] == &#39;#&#39;)
+		if (mp[x + dx[i]][y + dy[i]] == '#')
 			dfs(x + dx[i], y + dy[i]);
 }
 signed main() {
@@ -76,7 +85,7 @@ signed main() {
 				cin &gt;&gt; mp[i][j];
 		for (int i = 1; i &lt;= n; ++i)
 			for (int j = 1; j &lt;= m; ++j)
-				if (mp[i][j] == &#39;#&#39;)
+				if (mp[i][j] == '#')
 					dfs(i, j), f++;
 		ep[0] = ep[2] = { 80,80 };
 		ep[1] = ep[3] = { 0,0 };
@@ -85,43 +94,43 @@ signed main() {
 			ep[0].y = min(ep[0].y, v.y),
 			ep[1].x = max(ep[1].x, v.x),
 			ep[1].y = max(ep[1].y, v.y),
-			mp[v.x][v.y] = &#39;#&#39;;
+			mp[v.x][v.y] = '#';
 		for (const auto&amp; v : p[1])
 			ep[2].x = min(ep[2].x, v.x),
 			ep[2].y = min(ep[2].y, v.y),
 			ep[3].x = max(ep[3].x, v.x),
 			ep[3].y = max(ep[3].y, v.y),
-			mp[v.x][v.y] = &#39;#&#39;;
+			mp[v.x][v.y] = '#';
 		if (ep[1].x &lt; ep[2].x &amp;&amp; ep[1].y &lt; ep[2].y) {
-			for (int i = ep[1].x + 1; i &lt;= ep[2].x; ++i) mp[i][ep[1].y] = &#39;#&#39;;
-			for (int i = ep[1].y + 1; i != ep[2].y; ++i) mp[ep[2].x][i] = &#39;#&#39;;
+			for (int i = ep[1].x + 1; i &lt;= ep[2].x; ++i) mp[i][ep[1].y] = '#';
+			for (int i = ep[1].y + 1; i != ep[2].y; ++i) mp[ep[2].x][i] = '#';
 		}
 		if (ep[0].x &gt; ep[3].x &amp;&amp; ep[1].y &lt; ep[2].y) {
-			for (int i = ep[0].x - 1; i &gt;= ep[3].x; --i) mp[i][ep[1].y] = &#39;#&#39;;
-			for (int i = ep[1].y + 1; i != ep[2].y; ++i) mp[ep[3].x][i] = &#39;#&#39;;
+			for (int i = ep[0].x - 1; i &gt;= ep[3].x; --i) mp[i][ep[1].y] = '#';
+			for (int i = ep[1].y + 1; i != ep[2].y; ++i) mp[ep[3].x][i] = '#';
 		}
 		if (ep[0].x &gt; ep[3].x &amp;&amp; ep[0].y &gt; ep[3].y) {
-			for (int i = ep[3].x + 1; i &lt;= ep[0].x; ++i) mp[i][ep[3].y] = &#39;#&#39;;
-			for (int i = ep[3].y + 1; i != ep[0].y; ++i) mp[ep[0].x][i] = &#39;#&#39;;
+			for (int i = ep[3].x + 1; i &lt;= ep[0].x; ++i) mp[i][ep[3].y] = '#';
+			for (int i = ep[3].y + 1; i != ep[0].y; ++i) mp[ep[0].x][i] = '#';
 		}
 		if (ep[1].x &lt; ep[2].x &amp;&amp; ep[0].y &gt; ep[3].y) {
-			for (int i = ep[2].x - 1; i &gt;= ep[1].x; --i) mp[i][ep[3].y] = &#39;#&#39;;
-			for (int i = ep[3].y + 1; i != ep[0].y; ++i) mp[ep[1].x][i] = &#39;#&#39;;
+			for (int i = ep[2].x - 1; i &gt;= ep[1].x; --i) mp[i][ep[3].y] = '#';
+			for (int i = ep[3].y + 1; i != ep[0].y; ++i) mp[ep[1].x][i] = '#';
 		}
 		for (int k = 1; k &lt;= 2; ++k) {
 			for (int i = 1; i &lt;= n; ++i) {
 				int up = 0, dp = 0;
-				for (int j = 1; j &lt;= m; ++j) if (mp[i][j] == &#39;#&#39;) dp = j;
-				for (int j = m; j &gt;= 1; --j) if (mp[i][j] == &#39;#&#39;) up = j;
+				for (int j = 1; j &lt;= m; ++j) if (mp[i][j] == '#') dp = j;
+				for (int j = m; j &gt;= 1; --j) if (mp[i][j] == '#') up = j;
 				if (!up) continue;
-				for (int j = up; j &lt;= dp; ++j) mp[i][j] = &#39;#&#39;;
+				for (int j = up; j &lt;= dp; ++j) mp[i][j] = '#';
 			}
 			for (int j = 1; j &lt;= m; ++j) {
 				int up = 0, dp = 0;
-				for (int i = 1; i &lt;= n; ++i) if (mp[i][j] == &#39;#&#39;) dp = i;
-				for (int i = n; i &gt;= 1; i--) if (mp[i][j] == &#39;#&#39;) up = i;
+				for (int i = 1; i &lt;= n; ++i) if (mp[i][j] == '#') dp = i;
+				for (int i = n; i &gt;= 1; i--) if (mp[i][j] == '#') up = i;
 				if (!up) continue;
-				for (int i = up; i &lt;= dp; ++i) mp[i][j] = &#39;#&#39;;
+				for (int i = up; i &lt;= dp; ++i) mp[i][j] = '#';
 			}
 		}
 		for (int i = 1; i &lt;= n; ++i, cout &lt;&lt; endl)
@@ -130,8 +139,142 @@ signed main() {
 		cout &lt;&lt; endl;
 	}
 }
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">pos</span> { <span class="hljs-type">int</span> x, y; }ep[<span class="hljs-number">4</span>];
+<span class="hljs-type">int</span> t, n, m, f; <span class="hljs-type">char</span> mp[<span class="hljs-number">55</span>][<span class="hljs-number">55</span>]; vector&lt;pos&gt;p[<span class="hljs-number">2</span>];
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> dx[] = { <span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">-1</span> }, dy[] = { <span class="hljs-number">-1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span> };
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y)</span> </span>{
+	p[f].<span class="hljs-built_in">push_back</span>({ x,y }); mp[x][y] = <span class="hljs-string">&#x27;.&#x27;</span>;
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i != <span class="hljs-number">4</span>; ++i)
+		<span class="hljs-keyword">if</span> (mp[x + dx[i]][y + dy[i]] == <span class="hljs-string">&#x27;#&#x27;</span>)
+			<span class="hljs-built_in">dfs</span>(x + dx[i], y + dy[i]);
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span> (cin &gt;&gt; t; t; t--) {
+		cin &gt;&gt; n &gt;&gt; m; f = <span class="hljs-number">0</span>;
+		<span class="hljs-built_in">memset</span>(mp, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span> mp);
+		p[<span class="hljs-number">0</span>].<span class="hljs-built_in">clear</span>(); p[<span class="hljs-number">1</span>].<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i)
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= m; ++j)
+				cin &gt;&gt; mp[i][j];
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i)
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= m; ++j)
+				<span class="hljs-keyword">if</span> (mp[i][j] == <span class="hljs-string">&#x27;#&#x27;</span>)
+					<span class="hljs-built_in">dfs</span>(i, j), f++;
+		ep[<span class="hljs-number">0</span>] = ep[<span class="hljs-number">2</span>] = { <span class="hljs-number">80</span>,<span class="hljs-number">80</span> };
+		ep[<span class="hljs-number">1</span>] = ep[<span class="hljs-number">3</span>] = { <span class="hljs-number">0</span>,<span class="hljs-number">0</span> };
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp; v : p[<span class="hljs-number">0</span>])
+			ep[<span class="hljs-number">0</span>].x = <span class="hljs-built_in">min</span>(ep[<span class="hljs-number">0</span>].x, v.x),
+			ep[<span class="hljs-number">0</span>].y = <span class="hljs-built_in">min</span>(ep[<span class="hljs-number">0</span>].y, v.y),
+			ep[<span class="hljs-number">1</span>].x = <span class="hljs-built_in">max</span>(ep[<span class="hljs-number">1</span>].x, v.x),
+			ep[<span class="hljs-number">1</span>].y = <span class="hljs-built_in">max</span>(ep[<span class="hljs-number">1</span>].y, v.y),
+			mp[v.x][v.y] = <span class="hljs-string">&#x27;#&#x27;</span>;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp; v : p[<span class="hljs-number">1</span>])
+			ep[<span class="hljs-number">2</span>].x = <span class="hljs-built_in">min</span>(ep[<span class="hljs-number">2</span>].x, v.x),
+			ep[<span class="hljs-number">2</span>].y = <span class="hljs-built_in">min</span>(ep[<span class="hljs-number">2</span>].y, v.y),
+			ep[<span class="hljs-number">3</span>].x = <span class="hljs-built_in">max</span>(ep[<span class="hljs-number">3</span>].x, v.x),
+			ep[<span class="hljs-number">3</span>].y = <span class="hljs-built_in">max</span>(ep[<span class="hljs-number">3</span>].y, v.y),
+			mp[v.x][v.y] = <span class="hljs-string">&#x27;#&#x27;</span>;
+		<span class="hljs-keyword">if</span> (ep[<span class="hljs-number">1</span>].x &lt; ep[<span class="hljs-number">2</span>].x &amp;&amp; ep[<span class="hljs-number">1</span>].y &lt; ep[<span class="hljs-number">2</span>].y) {
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = ep[<span class="hljs-number">1</span>].x + <span class="hljs-number">1</span>; i &lt;= ep[<span class="hljs-number">2</span>].x; ++i) mp[i][ep[<span class="hljs-number">1</span>].y] = <span class="hljs-string">&#x27;#&#x27;</span>;
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = ep[<span class="hljs-number">1</span>].y + <span class="hljs-number">1</span>; i != ep[<span class="hljs-number">2</span>].y; ++i) mp[ep[<span class="hljs-number">2</span>].x][i] = <span class="hljs-string">&#x27;#&#x27;</span>;
+		}
+		<span class="hljs-keyword">if</span> (ep[<span class="hljs-number">0</span>].x &gt; ep[<span class="hljs-number">3</span>].x &amp;&amp; ep[<span class="hljs-number">1</span>].y &lt; ep[<span class="hljs-number">2</span>].y) {
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = ep[<span class="hljs-number">0</span>].x - <span class="hljs-number">1</span>; i &gt;= ep[<span class="hljs-number">3</span>].x; --i) mp[i][ep[<span class="hljs-number">1</span>].y] = <span class="hljs-string">&#x27;#&#x27;</span>;
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = ep[<span class="hljs-number">1</span>].y + <span class="hljs-number">1</span>; i != ep[<span class="hljs-number">2</span>].y; ++i) mp[ep[<span class="hljs-number">3</span>].x][i] = <span class="hljs-string">&#x27;#&#x27;</span>;
+		}
+		<span class="hljs-keyword">if</span> (ep[<span class="hljs-number">0</span>].x &gt; ep[<span class="hljs-number">3</span>].x &amp;&amp; ep[<span class="hljs-number">0</span>].y &gt; ep[<span class="hljs-number">3</span>].y) {
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = ep[<span class="hljs-number">3</span>].x + <span class="hljs-number">1</span>; i &lt;= ep[<span class="hljs-number">0</span>].x; ++i) mp[i][ep[<span class="hljs-number">3</span>].y] = <span class="hljs-string">&#x27;#&#x27;</span>;
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = ep[<span class="hljs-number">3</span>].y + <span class="hljs-number">1</span>; i != ep[<span class="hljs-number">0</span>].y; ++i) mp[ep[<span class="hljs-number">0</span>].x][i] = <span class="hljs-string">&#x27;#&#x27;</span>;
+		}
+		<span class="hljs-keyword">if</span> (ep[<span class="hljs-number">1</span>].x &lt; ep[<span class="hljs-number">2</span>].x &amp;&amp; ep[<span class="hljs-number">0</span>].y &gt; ep[<span class="hljs-number">3</span>].y) {
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = ep[<span class="hljs-number">2</span>].x - <span class="hljs-number">1</span>; i &gt;= ep[<span class="hljs-number">1</span>].x; --i) mp[i][ep[<span class="hljs-number">3</span>].y] = <span class="hljs-string">&#x27;#&#x27;</span>;
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = ep[<span class="hljs-number">3</span>].y + <span class="hljs-number">1</span>; i != ep[<span class="hljs-number">0</span>].y; ++i) mp[ep[<span class="hljs-number">1</span>].x][i] = <span class="hljs-string">&#x27;#&#x27;</span>;
+		}
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> k = <span class="hljs-number">1</span>; k &lt;= <span class="hljs-number">2</span>; ++k) {
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) {
+				<span class="hljs-type">int</span> up = <span class="hljs-number">0</span>, dp = <span class="hljs-number">0</span>;
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= m; ++j) <span class="hljs-keyword">if</span> (mp[i][j] == <span class="hljs-string">&#x27;#&#x27;</span>) dp = j;
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = m; j &gt;= <span class="hljs-number">1</span>; --j) <span class="hljs-keyword">if</span> (mp[i][j] == <span class="hljs-string">&#x27;#&#x27;</span>) up = j;
+				<span class="hljs-keyword">if</span> (!up) <span class="hljs-keyword">continue</span>;
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = up; j &lt;= dp; ++j) mp[i][j] = <span class="hljs-string">&#x27;#&#x27;</span>;
+			}
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= m; ++j) {
+				<span class="hljs-type">int</span> up = <span class="hljs-number">0</span>, dp = <span class="hljs-number">0</span>;
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) <span class="hljs-keyword">if</span> (mp[i][j] == <span class="hljs-string">&#x27;#&#x27;</span>) dp = i;
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = n; i &gt;= <span class="hljs-number">1</span>; i--) <span class="hljs-keyword">if</span> (mp[i][j] == <span class="hljs-string">&#x27;#&#x27;</span>) up = i;
+				<span class="hljs-keyword">if</span> (!up) <span class="hljs-keyword">continue</span>;
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = up; i &lt;= dp; ++i) mp[i][j] = <span class="hljs-string">&#x27;#&#x27;</span>;
+			}
+		}
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i, cout &lt;&lt; endl)
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= m; ++j)
+				cout &lt;&lt; mp[i][j];
+		cout &lt;&lt; endl;
+	}
+}
 </code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
 
-    </div>
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>

@@ -2,52 +2,61 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>题解：CF2074D Counting Points</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <style>
-        body {
-            padding: 2rem;
-            background-color: #f6f8fa;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { padding: 2rem; background-color: #f6f8fa; }
+        .markdown-body { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 2rem; }
+        .search-container {
+            max-width: 1200px; margin: 0 auto 1.5rem auto; background: white; border-radius: 8px;
+            padding: 1rem 2rem; display: flex; flex-wrap: wrap; align-items: center; gap: 1rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
-        .markdown-body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .katex-display {
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding: 0.5em 0;
-        }
-        .katex-error {
-            color: #dc2626;
-            background-color: #fef2f2;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
+        .search-box { flex: 3; min-width: 200px; padding: 0.6rem 1rem; border: 1px solid #d0d7de; border-radius: 6px; }
+        .search-box:focus { border-color: #0969da; outline: none; box-shadow: 0 0 0 3px rgba(9,105,218,0.3); }
+        .search-results { flex: 5; max-height: 400px; overflow-y: auto; background: #f6f8fa; border-radius: 8px; padding: 0.5rem; display: none; }
+        .search-results.active { display: block; }
+        .search-result-item { padding: 0.5rem; border-bottom: 1px solid #e1e4e8; cursor: pointer; }
+        .search-result-item:hover { background: #eaeef2; }
+        .search-result-title { font-weight: 600; color: #0969da; }
+        .search-result-snippet { font-size: 0.85rem; color: #57606a; margin-top: 0.2rem; }
+        
+        /* 代码块样式（无行号） */
+        .code-wrapper { margin: 1rem 0; border-radius: 6px; overflow: hidden; border: 1px solid #e1e4e8; }
+        .code-header { display: flex; justify-content: space-between; background: #f6f8fa; padding: 0.4rem 1rem; font-size: 0.85rem; border-bottom: 1px solid #e1e4e8; }
+        .code-lang { font-weight: 600; }
+        .copy-btn { background: white; border: 1px solid #d0d7de; border-radius: 6px; padding: 0.2rem 0.6rem; cursor: pointer; }
+        .copy-btn:hover { background: #eaeef2; }
+        .code-content pre { margin: 0 !important; padding: 0 !important; border-radius: 0 !important; background: white; overflow-x: auto; }
+        .footer { max-width: 1200px; margin: 2rem auto 0; text-align: center; font-size: 0.85rem; color: #57606a; border-top: 1px solid #e1e4e8; padding: 1.5rem 0; }
+        .footer a { color: #0969da; text-decoration: none; }
+        .katex-display { overflow-x: auto; }
+        .katex-error { color: #dc2626; background: #fef2f2; padding: 0.2rem 0.4rem; border-radius: 4px; }
         @media (max-width: 768px) {
             body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
 </head>
 <body>
-    <div class="markdown-body">
-        <h2>思路分析</h2>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
 <p>没有题面上的那个注释的话会更难一点：考察选手读题能力。</p>
-<p>翻译一下就是最多会有 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个形如 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span></span></span></span> 的点被覆盖掉，也就是有效的横坐标只有那么多个。</p>
+<p>翻译一下就是最多会有 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2</mn><mi>m</mi><mo>+</mo><mi>n</mi></mrow><annotation encoding="application/x-tex">2m+n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mord mathnormal">m</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> 个形如 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mn>0</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(x,0)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0</span><span class="mclose">)</span></span></span></span> 的点被覆盖掉，也就是有效的横坐标只有那么多个。</p>
 <p>所以说你就直接枚举每一个圆，枚举园内的横坐标，算出来最大的纵坐标值，统计答案。</p>
 <p>当然我写代码的时候脑子不太好使，写了个二分，不过时间复杂度还是对的，就先不修了。代码如下：</p>
-<pre><code class="language-cpp">#include&lt;iostream&gt;
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;iostream&gt;
 #include&lt;assert.h&gt;
 #include&lt;algorithm&gt;
 #include&lt;cmath&gt;
@@ -138,8 +147,157 @@ signed main() {
 		cout &lt;&lt; ans &lt;&lt; endl; ans = 0;
 	}
 }
-</code></pre>
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;assert.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;algorithm&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;cmath&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;map&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> double long double</span>
+<span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> t = <span class="hljs-type">double</span>&gt;
+<span class="hljs-keyword">struct</span> vecor {
+	t x, y;
+	<span class="hljs-built_in">vecor</span>(t x = <span class="hljs-number">0</span>, t y = <span class="hljs-number">0</span>) :<span class="hljs-built_in">x</span>(x), <span class="hljs-built_in">y</span>(y) {}
+	<span class="hljs-keyword">friend</span> istream&amp; <span class="hljs-keyword">operator</span>&gt;&gt;(istream&amp; l, vecor&lt;t&gt;&amp; r) {
+		<span class="hljs-keyword">return</span> l &gt;&gt; r.x &gt;&gt; r.y;
+	}
+	<span class="hljs-keyword">friend</span> ostream&amp; <span class="hljs-keyword">operator</span>&lt;&lt;(ostream&amp; l, <span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r) {
+		<span class="hljs-keyword">return</span> l &lt;&lt; r.x &lt;&lt; <span class="hljs-string">&quot; &quot;</span> &lt;&lt; r.y &lt;&lt; <span class="hljs-string">&quot; &quot;</span>;
+	}
 
-    </div>
+	<span class="hljs-keyword">inline</span> vecor <span class="hljs-keyword">operator</span>+(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r) <span class="hljs-type">const</span> {
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">vecor</span>(x + r.x, y + r.y);
+	}
+	<span class="hljs-keyword">inline</span> vecor <span class="hljs-keyword">operator</span>-(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r) <span class="hljs-type">const</span> {
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">vecor</span>(x - r.x, y - r.y);
+	}
+	<span class="hljs-keyword">inline</span> t <span class="hljs-keyword">operator</span>^(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r) <span class="hljs-type">const</span> {
+		<span class="hljs-keyword">return</span> x * r.x + y * r.y;
+	}
+	<span class="hljs-keyword">inline</span> t <span class="hljs-keyword">operator</span>*(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r) <span class="hljs-type">const</span> {
+		<span class="hljs-keyword">return</span> x * r.y - y * r.x;
+	}
+	<span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>==(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r) <span class="hljs-type">const</span>{
+		<span class="hljs-keyword">return</span> x == r.x &amp;&amp; y == r.y;
+	}
+
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">resize</span><span class="hljs-params">(t sz)</span> </span>{
+		<span class="hljs-type">double</span> k = sz / <span class="hljs-built_in">sqrt</span>(x * x + y * y);
+		x *= k; y *= k;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">zig</span><span class="hljs-params">()</span> </span>{ <span class="hljs-built_in">swap</span>(x, y); x = -x; }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">zag</span><span class="hljs-params">()</span> </span>{ <span class="hljs-built_in">swap</span>(x, y); y = -y; }
+
+	<span class="hljs-keyword">friend</span> <span class="hljs-type">bool</span> <span class="hljs-keyword">operator</span>&lt;(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; l, <span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r) {
+		<span class="hljs-keyword">return</span> l.x != r.x ? l.x &lt; r.x : l.y &lt; r.y;
+	}
+};
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">double</span> <span class="hljs-title">sqr</span><span class="hljs-params">(<span class="hljs-type">double</span> v)</span> </span>{ <span class="hljs-keyword">return</span> v * v; }
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> t&gt;
+<span class="hljs-keyword">inline</span> <span class="hljs-type">double</span> <span class="hljs-title">odis</span><span class="hljs-params">(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; l, <span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r)</span> </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">sqrt</span>(<span class="hljs-built_in">sqr</span>(l.x - r.x) + <span class="hljs-built_in">sqr</span>(l.y - r.y));
+}
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> t&gt;
+<span class="hljs-keyword">inline</span> t <span class="hljs-title">mdis</span><span class="hljs-params">(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; l, <span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r)</span> </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">abs</span>(l.x - r.x) + <span class="hljs-built_in">abs</span>(l.y - r.y);
+}
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> t&gt;
+<span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">online</span><span class="hljs-params">(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; l, <span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r, <span class="hljs-type">const</span> vecor&lt;t&gt;&amp; p)</span> </span>{
+	<span class="hljs-keyword">if</span> (<span class="hljs-built_in">abs</span>((p - l) * (p - r))) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">if</span> (p.x &lt; l.x &amp;&amp; p.x &lt; r.x) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">if</span> (p.y &lt; l.y &amp;&amp; p.y &lt; r.y) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">if</span> (p.x &gt; l.x &amp;&amp; p.x &gt; r.x) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">if</span> (p.y &gt; l.y &amp;&amp; p.y &gt; r.y) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> t&gt;
+<span class="hljs-keyword">inline</span> <span class="hljs-type">double</span> <span class="hljs-title">s</span><span class="hljs-params">(<span class="hljs-type">const</span> vecor&lt;t&gt;&amp; l, <span class="hljs-type">const</span> vecor&lt;t&gt;&amp; r, <span class="hljs-type">const</span> vecor&lt;t&gt;&amp; p)</span> </span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">abs</span>((p - l) * (p - r) / <span class="hljs-number">2</span>);
+}
+
+<span class="hljs-type">int</span> t, n, m, x[<span class="hljs-number">200005</span>], r[<span class="hljs-number">200005</span>], ans; map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;v;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span> (cin &gt;&gt; t; t; t--) {
+		cin &gt;&gt; n &gt;&gt; m; <span class="hljs-built_in">map</span>&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;().<span class="hljs-built_in">swap</span>(v);
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) cin &gt;&gt; x[i];
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) cin &gt;&gt; r[i];
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) {
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = x[i] - r[i]; j &lt;= x[i] + r[i]; ++j) {
+				<span class="hljs-type">int</span> l = <span class="hljs-number">0</span>, r = <span class="hljs-number">2e5</span>, mid;
+				<span class="hljs-keyword">while</span> (l != r) {
+					mid = l + r + <span class="hljs-number">1</span> &gt;&gt; <span class="hljs-number">1</span>;
+					<span class="hljs-keyword">if</span> (odis&lt;&gt;(vecor&lt;&gt;(x[i], <span class="hljs-number">0</span>), vecor&lt;&gt;(j, mid)) &lt;= ::r[i]) l = mid;
+					<span class="hljs-keyword">else</span> r = mid - <span class="hljs-number">1</span>;
+				}
+				v[j] = <span class="hljs-built_in">max</span>(v[j], l &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span>);
+			}
+		}
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp; t : v) ans += t.second;
+		cout &lt;&lt; ans &lt;&lt; endl; ans = <span class="hljs-number">0</span>;
+	}
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2025 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
+
+        let searchIndex = null;
+        const searchInput = document.getElementById('globalSearchInput');
+        const resultsDiv = document.getElementById('searchResults');
+        async function loadSearchIndex() {
+            if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+            else if (window.__SEARCH_INDEX_URL__) {
+                try {
+                    const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                    if (resp.ok) searchIndex = await resp.json();
+                } catch(e) {}
+            }
+        }
+        function performSearch(keyword) {
+            if (!searchIndex || !keyword.trim()) {
+                resultsDiv.classList.remove('active');
+                resultsDiv.innerHTML = '';
+                return;
+            }
+            const lower = keyword.toLowerCase();
+            const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+                resultsDiv.classList.add('active');
+                return;
+            }
+            resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+            resultsDiv.classList.add('active');
+            document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+        let timer;
+        searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+        document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+        loadSearchIndex();
+    })();
+</script>
 </body>
 </html>
