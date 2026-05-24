@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P16596 【四川省集】仙人掌最小值查询</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* 全局主题变量，支持跟随系统深色模式 */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --search-result-hover: #eaeef2;
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --search-result-hover: #21262d;
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+<div class="markdown-body"><h2>思路分析</h2>
+<p>正如题目背景所说，这道题在最开始出出来的时候就是奔着板子题去的，所以基本上没有什么好讲的。</p>
+<p>我们考虑，如果是一棵树，那么这个问题是简单的，因为只有一条路径，查询出来的值就是答案。</p>
+<p>但是现在是边仙人掌。我们考虑边仙人掌意味着什么：在经过一个环的时候，我可以选择从哪一边走过去。</p>
+<p>这样的描述是不好优化的，我们换一个角度：我先随便选一个方向，然后如果觉得不优，可以通过异或上整个环的方式来选择另一边。</p>
+<p>于是问题被转化成了两点之间有一个路径的基值，对于路径上的每一个环，你可以选择异或上他的权值，问最终权值的最小值，多次询问。</p>
+<p>这是不困难的，我们直接建出圆方树，把环长挂到方点上，然后就变成了查询两点之间的异或值以及其路径上方点的元素所构成的线性基。</p>
+<p>第一个是简单的，第二个怎么办呢？</p>
+<p>我们会前缀线性基，于是我们直接把这个东西上树。具体来说，$p$ 节点继承 $fa_p$ 的线性基，然后时间戳标记为一个祖先严格大于后代的值就行了，比如说深度，欧拉序等都可以。</p>
+<p>然后类似前缀线性基，我们可以 $O(\log)$ 的提取出某一段向上的链中的元素所构成的线性基。于是我们把查询的部分拆成两段，求出两个线性基然后 $\log^2$ 合并起来就行了。</p>
+<p>显然瓶颈在于合并线性基，总时间复杂度是 $O(n\log V+k\log^2 V)$ 的。注意卡时间和空间的常数（没办法各种歪解太狂妄了）。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include &lt;bits/stdc++.h&gt;
+using namespace std;
+struct IO {
+#define mxsz (1 &lt;&lt; 21)
+    char buf[mxsz], *p1, *p2;
+    char pbuf[mxsz], *pp;
+    IO() : p1(buf), p2(buf), pp(pbuf) {}
+    ~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
+    inline char gc() {
+        if (p1 == p2) p2 = (p1 = buf) + fread(buf, 1, mxsz, stdin);
+        return p1 == p2 ? ' ' : *p1++;
+    }
+    inline int read() {
+        int r = 0; char c = gc();
+        while (c &lt; '0' || c &gt; '9') c = gc();
+        while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+        return r;
+    }
+    inline void push(const char&amp; c) {
+        if (pp - pbuf == mxsz) fwrite(pbuf, 1, mxsz, stdout), pp = pbuf;
+        *pp++ = c;
+    }
+    inline void write(int x) {
+        static char sta[22]; int top = 0;
+        do sta[top++] = x % 10, x /= 10; while (x);
+        while (top) push(sta[--top] ^ 48);
+    }
+    inline void write(int x, char opc) {
+        write(x); push(opc);
+    }
+} io;
+struct edge { int p, v, nt; } e1[2000005], e2[1000005];
+int h1[500005], h2[1000005], ec1 = 1, ec2 = 1;
+inline void adde1(int l, int r, int v) {
+    e1[++ec1] = {r, v, h1[l]}; h1[l] = ec1;
+    e1[++ec1] = {l, v, h1[r]}; h1[r] = ec1;
+}
+inline void adde2(int l, int r, int v) {
+    e2[++ec2] = {r, v, h2[l]}; h2[l] = ec2;
+}
+int n, m, k, cnt, dfn[1000005], cln[1000005];
+int dep[1000005], fa[1000005], sz[1000005], son[1000005], top[1000005];
+int pfa[500005], v[500005], fe[500005], dis[1000005], vcn;
+inline void tmin(int&amp; l, int r) { if (l &gt; r) l = r; }
+inline void mkcir(int ep, int sp, int sv) {
+    for (int p = sp; p != ep; p = pfa[p]) dis[p] = sv, sv ^= v[p];
+    dis[ep] = cln[ep] = cln[++vcn] = sv;
+    adde2(ep, vcn, 0);
+    for (int p = sp; p != ep; p = pfa[p])
+        cln[p] = sv, adde2(vcn, p, dis[p]);
+}
+inline void tarjan(int p, int id) {
+    dfn[p] = dep[p] = ++cnt;
+    for (int i = h1[p], sp; i; i = e1[i].nt)
+        if (!dfn[sp = e1[i].p]) {
+            pfa[sp] = p; v[sp] = e1[i].v; fe[sp] = i;
+            tarjan(sp, i); tmin(dep[p], dep[sp]);
+            if (dfn[p] &lt; dep[sp]) adde2(p, sp, e1[i].v);
+        } else if (i ^ id ^ 1) tmin(dep[p], dfn[sp]);
+    for (int i = h1[p], sp; i; i = e1[i].nt)
+        if (dfn[p] &lt; dfn[sp = e1[i].p] &amp;&amp; (fe[sp] ^ i))
+            mkcir(p, sp, e1[i].v);
+}
+int *lb_v[1000005], *lb_p[1000005];
+int pool_v[500005 * 30], pool_p[500005 * 30];
+int pool_top = 0;
+int zero_v[30] = {0}, zero_p[30] = {0};
+inline void ins_basis(int cp, int lp, int cv) {
+    lb_v[cp] = pool_v + pool_top;
+    lb_p[cp] = pool_p + pool_top;
+    pool_top += 30;
+    memcpy(lb_v[cp], lb_v[lp], 30 * sizeof(int));
+    memcpy(lb_p[cp], lb_p[lp], 30 * sizeof(int));
+    if (!cv) return;
+    int np = dfn[cp];
+    int i = 31 - __builtin_clz(cv);
+    while (true) {
+        if (lb_v[cp][i]) {
+            if (lb_p[cp][i] &lt; np) {
+                swap(lb_p[cp][i], np);
+                swap(lb_v[cp][i], cv);
+            }
+            cv ^= lb_v[cp][i];
+            if (!cv) return;
+            i = 31 - __builtin_clz(cv);
+        } else {
+            lb_v[cp][i] = cv;
+            lb_p[cp][i] = np;
+            return;
+        }
+    }
+}
+void dfs1(int p) {
+    sz[p] = 1;
+    for (int i = h2[p]; i; i = e2[i].nt) {
+        int sp = e2[i].p;
+        fa[sp] = p;
+        dep[sp] = dep[p] + 1;
+        dis[sp] = dis[p] ^ e2[i].v;
+        dfs1(sp);
+        sz[p] += sz[sp];
+        if (sz[sp] &gt; sz[son[p]]) son[p] = sp;
+    }
+}
+void dfs2(int p, int tp) {
+    dfn[p] = ++cnt; top[p] = tp;
+    if (p &gt; n) ins_basis(p, fa[p], cln[p]);
+    else {
+        lb_v[p] = lb_v[fa[p]];
+        lb_p[p] = lb_p[fa[p]];
+    }
+    if (son[p]) dfs2(son[p], tp);
+    for (int i = h2[p]; i; i = e2[i].nt) {
+        int sp = e2[i].p;
+        if (sp != son[p]) dfs2(sp, sp);
+    }
+}
+struct blin_base {
+    int v[30];
+    blin_base() { memset(v, 0, sizeof v); }
+    inline void merge(int cv) {
+        if (!cv) return;
+        int i = 31 - __builtin_clz(cv);
+        do {
+            if (v[i]) {
+                cv ^= v[i];
+                if (!cv) return;
+                i = 31 - __builtin_clz(cv);
+            } else { v[i] = cv; return; }
+        } while (true);
+    }
+    inline int qmin(int t) const {
+        for (int i = 29; i &gt;= 0; --i)
+            if ((t ^ v[i]) &lt; t) t ^= v[i];
+        return t;
+    }
+};
+inline void add_path(blin_base&amp; bs, int la, int x) {
+    int r = dfn[x], l = dfn[la];
+    int *v_x = lb_v[x], *p_x = lb_p[x];
+    for (int i = 0; i &lt; 30; ++i) {
+        int val = v_x[i];
+        if (val &amp;&amp; p_x[i] &gt;= l) bs.merge(val);
+    }
+}
+inline int lca(int u, int v) {
+    while (top[u] != top[v]) {
+        if (dep[top[u]] &lt; dep[top[v]]) swap(u, v);
+        u = fa[top[u]];
+    }
+    return dep[u] &lt; dep[v] ? u : v;
+}
+int main() {
+    ios::sync_with_stdio(0);
+    lb_v[0] = zero_v; lb_p[0] = zero_p;
+    vcn = n = io.read(); m = io.read(); k = io.read();
+    for (int i = 1, l, r, v; i &lt;= m; ++i) {
+        l = io.read(); r = io.read(); v = io.read(); 
+        adde1(l, r, v);
+    }
+    tarjan(1, 0);
+    memset(dep, 0, (vcn + 1) * sizeof(int));
+    memset(dis, 0, (vcn + 1) * sizeof(int));
+    cnt = 0; dfs1(1);
+    cnt = 0; dfs2(1, 1);
+    for (int i = 1, l, r, la; i &lt;= k; ++i) {
+        l = io.read(); r = io.read(); la = lca(l, r);
+        blin_base bs;
+        if (la &gt; n) bs.merge(cln[la]);
+        add_path(bs, la, l);
+        add_path(bs, la, r);
+        io.write(bs.qmin(dis[l] ^ dis[r]), '\n');
+    }
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">IO</span> {
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> mxsz (1 &lt;&lt; 21)</span>
+    <span class="hljs-type">char</span> buf[mxsz], *p1, *p2;
+    <span class="hljs-type">char</span> pbuf[mxsz], *pp;
+    <span class="hljs-built_in">IO</span>() : <span class="hljs-built_in">p1</span>(buf), <span class="hljs-built_in">p2</span>(buf), <span class="hljs-built_in">pp</span>(pbuf) {}
+    ~<span class="hljs-built_in">IO</span>() { <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, pp - pbuf, stdout); }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">gc</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">if</span> (p1 == p2) p2 = (p1 = buf) + <span class="hljs-built_in">fread</span>(buf, <span class="hljs-number">1</span>, mxsz, stdin);
+        <span class="hljs-keyword">return</span> p1 == p2 ? <span class="hljs-string">&#x27; &#x27;</span> : *p1++;
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>();
+        <span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c &gt; <span class="hljs-string">&#x27;9&#x27;</span>) c = <span class="hljs-built_in">gc</span>();
+        <span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+        <span class="hljs-keyword">return</span> r;
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">push</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>&amp; c)</span> </span>{
+        <span class="hljs-keyword">if</span> (pp - pbuf == mxsz) <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, mxsz, stdout), pp = pbuf;
+        *pp++ = c;
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> </span>{
+        <span class="hljs-type">static</span> <span class="hljs-type">char</span> sta[<span class="hljs-number">22</span>]; <span class="hljs-type">int</span> top = <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">do</span> sta[top++] = x % <span class="hljs-number">10</span>, x /= <span class="hljs-number">10</span>; <span class="hljs-keyword">while</span> (x);
+        <span class="hljs-keyword">while</span> (top) <span class="hljs-built_in">push</span>(sta[--top] ^ <span class="hljs-number">48</span>);
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">char</span> opc)</span> </span>{
+        <span class="hljs-built_in">write</span>(x); <span class="hljs-built_in">push</span>(opc);
+    }
+} io;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">edge</span> { <span class="hljs-type">int</span> p, v, nt; } e1[<span class="hljs-number">2000005</span>], e2[<span class="hljs-number">1000005</span>];
+<span class="hljs-type">int</span> h1[<span class="hljs-number">500005</span>], h2[<span class="hljs-number">1000005</span>], ec1 = <span class="hljs-number">1</span>, ec2 = <span class="hljs-number">1</span>;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">adde1</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r, <span class="hljs-type">int</span> v)</span> </span>{
+    e1[++ec1] = {r, v, h1[l]}; h1[l] = ec1;
+    e1[++ec1] = {l, v, h1[r]}; h1[r] = ec1;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">adde2</span><span class="hljs-params">(<span class="hljs-type">int</span> l, <span class="hljs-type">int</span> r, <span class="hljs-type">int</span> v)</span> </span>{
+    e2[++ec2] = {r, v, h2[l]}; h2[l] = ec2;
+}
+<span class="hljs-type">int</span> n, m, k, cnt, dfn[<span class="hljs-number">1000005</span>], cln[<span class="hljs-number">1000005</span>];
+<span class="hljs-type">int</span> dep[<span class="hljs-number">1000005</span>], fa[<span class="hljs-number">1000005</span>], sz[<span class="hljs-number">1000005</span>], son[<span class="hljs-number">1000005</span>], top[<span class="hljs-number">1000005</span>];
+<span class="hljs-type">int</span> pfa[<span class="hljs-number">500005</span>], v[<span class="hljs-number">500005</span>], fe[<span class="hljs-number">500005</span>], dis[<span class="hljs-number">1000005</span>], vcn;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tmin</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l, <span class="hljs-type">int</span> r)</span> </span>{ <span class="hljs-keyword">if</span> (l &gt; r) l = r; }
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mkcir</span><span class="hljs-params">(<span class="hljs-type">int</span> ep, <span class="hljs-type">int</span> sp, <span class="hljs-type">int</span> sv)</span> </span>{
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> p = sp; p != ep; p = pfa[p]) dis[p] = sv, sv ^= v[p];
+    dis[ep] = cln[ep] = cln[++vcn] = sv;
+    <span class="hljs-built_in">adde2</span>(ep, vcn, <span class="hljs-number">0</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> p = sp; p != ep; p = pfa[p])
+        cln[p] = sv, <span class="hljs-built_in">adde2</span>(vcn, p, dis[p]);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tarjan</span><span class="hljs-params">(<span class="hljs-type">int</span> p, <span class="hljs-type">int</span> id)</span> </span>{
+    dfn[p] = dep[p] = ++cnt;
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = h1[p], sp; i; i = e1[i].nt)
+        <span class="hljs-keyword">if</span> (!dfn[sp = e1[i].p]) {
+            pfa[sp] = p; v[sp] = e1[i].v; fe[sp] = i;
+            <span class="hljs-built_in">tarjan</span>(sp, i); <span class="hljs-built_in">tmin</span>(dep[p], dep[sp]);
+            <span class="hljs-keyword">if</span> (dfn[p] &lt; dep[sp]) <span class="hljs-built_in">adde2</span>(p, sp, e1[i].v);
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (i ^ id ^ <span class="hljs-number">1</span>) <span class="hljs-built_in">tmin</span>(dep[p], dfn[sp]);
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = h1[p], sp; i; i = e1[i].nt)
+        <span class="hljs-keyword">if</span> (dfn[p] &lt; dfn[sp = e1[i].p] &amp;&amp; (fe[sp] ^ i))
+            <span class="hljs-built_in">mkcir</span>(p, sp, e1[i].v);
+}
+<span class="hljs-type">int</span> *lb_v[<span class="hljs-number">1000005</span>], *lb_p[<span class="hljs-number">1000005</span>];
+<span class="hljs-type">int</span> pool_v[<span class="hljs-number">500005</span> * <span class="hljs-number">30</span>], pool_p[<span class="hljs-number">500005</span> * <span class="hljs-number">30</span>];
+<span class="hljs-type">int</span> pool_top = <span class="hljs-number">0</span>;
+<span class="hljs-type">int</span> zero_v[<span class="hljs-number">30</span>] = {<span class="hljs-number">0</span>}, zero_p[<span class="hljs-number">30</span>] = {<span class="hljs-number">0</span>};
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins_basis</span><span class="hljs-params">(<span class="hljs-type">int</span> cp, <span class="hljs-type">int</span> lp, <span class="hljs-type">int</span> cv)</span> </span>{
+    lb_v[cp] = pool_v + pool_top;
+    lb_p[cp] = pool_p + pool_top;
+    pool_top += <span class="hljs-number">30</span>;
+    <span class="hljs-built_in">memcpy</span>(lb_v[cp], lb_v[lp], <span class="hljs-number">30</span> * <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+    <span class="hljs-built_in">memcpy</span>(lb_p[cp], lb_p[lp], <span class="hljs-number">30</span> * <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+    <span class="hljs-keyword">if</span> (!cv) <span class="hljs-keyword">return</span>;
+    <span class="hljs-type">int</span> np = dfn[cp];
+    <span class="hljs-type">int</span> i = <span class="hljs-number">31</span> - __builtin_clz(cv);
+    <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+        <span class="hljs-keyword">if</span> (lb_v[cp][i]) {
+            <span class="hljs-keyword">if</span> (lb_p[cp][i] &lt; np) {
+                <span class="hljs-built_in">swap</span>(lb_p[cp][i], np);
+                <span class="hljs-built_in">swap</span>(lb_v[cp][i], cv);
+            }
+            cv ^= lb_v[cp][i];
+            <span class="hljs-keyword">if</span> (!cv) <span class="hljs-keyword">return</span>;
+            i = <span class="hljs-number">31</span> - __builtin_clz(cv);
+        } <span class="hljs-keyword">else</span> {
+            lb_v[cp][i] = cv;
+            lb_p[cp][i] = np;
+            <span class="hljs-keyword">return</span>;
+        }
+    }
+}
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs1</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span> </span>{
+    sz[p] = <span class="hljs-number">1</span>;
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = h2[p]; i; i = e2[i].nt) {
+        <span class="hljs-type">int</span> sp = e2[i].p;
+        fa[sp] = p;
+        dep[sp] = dep[p] + <span class="hljs-number">1</span>;
+        dis[sp] = dis[p] ^ e2[i].v;
+        <span class="hljs-built_in">dfs1</span>(sp);
+        sz[p] += sz[sp];
+        <span class="hljs-keyword">if</span> (sz[sp] &gt; sz[son[p]]) son[p] = sp;
+    }
+}
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs2</span><span class="hljs-params">(<span class="hljs-type">int</span> p, <span class="hljs-type">int</span> tp)</span> </span>{
+    dfn[p] = ++cnt; top[p] = tp;
+    <span class="hljs-keyword">if</span> (p &gt; n) <span class="hljs-built_in">ins_basis</span>(p, fa[p], cln[p]);
+    <span class="hljs-keyword">else</span> {
+        lb_v[p] = lb_v[fa[p]];
+        lb_p[p] = lb_p[fa[p]];
+    }
+    <span class="hljs-keyword">if</span> (son[p]) <span class="hljs-built_in">dfs2</span>(son[p], tp);
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = h2[p]; i; i = e2[i].nt) {
+        <span class="hljs-type">int</span> sp = e2[i].p;
+        <span class="hljs-keyword">if</span> (sp != son[p]) <span class="hljs-built_in">dfs2</span>(sp, sp);
+    }
+}
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">blin_base</span> {
+    <span class="hljs-type">int</span> v[<span class="hljs-number">30</span>];
+    <span class="hljs-built_in">blin_base</span>() { <span class="hljs-built_in">memset</span>(v, <span class="hljs-number">0</span>, <span class="hljs-keyword">sizeof</span> v); }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-type">int</span> cv)</span> </span>{
+        <span class="hljs-keyword">if</span> (!cv) <span class="hljs-keyword">return</span>;
+        <span class="hljs-type">int</span> i = <span class="hljs-number">31</span> - __builtin_clz(cv);
+        <span class="hljs-keyword">do</span> {
+            <span class="hljs-keyword">if</span> (v[i]) {
+                cv ^= v[i];
+                <span class="hljs-keyword">if</span> (!cv) <span class="hljs-keyword">return</span>;
+                i = <span class="hljs-number">31</span> - __builtin_clz(cv);
+            } <span class="hljs-keyword">else</span> { v[i] = cv; <span class="hljs-keyword">return</span>; }
+        } <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>);
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">qmin</span><span class="hljs-params">(<span class="hljs-type">int</span> t)</span> <span class="hljs-type">const</span> </span>{
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">29</span>; i &gt;= <span class="hljs-number">0</span>; --i)
+            <span class="hljs-keyword">if</span> ((t ^ v[i]) &lt; t) t ^= v[i];
+        <span class="hljs-keyword">return</span> t;
+    }
+};
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">add_path</span><span class="hljs-params">(blin_base&amp; bs, <span class="hljs-type">int</span> la, <span class="hljs-type">int</span> x)</span> </span>{
+    <span class="hljs-type">int</span> r = dfn[x], l = dfn[la];
+    <span class="hljs-type">int</span> *v_x = lb_v[x], *p_x = lb_p[x];
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">30</span>; ++i) {
+        <span class="hljs-type">int</span> val = v_x[i];
+        <span class="hljs-keyword">if</span> (val &amp;&amp; p_x[i] &gt;= l) bs.<span class="hljs-built_in">merge</span>(val);
+    }
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">lca</span><span class="hljs-params">(<span class="hljs-type">int</span> u, <span class="hljs-type">int</span> v)</span> </span>{
+    <span class="hljs-keyword">while</span> (top[u] != top[v]) {
+        <span class="hljs-keyword">if</span> (dep[top[u]] &lt; dep[top[v]]) <span class="hljs-built_in">swap</span>(u, v);
+        u = fa[top[u]];
+    }
+    <span class="hljs-keyword">return</span> dep[u] &lt; dep[v] ? u : v;
+}
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+    lb_v[<span class="hljs-number">0</span>] = zero_v; lb_p[<span class="hljs-number">0</span>] = zero_p;
+    vcn = n = io.<span class="hljs-built_in">read</span>(); m = io.<span class="hljs-built_in">read</span>(); k = io.<span class="hljs-built_in">read</span>();
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, l, r, v; i &lt;= m; ++i) {
+        l = io.<span class="hljs-built_in">read</span>(); r = io.<span class="hljs-built_in">read</span>(); v = io.<span class="hljs-built_in">read</span>(); 
+        <span class="hljs-built_in">adde1</span>(l, r, v);
+    }
+    <span class="hljs-built_in">tarjan</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>);
+    <span class="hljs-built_in">memset</span>(dep, <span class="hljs-number">0</span>, (vcn + <span class="hljs-number">1</span>) * <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+    <span class="hljs-built_in">memset</span>(dis, <span class="hljs-number">0</span>, (vcn + <span class="hljs-number">1</span>) * <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+    cnt = <span class="hljs-number">0</span>; <span class="hljs-built_in">dfs1</span>(<span class="hljs-number">1</span>);
+    cnt = <span class="hljs-number">0</span>; <span class="hljs-built_in">dfs2</span>(<span class="hljs-number">1</span>, <span class="hljs-number">1</span>);
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>, l, r, la; i &lt;= k; ++i) {
+        l = io.<span class="hljs-built_in">read</span>(); r = io.<span class="hljs-built_in">read</span>(); la = <span class="hljs-built_in">lca</span>(l, r);
+        blin_base bs;
+        <span class="hljs-keyword">if</span> (la &gt; n) bs.<span class="hljs-built_in">merge</span>(cln[la]);
+        <span class="hljs-built_in">add_path</span>(bs, la, l);
+        <span class="hljs-built_in">add_path</span>(bs, la, r);
+        io.<span class="hljs-built_in">write</span>(bs.<span class="hljs-built_in">qmin</span>(dis[l] ^ dis[r]), <span class="hljs-string">&#x27;\n&#x27;</span>);
+    }
+}
+</code></pre>
+</div>
+</div>
+</div>
+<div class="footer">
+    <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+</div>
+<script>
+    (function() {
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const code = btn.getAttribute('data-code');
+                if (code) {
+                    await navigator.clipboard.writeText(code);
+                    const orig = btn.textContent;
+                    btn.textContent = '已复制！';
+                    btn.classList.add('copied');
+                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+                }
+            });
+        });
+        
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
+        else if (window.__SEARCH_INDEX_URL__) {
+            try {
+                const resp = await fetch(window.__SEARCH_INDEX_URL__);
+                if (resp.ok) searchIndex = await resp.json();
+            } catch(e) {}
+        }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+    })();
+</script>
+</body>
+</html>
