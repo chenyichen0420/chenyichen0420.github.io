@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
-        /* 全局主题变量，支持跟随系统深色模式 */
+        /* ========== 全局主题变量 ========== */
         :root {
             color-scheme: light dark;
             --bg-body: #f6f8fa;
@@ -23,9 +23,13 @@
             --btn-border: #d0d7de;
             --btn-hover-bg: #eaeef2;
             --shadow: 0 1px 4px rgba(0,0,0,0.1);
-            --search-result-hover: #eaeef2;
             --code-text: #24292f;
             --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -41,9 +45,13 @@
                 --btn-border: #30363d;
                 --btn-hover-bg: #30363d;
                 --shadow: 0 1px 4px rgba(0,0,0,0.3);
-                --search-result-hover: #21262d;
                 --code-text: #c9d1d9;
                 --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,31 +60,11 @@
             background-color: var(--bg-body);
             color: var(--text-primary);
         }
-        .markdown-body {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: var(--bg-card);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-        }
-        .markdown-body {
-            color: var(--text-primary) !important;
-        }
-        .code-content pre code,
-        .code-content pre code.hljs {
-            color: var(--code-text) !important;
-            background-color: var(--code-bg) !important;
-        }
-        .line-numbers {
-            color: var(--line-numbers-color) !important;
-            background-color: var(--code-bg) !important;
-        }
         
         .search-container {
             max-width: 1200px;
             margin: 0 auto 1.5rem auto;
-            background-color: var(--bg-card);
+            background-color: var(--search-container-bg);
             border-radius: 8px;
             padding: 1rem 2rem;
             display: flex;
@@ -125,6 +113,27 @@
             margin-top: 0.2rem;
         }
         
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
         .code-wrapper {
             margin: 1rem 0;
             border-radius: 6px;
@@ -192,12 +201,10 @@
             border-radius: 4px;
         }
         @media (max-width: 768px) {
-            body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
             .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
-    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
         delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
@@ -206,14 +213,16 @@
     });"></script>
 </head>
 <body>
-<div class="search-container">
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
     <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
     <div class="search-results" id="searchResults"></div>
 </div>
-<div class="markdown-body"><h2>思路分析</h2>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
 <p>似乎少有人写严格线性的解法？简单讲一讲：</p>
 <p>PS：大多数图片都是从<a href="https://github.com/hzwer/shareOI/blob/master/%E5%9B%BE%E8%AE%BA/%E5%BC%A6%E5%9B%BE%E4%B8%8E%E5%8C%BA%E9%97%B4%E5%9B%BE_%E9%99%88%E4%B8%B9%E7%90%A6.pptx">陈丹琦的课件</a>上截的，真的讲得非常好，推荐阅读。</p>
-<h3>基本概念与定义</h3>
+<h3 id="基本概念与定义">基本概念与定义</h3>
 <p>约定原图 $G=(V,E)$。</p>
 <p>定义完全图为 $\forall u,v\in V,u\neq v,(u,v)\in E$ 的图。</p>
 <p>定义诱导子图（导出子图）为 $G_0=(V_0,E_0),V_0\subseteq V,E_0=\{(u,v)\mid u,v\in V_0,(u,v)\in E\}$。</p>
@@ -238,7 +247,7 @@
 <li>弦图的任一个诱导子图不同构于 $C_n\ (n>3)$，图论中 $C_n$ 为 $n$ 点环。</li>
 </ol>
 <p>此外，给定一些区间，定义一个相交图为每个顶点表示一个区间，两个点有边当且仅当两个区间的交集非空。一个图为区间图当它是若干个区间的相交图。我们还有性质：区间图一定是弦图。</p>
-<h3>完美消除序列与判定</h3>
+<h3 id="完美消除序列与判定">完美消除序列与判定</h3>
 <p>令 $\Nu(v)$ 表示与 $v$ 相邻的点集，称一个点为单纯点当且仅当 $V=\{v\}\cup\Nu(v)$ 的诱导子图为一个团。</p>
 <p><img src="https://chenyichen0420.netlify.app/picbed/20260423simplicial.png" alt=""></p>
 <p>有引理：任何一个弦图都至少有一个单纯点，不是完全图的弦图至少有两个不相邻的单纯点。</p>
@@ -258,7 +267,7 @@
 <p>好像常见的做法是带个 $\log$ 或者用哈希表的，有一种严格 $O(n+m)$ 的方法：我们直接把询问拍到点上。</p>
 <p>如果一些点共享了同一个 $v_{j_1}$，那么可以直接把他们一并处理，只需要将他们挂到 $v_{j_1}$ 的询问下面即可。显然，这个操作的常数是不大的，并且严格线性。</p>
 <p>判定就简单了：如果图为弦图，那么最大势算法会给出一个合法的完美消除序列，反之则不会，因此跑一遍最大势再跑一遍判定即可，时间复杂度 $O(n+m)$。</p>
-<h3>极大团</h3>
+<h3 id="极大团">极大团</h3>
 <p>设第 $i$ 个点在弦图的完美消除序列第 $p_i$ 个。令 $\Nu(v)=\{w\mid w与v相邻且p_w>p_v\}$，则弦图的极大团一定是 $\{v\}\cup\Nu(v)$ 的形式。证明：</p>
 <p>设点集 $V$ 的诱导子图为弦图的极大团，设 $v$ 为 $V$ 中 $p$ 值最小的点，即出现在完美消除序列中最前面的点。由于 $V\subseteq\{v\}\cup\Nu(v)$ 为一个团，$V$ 为极大团，所以 $V=\{v\}\cup\Nu(v)$。</p>
 <p>推论：弦图最多有 $n$ 个极大团。显然只需要检验每一个 $\{v\}\cup\Nu(v)$ 是不是极大团即可。</p>
@@ -266,11 +275,11 @@
 <p>具体来说，此时一定有 $p_w<p_v$，我们设 $next_v$ 表示 $\Nu(v)$ 中最靠前的点，令 $w_0$ 表示所有满足 $A\subseteq B$ 的 $w$ 中最后的一个点，那么有 $next_{w_0}=v$。</p>
 <p>因此有 $next_w=v$，于是 $\{v\}\cup\Nu(v)\subseteq\{w\}\cup\Nu(w)$ 当且仅当 $|\Nu(v)|+1\le|\Nu(w)|$。</p>
 <p>于是我们只需要判断是否存在 $w$ 满足 $next_w=v$ 且 $|\Nu(v)|+1\le|\Nu(w)|$ 即可。时间复杂度 $O(n+m)$。</p>
-<h3>色数与团数</h3>
+<h3 id="色数与团数">色数与团数</h3>
 <p>我们按照完美消除序列从后往前依次给每个点染色，给每个点染上可以染的最小的颜色即可。证明：</p>
 <p>设使用了 $T$ 种颜色，则 $T\ge\chi(G)$，又因为 $T=\kappa(G)\le\chi(G)$，所以 $\kappa(G)=\chi(G)=T$。</p>
 <p><img src="https://chenyichen0420.netlify.app/picbed/20260423mincolor.png" alt=""></p>
-<h3>最大独立集与最小团覆盖</h3>
+<h3 id="最大独立集与最小团覆盖">最大独立集与最小团覆盖</h3>
 <p>最大独立集：完美消除序列从前往后能选就选。</p>
 <p><img src="https://chenyichen0420.netlify.app/picbed/20260423maxisolated.png" alt=""></p>
 <p>最小团覆盖：设最大独立集为 $\{p_1,p_2,\dots,p_t\}$，则 $\{p_1\cup\Nu(p_1),\dots,p_t\cup\Nu(p_t)\}$ 为最小团覆盖。证明：</p>
@@ -529,35 +538,38 @@ vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">10
 </div>
 </div>
 </div>
-<div class="footer">
-    <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
 </div>
 <script>
-    (function() {
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const code = btn.getAttribute('data-code');
-                if (code) {
-                    await navigator.clipboard.writeText(code);
-                    const orig = btn.textContent;
-                    btn.textContent = '已复制！';
-                    btn.classList.add('copied');
-                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
-                }
-            });
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
         });
-        
+    });
+    
+    
     let searchIndex = null;
     const searchInput = document.getElementById('globalSearchInput');
     const resultsDiv = document.getElementById('searchResults');
     async function loadSearchIndex() {
-        if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
-        else if (window.__SEARCH_INDEX_URL__) {
-            try {
-                const resp = await fetch(window.__SEARCH_INDEX_URL__);
-                if (resp.ok) searchIndex = await resp.json();
-            } catch(e) {}
-        }
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
     }
     function performSearch(keyword) {
         if (!searchIndex || !keyword.trim()) {
@@ -581,7 +593,7 @@ vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">10
     searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
     document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
     loadSearchIndex();
-    })();
+})();
 </script>
 </body>
 </html>

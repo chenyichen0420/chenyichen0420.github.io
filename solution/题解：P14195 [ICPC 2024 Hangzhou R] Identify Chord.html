@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P14195 [ICPC 2024 Hangzhou R] Identify Chord</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>一个符合直觉的事实是如果我有一个跨度非常大的询问区间，那么我大概率能够“感觉到”有一个弦，也就是最短路必须经过弦。</p>
+<p>但是光这么说是没有用的，你得把他精准的找出来，而且步数不能太多。</p>
+<p>先来估计一个粗略的上界吧。按照前面的直觉，显然我们需要一个长度为 $\frac{n}{2}$ 的查询区间。然后看看我们能干什么：</p>
+<p><img src="https://chenyichen0420.netlify.app/picbed/20260525findchord.png" alt=""></p>
+<p>在 $n$ 较大的时候，我们将其近似的看作一个圆，于是只有弦的中垂线是不满足要求的，其他的任意一个直径都是满足要求的。</p>
+<p>这也就启示我们，大概率区分不出来的长区间只有少数。是不是我随便找一个初始位置，然后随手转两下就能找到呢？</p>
+<p>在 $2\mid n$ 的情况下这确实是成立的，但是在 $2\nmid n$ 的情况下却存在一个特殊情况：长度为 $2$ 的弦。这时候，在半数长度为 $\lfloor\frac{n}{2}\rfloor$ 的查询看来都是完全没有问题的。我们希望的就是在奇数情况下，这个弦可以向上拱一下，再向下拱一下，这样就能覆盖所有情况了。</p>
+<p>这确实是不困难的，结合前面所说，我们可以严谨的说明最多只需要 $5$ 次操作（这是一个宽松的上界），我们就可以找到一个最段路必须经过弦的弦。</p>
+<p>光知道经过最短路可是没有用的，我们还需要定位到最短路。直接旋转过去是不现实的，我们考虑能不能先把一个端点对上，再对另一个端点？</p>
+<p>此时我们观察数据范围，容易注意到次数上限大约是 $\log$ 的，于是我们考虑能不能先将其中的一个端点给二分出来。</p>
+<p>考虑之前找到的特殊端点为 $l,r$，我们确认 $l-1,r$ 是否能够使得距离变小，如果是，那么说明有一个端点在比 $l$ 更小一些的某个位置（这里是循环的，总之就是不停的缩小，在缩到 $r$ 之前就可以遇到端点）。反之则说明在比 $l$ 更大一些的某一个位置。</p>
+<p>如何判断有没有跳过呢？如果 $l,r$ 的实际距离为 $d$，那么在正确方向上跳过之前，$l+\Delta d,r$ 的距离应该是 $d-\Delta d$。也就是说确实可以二分出端点。这部分需要的操作次数是 $\log n+1$ 的。</p>
+<p>我们最后考虑另一个端点在哪里。如果当前 $l,r$ 的距离是 $d$，那么真正的 $r$ 就应该是 $r\pm(d-1)$ 中的某一个。判定就是二者真实距离为 $1$ 且二者环上距离不为 $1$，这部分的操作次数是 $1$。</p>
+<p>于是总的操作次数就只有 $\log n+7=37$ 次，完全可以通过。代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+#include&lt;cassert&gt;
+using namespace std;
+#define int long long
+int t,n, ret, cnt;
+inline int ensure(int v){
+	return (v+n*5-1)%n+1;
+}
+inline int dis(int l,int r){
+	l=ensure(l); r=ensure(r);
+	if(l&gt;r) swap(l,r);
+	return min(r-l,l+n-r);
+}
+inline int ask(int l,int r){
+	if(dis(l,r)==1) return 1;
+	l=ensure(l); r=ensure(r);
+	cout&lt;&lt;&quot;? &quot;&lt;&lt;l&lt;&lt;&quot; &quot;&lt;&lt;r&lt;&lt;endl;
+	int v; cin&gt;&gt;v; return v;
+}
+signed main(){
+    ios::sync_with_stdio(0);
+	for(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; int p=1,da,p2=1+n/2,f=1; 
+		if(n&lt;=8){
+			bool hs=0;
+			for(int i=1;i&lt;=n;++i)
+				for(int j=i+1;j&lt;=n&amp;&amp;!hs;++j)
+					if(dis(i,j)!=1&amp;&amp;ask(i,j)==1)
+						cout&lt;&lt;&quot;! &quot;&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;j&lt;&lt;endl, hs=1;
+			cin&gt;&gt;ret;
+			continue;
+		}
+		while(dis(p,p2)==(da=ask(p,p2))){
+			if(n&amp;1)
+				if(f) p2++,f^=1;
+				else p++,f^=1;
+			else p++,p2++;
+		}
+		int l=0,r=n/2,mid;
+		if(ask(p+1,p2)==da-1){
+			while(l!=r){
+				mid=l+r+1&gt;&gt;1;
+				if(ask(p+mid,p2)==da-mid) l=mid;
+				else r=mid-1;
+			}
+			p+=l;
+		}
+		else if(ask(p-1,p2)==da-1){
+			while(l!=r){
+				mid=l+r+1&gt;&gt;1;
+				if(ask(p-mid,p2)==da-mid) l=mid;
+				else r=mid-1;
+			}
+			p-=l;
+		}
+		p=ensure(p);
+		da=ask(p,p2);
+		if(dis(p,p2-da+1)!=1&amp;&amp;ask(p,p2-1)==da-1) p2-=da-1;
+		else p2+=da-1;
+		p2=ensure(p2); cout&lt;&lt;&quot;! &quot;&lt;&lt;p&lt;&lt;&quot; &quot;&lt;&lt;p2&lt;&lt;endl;
+		cin&gt;&gt;ret;
+	}
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;cassert&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-type">int</span> t,n, ret, cnt;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">ensure</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span></span>{
+	<span class="hljs-keyword">return</span> (v+n*<span class="hljs-number">5</span><span class="hljs-number">-1</span>)%n<span class="hljs-number">+1</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">dis</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r)</span></span>{
+	l=<span class="hljs-built_in">ensure</span>(l); r=<span class="hljs-built_in">ensure</span>(r);
+	<span class="hljs-keyword">if</span>(l&gt;r) <span class="hljs-built_in">swap</span>(l,r);
+	<span class="hljs-keyword">return</span> <span class="hljs-built_in">min</span>(r-l,l+n-r);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">ask</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r)</span></span>{
+	<span class="hljs-keyword">if</span>(<span class="hljs-built_in">dis</span>(l,r)==<span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+	l=<span class="hljs-built_in">ensure</span>(l); r=<span class="hljs-built_in">ensure</span>(r);
+	cout&lt;&lt;<span class="hljs-string">&quot;? &quot;</span>&lt;&lt;l&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;r&lt;&lt;endl;
+	<span class="hljs-type">int</span> v; cin&gt;&gt;v; <span class="hljs-keyword">return</span> v;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; <span class="hljs-type">int</span> p=<span class="hljs-number">1</span>,da,p2=<span class="hljs-number">1</span>+n/<span class="hljs-number">2</span>,f=<span class="hljs-number">1</span>; 
+		<span class="hljs-keyword">if</span>(n&lt;=<span class="hljs-number">8</span>){
+			<span class="hljs-type">bool</span> hs=<span class="hljs-number">0</span>;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=i<span class="hljs-number">+1</span>;j&lt;=n&amp;&amp;!hs;++j)
+					<span class="hljs-keyword">if</span>(<span class="hljs-built_in">dis</span>(i,j)!=<span class="hljs-number">1</span>&amp;&amp;<span class="hljs-built_in">ask</span>(i,j)==<span class="hljs-number">1</span>)
+						cout&lt;&lt;<span class="hljs-string">&quot;! &quot;</span>&lt;&lt;i&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;j&lt;&lt;endl, hs=<span class="hljs-number">1</span>;
+			cin&gt;&gt;ret;
+			<span class="hljs-keyword">continue</span>;
+		}
+		<span class="hljs-keyword">while</span>(<span class="hljs-built_in">dis</span>(p,p2)==(da=<span class="hljs-built_in">ask</span>(p,p2))){
+			<span class="hljs-keyword">if</span>(n&amp;<span class="hljs-number">1</span>)
+				<span class="hljs-keyword">if</span>(f) p2++,f^=<span class="hljs-number">1</span>;
+				<span class="hljs-keyword">else</span> p++,f^=<span class="hljs-number">1</span>;
+			<span class="hljs-keyword">else</span> p++,p2++;
+		}
+		<span class="hljs-type">int</span> l=<span class="hljs-number">0</span>,r=n/<span class="hljs-number">2</span>,mid;
+		<span class="hljs-keyword">if</span>(<span class="hljs-built_in">ask</span>(p<span class="hljs-number">+1</span>,p2)==da<span class="hljs-number">-1</span>){
+			<span class="hljs-keyword">while</span>(l!=r){
+				mid=l+r<span class="hljs-number">+1</span>&gt;&gt;<span class="hljs-number">1</span>;
+				<span class="hljs-keyword">if</span>(<span class="hljs-built_in">ask</span>(p+mid,p2)==da-mid) l=mid;
+				<span class="hljs-keyword">else</span> r=mid<span class="hljs-number">-1</span>;
+			}
+			p+=l;
+		}
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(<span class="hljs-built_in">ask</span>(p<span class="hljs-number">-1</span>,p2)==da<span class="hljs-number">-1</span>){
+			<span class="hljs-keyword">while</span>(l!=r){
+				mid=l+r<span class="hljs-number">+1</span>&gt;&gt;<span class="hljs-number">1</span>;
+				<span class="hljs-keyword">if</span>(<span class="hljs-built_in">ask</span>(p-mid,p2)==da-mid) l=mid;
+				<span class="hljs-keyword">else</span> r=mid<span class="hljs-number">-1</span>;
+			}
+			p-=l;
+		}
+		p=<span class="hljs-built_in">ensure</span>(p);
+		da=<span class="hljs-built_in">ask</span>(p,p2);
+		<span class="hljs-keyword">if</span>(<span class="hljs-built_in">dis</span>(p,p2-da<span class="hljs-number">+1</span>)!=<span class="hljs-number">1</span>&amp;&amp;<span class="hljs-built_in">ask</span>(p,p2<span class="hljs-number">-1</span>)==da<span class="hljs-number">-1</span>) p2-=da<span class="hljs-number">-1</span>;
+		<span class="hljs-keyword">else</span> p2+=da<span class="hljs-number">-1</span>;
+		p2=<span class="hljs-built_in">ensure</span>(p2); cout&lt;&lt;<span class="hljs-string">&quot;! &quot;</span>&lt;&lt;p&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;p2&lt;&lt;endl;
+		cin&gt;&gt;ret;
+	}
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

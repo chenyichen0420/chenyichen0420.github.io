@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
-        /* 全局主题变量，支持跟随系统深色模式 */
+        /* ========== 全局主题变量 ========== */
         :root {
             color-scheme: light dark;
             --bg-body: #f6f8fa;
@@ -23,9 +23,13 @@
             --btn-border: #d0d7de;
             --btn-hover-bg: #eaeef2;
             --shadow: 0 1px 4px rgba(0,0,0,0.1);
-            --search-result-hover: #eaeef2;
             --code-text: #24292f;
             --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -41,9 +45,13 @@
                 --btn-border: #30363d;
                 --btn-hover-bg: #30363d;
                 --shadow: 0 1px 4px rgba(0,0,0,0.3);
-                --search-result-hover: #21262d;
                 --code-text: #c9d1d9;
                 --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,31 +60,11 @@
             background-color: var(--bg-body);
             color: var(--text-primary);
         }
-        .markdown-body {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: var(--bg-card);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-        }
-        .markdown-body {
-            color: var(--text-primary) !important;
-        }
-        .code-content pre code,
-        .code-content pre code.hljs {
-            color: var(--code-text) !important;
-            background-color: var(--code-bg) !important;
-        }
-        .line-numbers {
-            color: var(--line-numbers-color) !important;
-            background-color: var(--code-bg) !important;
-        }
         
         .search-container {
             max-width: 1200px;
             margin: 0 auto 1.5rem auto;
-            background-color: var(--bg-card);
+            background-color: var(--search-container-bg);
             border-radius: 8px;
             padding: 1rem 2rem;
             display: flex;
@@ -125,6 +113,27 @@
             margin-top: 0.2rem;
         }
         
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
         .code-wrapper {
             margin: 1rem 0;
             border-radius: 6px;
@@ -192,12 +201,10 @@
             border-radius: 4px;
         }
         @media (max-width: 768px) {
-            body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
             .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
-    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
         delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
@@ -206,13 +213,15 @@
     });"></script>
 </head>
 <body>
-<div class="search-container">
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
     <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
     <div class="search-results" id="searchResults"></div>
 </div>
-<div class="markdown-body"><h1>题目大意</h1>
+        <div class="markdown-body"><h1 id="题目大意">题目大意</h1>
 <p>给你一个长度为 $n$ 的序列 $a$，可以进行任意多次操作，每一次可以选择一个区间，其众数个数严格大于区间长度的一半，并将这个区间所有数改为为这个众数。请问最终这个序列所有的数都一样的时候这个数可能是多少？无法都一样则输出 $-1$。多测。</p>
-<h1>思路分析</h1>
+<h1 id="思路分析">思路分析</h1>
 <p>怎么说都知道搜索是错的，$2\times10^5$ 能给你放过去？！</p>
 <p>这时候我们分析一下每一次操作：其众数个数严格大于区间长度的一半。</p>
 <p>首先我们知道，如果两个一样的数放在一起，那么这个数一定是可以的。他可以选两个这个数，然后从相邻的地方强制选一个数加进来，变成这个数，以此类推：$aab$ 变为 $aaa$。</p>
@@ -274,35 +283,38 @@ map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">bool</span>&g
 </div>
 <p>这题其实可以算是抄的，因为我竟然做过原题（形式化题意基本一样的那种），但是记不住题号了。</p>
 </div>
-<div class="footer">
-    <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
 </div>
 <script>
-    (function() {
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const code = btn.getAttribute('data-code');
-                if (code) {
-                    await navigator.clipboard.writeText(code);
-                    const orig = btn.textContent;
-                    btn.textContent = '已复制！';
-                    btn.classList.add('copied');
-                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
-                }
-            });
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
         });
-        
+    });
+    
+    
     let searchIndex = null;
     const searchInput = document.getElementById('globalSearchInput');
     const resultsDiv = document.getElementById('searchResults');
     async function loadSearchIndex() {
-        if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
-        else if (window.__SEARCH_INDEX_URL__) {
-            try {
-                const resp = await fetch(window.__SEARCH_INDEX_URL__);
-                if (resp.ok) searchIndex = await resp.json();
-            } catch(e) {}
-        }
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
     }
     function performSearch(keyword) {
         if (!searchIndex || !keyword.trim()) {
@@ -326,7 +338,7 @@ map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">bool</span>&g
     searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
     document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
     loadSearchIndex();
-    })();
+})();
 </script>
 </body>
 </html>
