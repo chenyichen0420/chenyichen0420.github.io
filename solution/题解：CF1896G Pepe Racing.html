@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：CF1896G Pepe Racing</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>如果我只问你最大的那一个，那你怎么办？</p>
+<p>这不唐完了吗？直接每 $n$ 个一组，分别选出最大值，然后再把第一轮的最大值和起来得到一个新的最大值就是最终的答案了。</p>
+<p>那么，这个做法有没有扩展的希望呢？似乎是有的，我们把最大值删掉之后，把那一堆剩下部分的最大值给选出来不就行了，吗？</p>
+<p>好像，剩的不够 $n$ 个了？确实。</p>
+<p>那，我从别的堆里面随便薅一个出来放到自己这里是对的吗？我们发现这样确实是对的。考虑归纳，假设前 $k$ 大的都已经被删干净了，我们只需要保证第 $k+1$ 个在某一堆的最大值就行了。</p>
+<p>可是我们发现，无论被移动到哪一堆，到底是怎么移的，总之发生移动之后会立即在被移动到的那一堆选出当前的最大值，于是第 $k+1$ 个一定处在堆顶！</p>
+<p>没有做完，我们要求了薅的时候只能薅非最大值，那我最后 $2n-1$ 个元素选不出来啊，元素个数不够了！</p>
+<p>不过，我们注意到性质：最后的 $2n-1$ 个元素中会被选出来的一定就是此时的堆顶的那 $n$ 个元素，于是我们直接对他们找最大值，删掉然后随便找一个顶上来就行了。最后只剩一个该删元素的时候直接把他拎出来就行。</p>
+<p>算一下操作次数：</p>
+<p>确定初始堆顶 $n$ 次，确定前 $n^2-2n+1$ 个元素 $2(n^2-2n+1)=2n^2-4n+2$ 次，确定后 $n$ 个元素用 $n-1$ 次，总共正好 $2n^2-2n+1$ 次。</p>
+<p>思路还是比较自然的，瞎实现的代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int t,n,bs[25];
+set&lt;int&gt;v[25];
+vector&lt;int&gt;ans;
+signed main(){
+    ios::sync_with_stdio(0);
+	for(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; ans.clear();
+		for(int i=1;i&lt;=n;++i) v[i].clear();
+		for(int i=1;i&lt;=n;++i)
+			for(int j=1,a;j&lt;=n;++j)
+				v[i].emplace((i-1)*n+j);
+		for(int i=1;i&lt;=n;++i){
+			cout&lt;&lt;&quot;? &quot;;
+			for(int a:v[i]) cout&lt;&lt;a&lt;&lt;&quot; &quot;;
+			cout&lt;&lt;endl;
+			int a; cin&gt;&gt;a;
+			v[i].erase(a);
+			bs[i]=a;
+		}
+		for(int i=1;i&lt;=n*n-n*2+1;++i){
+			cout&lt;&lt;&quot;? &quot;;
+			for(int j=1;j&lt;=n;++j) cout&lt;&lt;bs[j]&lt;&lt;&quot; &quot;;
+			cout&lt;&lt;endl;
+			int a;
+			cin&gt;&gt;a;
+			ans.emplace_back(a);
+			for(int j=1;j&lt;=n;++j)
+				if(bs[j]==a){
+					bs[j]=0;
+					while(v[j].size()&lt;n)
+						for(int k=1;k&lt;=n;++k)
+							if(k!=j&amp;&amp;v[k].size()){
+								v[j].emplace(*v[k].begin());
+								v[k].erase(v[k].begin());
+								break;
+							}
+					cout&lt;&lt;&quot;? &quot;;
+					for(int a:v[j]) cout&lt;&lt;a&lt;&lt;&quot; &quot;;
+					cout&lt;&lt;endl;
+					int b; cin&gt;&gt;b;
+					v[j].erase(b);
+					bs[j]=b;
+				}
+		}
+		for(int i=1;i&lt;=n;++i) v[0].emplace(bs[i]);
+		for(int i=1;i!=n;++i){
+			cout&lt;&lt;&quot;? &quot;;
+			for(int j=1;j&lt;=n;++j) cout&lt;&lt;bs[j]&lt;&lt;&quot; &quot;;
+			cout&lt;&lt;endl;
+			int a;
+			cin&gt;&gt;a;
+			v[0].erase(a);
+			ans.emplace_back(a);
+			for(int j=1;j&lt;=n&amp;&amp;i!=n;++j)
+				if(bs[j]==a){
+					bs[j]=0;
+					while(!v[j].size())
+						for(int k=1;k&lt;=n;++k)
+							if(k!=j&amp;&amp;v[k].size()){
+								v[j].emplace(*v[k].begin());
+								v[k].erase(v[k].begin());
+								break;
+							}
+					int b=*v[j].begin();
+					v[j].erase(b);
+					bs[j]=b;
+				}
+		}
+		ans.emplace_back(*v[0].begin());
+		cout&lt;&lt;&quot;! &quot;; v[0].clear();
+		for(int a:ans) cout&lt;&lt;a&lt;&lt;&quot; &quot;;
+		cout&lt;&lt;endl;
+	}
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-type">int</span> t,n,bs[<span class="hljs-number">25</span>];
+set&lt;<span class="hljs-type">int</span>&gt;v[<span class="hljs-number">25</span>];
+vector&lt;<span class="hljs-type">int</span>&gt;ans;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; ans.<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) v[i].<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>,a;j&lt;=n;++j)
+				v[i].<span class="hljs-built_in">emplace</span>((i<span class="hljs-number">-1</span>)*n+j);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+			cout&lt;&lt;<span class="hljs-string">&quot;? &quot;</span>;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> a:v[i]) cout&lt;&lt;a&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;
+			cout&lt;&lt;endl;
+			<span class="hljs-type">int</span> a; cin&gt;&gt;a;
+			v[i].<span class="hljs-built_in">erase</span>(a);
+			bs[i]=a;
+		}
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n*n-n*<span class="hljs-number">2</span><span class="hljs-number">+1</span>;++i){
+			cout&lt;&lt;<span class="hljs-string">&quot;? &quot;</span>;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j) cout&lt;&lt;bs[j]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;
+			cout&lt;&lt;endl;
+			<span class="hljs-type">int</span> a;
+			cin&gt;&gt;a;
+			ans.<span class="hljs-built_in">emplace_back</span>(a);
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j)
+				<span class="hljs-keyword">if</span>(bs[j]==a){
+					bs[j]=<span class="hljs-number">0</span>;
+					<span class="hljs-keyword">while</span>(v[j].<span class="hljs-built_in">size</span>()&lt;n)
+						<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">1</span>;k&lt;=n;++k)
+							<span class="hljs-keyword">if</span>(k!=j&amp;&amp;v[k].<span class="hljs-built_in">size</span>()){
+								v[j].<span class="hljs-built_in">emplace</span>(*v[k].<span class="hljs-built_in">begin</span>());
+								v[k].<span class="hljs-built_in">erase</span>(v[k].<span class="hljs-built_in">begin</span>());
+								<span class="hljs-keyword">break</span>;
+							}
+					cout&lt;&lt;<span class="hljs-string">&quot;? &quot;</span>;
+					<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> a:v[j]) cout&lt;&lt;a&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;
+					cout&lt;&lt;endl;
+					<span class="hljs-type">int</span> b; cin&gt;&gt;b;
+					v[j].<span class="hljs-built_in">erase</span>(b);
+					bs[j]=b;
+				}
+		}
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) v[<span class="hljs-number">0</span>].<span class="hljs-built_in">emplace</span>(bs[i]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=n;++i){
+			cout&lt;&lt;<span class="hljs-string">&quot;? &quot;</span>;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j) cout&lt;&lt;bs[j]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;
+			cout&lt;&lt;endl;
+			<span class="hljs-type">int</span> a;
+			cin&gt;&gt;a;
+			v[<span class="hljs-number">0</span>].<span class="hljs-built_in">erase</span>(a);
+			ans.<span class="hljs-built_in">emplace_back</span>(a);
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n&amp;&amp;i!=n;++j)
+				<span class="hljs-keyword">if</span>(bs[j]==a){
+					bs[j]=<span class="hljs-number">0</span>;
+					<span class="hljs-keyword">while</span>(!v[j].<span class="hljs-built_in">size</span>())
+						<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">1</span>;k&lt;=n;++k)
+							<span class="hljs-keyword">if</span>(k!=j&amp;&amp;v[k].<span class="hljs-built_in">size</span>()){
+								v[j].<span class="hljs-built_in">emplace</span>(*v[k].<span class="hljs-built_in">begin</span>());
+								v[k].<span class="hljs-built_in">erase</span>(v[k].<span class="hljs-built_in">begin</span>());
+								<span class="hljs-keyword">break</span>;
+							}
+					<span class="hljs-type">int</span> b=*v[j].<span class="hljs-built_in">begin</span>();
+					v[j].<span class="hljs-built_in">erase</span>(b);
+					bs[j]=b;
+				}
+		}
+		ans.<span class="hljs-built_in">emplace_back</span>(*v[<span class="hljs-number">0</span>].<span class="hljs-built_in">begin</span>());
+		cout&lt;&lt;<span class="hljs-string">&quot;! &quot;</span>; v[<span class="hljs-number">0</span>].<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> a:ans) cout&lt;&lt;a&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;
+		cout&lt;&lt;endl;
+	}
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

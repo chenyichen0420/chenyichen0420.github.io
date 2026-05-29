@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
-        /* 全局主题变量，支持跟随系统深色模式 */
+        /* ========== 全局主题变量 ========== */
         :root {
             color-scheme: light dark;
             --bg-body: #f6f8fa;
@@ -23,9 +23,13 @@
             --btn-border: #d0d7de;
             --btn-hover-bg: #eaeef2;
             --shadow: 0 1px 4px rgba(0,0,0,0.1);
-            --search-result-hover: #eaeef2;
             --code-text: #24292f;
             --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -41,9 +45,13 @@
                 --btn-border: #30363d;
                 --btn-hover-bg: #30363d;
                 --shadow: 0 1px 4px rgba(0,0,0,0.3);
-                --search-result-hover: #21262d;
                 --code-text: #c9d1d9;
                 --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,31 +60,11 @@
             background-color: var(--bg-body);
             color: var(--text-primary);
         }
-        .markdown-body {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: var(--bg-card);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-        }
-        .markdown-body {
-            color: var(--text-primary) !important;
-        }
-        .code-content pre code,
-        .code-content pre code.hljs {
-            color: var(--code-text) !important;
-            background-color: var(--code-bg) !important;
-        }
-        .line-numbers {
-            color: var(--line-numbers-color) !important;
-            background-color: var(--code-bg) !important;
-        }
         
         .search-container {
             max-width: 1200px;
             margin: 0 auto 1.5rem auto;
-            background-color: var(--bg-card);
+            background-color: var(--search-container-bg);
             border-radius: 8px;
             padding: 1rem 2rem;
             display: flex;
@@ -125,6 +113,27 @@
             margin-top: 0.2rem;
         }
         
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
         .code-wrapper {
             margin: 1rem 0;
             border-radius: 6px;
@@ -192,12 +201,10 @@
             border-radius: 4px;
         }
         @media (max-width: 768px) {
-            body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
             .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
-    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
         delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
@@ -206,14 +213,16 @@
     });"></script>
 </head>
 <body>
-<div class="search-container">
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
     <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
     <div class="search-results" id="searchResults"></div>
 </div>
-<div class="markdown-body"><h2>思路分析</h2>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
 <p>先把网络流模型给建立出来吧。根据题目要求，我们将少女和每一天看作是图中的点；加一个源点 $s$，向每一天连边，这个边的容量范围是 $[0,D_i]$；加一个汇点 $t$，然后让每个少女向汇点连边，容量范围自然是 $[G_i,\infin]$；少女和每一天之间连边的容量是 $[L,R]$。</p>
 <p>然后就可以认真的讲解怎么玩有源汇上下界最大流了。推荐一篇较好的<a href="https://blog.csdn.net/EQUINOX1/article/details/135953172">博客</a>专讲基础上下界流。</p>
-<h3>存在性判定</h3>
+<h3 id="存在性判定">存在性判定</h3>
 <p>对于每一个点，我们令 $cin_i=\sum f(j,i),cout_i=\sum f(i,j),rd_i=cin_i-cout_i$，然后思考：</p>
 <ol>
 <li>对于 $rd_i=0$ 的点，其入度的下界与出度的下界相同，也就是说这些边我们可以将上界重写为 $fmax-fmin$，仍满足流量守恒。</li>
@@ -221,9 +230,9 @@
 <li>对于 $rd_i>0$ 的点，他若直接将上界重写为 $fmax-fmin$，则不满足流量守恒，入度过小。需要从超级源点连一条容量上界为 $rd_i$ 的边。</li>
 </ol>
 <p>此时，若从超级源点到超级汇点满流，则存在，反之不存在，由源汇点的流量与原图的流量守恒关系不难证得。</p>
-<h3>有源状态下的判定</h3>
+<h3 id="有源状态下的判定">有源状态下的判定</h3>
 <p>从 $t$ 向 $s$ 连一条容量无限的边，就完美地将有源强转成了无源，然后就能做了。</p>
-<h3>最大/小流(有源)</h3>
+<h3 id="最大小流有源">最大/小流(有源)</h3>
 <p>我们还是先有源强转无源跑判定，判定完了之后记录 $s$ 到 $t$ 的最大流，删除 $t$ 到 $s$ 的边，然后分情况：</p>
 <p>如果是最大流，就跑出 $s$ 到 $t$ 的最大流和开始的那个最大流相加得到结果。</p>
 <p>如果是最小流，就跑出 $t$ 到 $s$ 的最大流和开始的那个最大流相减得到结果。</p>
@@ -432,35 +441,38 @@ signed main() {
 </div>
 </div>
 </div>
-<div class="footer">
-    <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
 </div>
 <script>
-    (function() {
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const code = btn.getAttribute('data-code');
-                if (code) {
-                    await navigator.clipboard.writeText(code);
-                    const orig = btn.textContent;
-                    btn.textContent = '已复制！';
-                    btn.classList.add('copied');
-                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
-                }
-            });
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
         });
-        
+    });
+    
+    
     let searchIndex = null;
     const searchInput = document.getElementById('globalSearchInput');
     const resultsDiv = document.getElementById('searchResults');
     async function loadSearchIndex() {
-        if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
-        else if (window.__SEARCH_INDEX_URL__) {
-            try {
-                const resp = await fetch(window.__SEARCH_INDEX_URL__);
-                if (resp.ok) searchIndex = await resp.json();
-            } catch(e) {}
-        }
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
     }
     function performSearch(keyword) {
         if (!searchIndex || !keyword.trim()) {
@@ -484,7 +496,7 @@ signed main() {
     searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
     document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
     loadSearchIndex();
-    })();
+})();
 </script>
 </body>
 </html>

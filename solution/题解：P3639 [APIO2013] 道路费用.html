@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
-        /* 全局主题变量，支持跟随系统深色模式 */
+        /* ========== 全局主题变量 ========== */
         :root {
             color-scheme: light dark;
             --bg-body: #f6f8fa;
@@ -23,9 +23,13 @@
             --btn-border: #d0d7de;
             --btn-hover-bg: #eaeef2;
             --shadow: 0 1px 4px rgba(0,0,0,0.1);
-            --search-result-hover: #eaeef2;
             --code-text: #24292f;
             --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -41,9 +45,13 @@
                 --btn-border: #30363d;
                 --btn-hover-bg: #30363d;
                 --shadow: 0 1px 4px rgba(0,0,0,0.3);
-                --search-result-hover: #21262d;
                 --code-text: #c9d1d9;
                 --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,31 +60,11 @@
             background-color: var(--bg-body);
             color: var(--text-primary);
         }
-        .markdown-body {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: var(--bg-card);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-        }
-        .markdown-body {
-            color: var(--text-primary) !important;
-        }
-        .code-content pre code,
-        .code-content pre code.hljs {
-            color: var(--code-text) !important;
-            background-color: var(--code-bg) !important;
-        }
-        .line-numbers {
-            color: var(--line-numbers-color) !important;
-            background-color: var(--code-bg) !important;
-        }
         
         .search-container {
             max-width: 1200px;
             margin: 0 auto 1.5rem auto;
-            background-color: var(--bg-card);
+            background-color: var(--search-container-bg);
             border-radius: 8px;
             padding: 1rem 2rem;
             display: flex;
@@ -125,6 +113,27 @@
             margin-top: 0.2rem;
         }
         
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
         .code-wrapper {
             margin: 1rem 0;
             border-radius: 6px;
@@ -192,12 +201,10 @@
             border-radius: 4px;
         }
         @media (max-width: 768px) {
-            body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
             .search-container { flex-direction: column; align-items: stretch; }
         }
     </style>
-    <script>window.__SEARCH_INDEX_URL__ = "./search_index.json";</script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
         delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
@@ -206,13 +213,15 @@
     });"></script>
 </head>
 <body>
-<div class="search-container">
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
     <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
     <div class="search-results" id="searchResults"></div>
 </div>
-<div class="markdown-body"><h2>题目大意</h2>
+        <div class="markdown-body"><h2 id="题目大意">题目大意</h2>
 <p>给你一张原图 $G^\prime=(V,E_1)$，再给你一些边 $E_2$，其中 $E_1$ 的边边权确定，$E_2$ 中的边的边权由你自己定。这时我们令 $E=E_1\cup E_2$，则 $E$ 中每一个边的起始点均已确定。问你，如果在 $G=(V,E)$ 中生成出一个指定的最小生成树（毕竟最小生成树可以有多个），那么这棵树上属于 $E_2$ 的边的边权之和最大为多少。</p>
-<h2>思路分析</h2>
+<h2 id="思路分析">思路分析</h2>
 <p>当你对一道题目无从下手时，我们就要观察数据范围。观察到： $k\le20$。这是一个突破口，这么小的数字多半与 $2^k$ 挂钩。</p>
 <p>顺势出现一个思路：枚举每一条边有没有出现在最小生成树中。虽然复杂度不对（等会儿分析），但是讲一下：枚举 $2^k$ 种情况，对于每一种，先将所有已经选择的边加入最小生成树中（特判此时已经有环的情况，直接舍弃），然后对整张图跑一遍最小生成树。最后用上最小生成树的性质对被选择的边进行约束，即可求出答案。</p>
 <p>性质：最小生成树再加上任意一条边都会形成一个环。假定这条边的边权为 $a$，那么所有环上的边的边权都小于等于 $a$。</p>
@@ -228,7 +237,7 @@
 <p>最后，我们再用开始的思路进行求解就行了。因为只剩下了 $k+1$ 个点，因此我们不需要对最小生成树的限制与求解这一步进行任何优化，直接使用 $k^2$ 的暴力更新就行了。</p>
 <p>注意数据范围，不开 <code>long long</code> 见祖宗。</p>
 <p>总复杂度：$O(m\log m+2^kk^2)$。</p>
-<h3>代码如下：</h3>
+<h3 id="代码如下">代码如下：</h3>
 <div class="code-wrapper">
 <div class="code-header">
     <span class="code-lang">CPP</span>
@@ -443,35 +452,38 @@ signed main() {
 </div>
 </div>
 </div>
-<div class="footer">
-    <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
 </div>
 <script>
-    (function() {
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const code = btn.getAttribute('data-code');
-                if (code) {
-                    await navigator.clipboard.writeText(code);
-                    const orig = btn.textContent;
-                    btn.textContent = '已复制！';
-                    btn.classList.add('copied');
-                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
-                }
-            });
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
         });
-        
+    });
+    
+    
     let searchIndex = null;
     const searchInput = document.getElementById('globalSearchInput');
     const resultsDiv = document.getElementById('searchResults');
     async function loadSearchIndex() {
-        if (window.__SEARCH_INDEX__) searchIndex = window.__SEARCH_INDEX__;
-        else if (window.__SEARCH_INDEX_URL__) {
-            try {
-                const resp = await fetch(window.__SEARCH_INDEX_URL__);
-                if (resp.ok) searchIndex = await resp.json();
-            } catch(e) {}
-        }
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
     }
     function performSearch(keyword) {
         if (!searchIndex || !keyword.trim()) {
@@ -495,7 +507,7 @@ signed main() {
     searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
     document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
     loadSearchIndex();
-    })();
+})();
 </script>
 </body>
 </html>

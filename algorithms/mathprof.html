@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
-        /* 全局主题变量，支持跟随系统深色模式 */
+        /* ========== 全局主题变量 ========== */
         :root {
             color-scheme: light dark;
             --bg-body: #f6f8fa;
@@ -23,9 +23,15 @@
             --btn-border: #d0d7de;
             --btn-hover-bg: #eaeef2;
             --shadow: 0 1px 4px rgba(0,0,0,0.1);
-            --search-result-hover: #eaeef2;
             --code-text: #24292f;
             --line-numbers-color: #8c959f;
+            
+            
+            --toc-bg: #ffffff;
+            --toc-hover: #f6f8fa;
+            --toc-active: #0969da;
+            --toc-active-bg: #ddf4ff;
+            
         }
         @media (prefers-color-scheme: dark) {
             :root {
@@ -41,9 +47,15 @@
                 --btn-border: #30363d;
                 --btn-hover-bg: #30363d;
                 --shadow: 0 1px 4px rgba(0,0,0,0.3);
-                --search-result-hover: #21262d;
                 --code-text: #c9d1d9;
                 --line-numbers-color: #8b949e;
+                
+                
+                --toc-bg: #161b22;
+                --toc-hover: #21262d;
+                --toc-active: #2f81f7;
+                --toc-active-bg: #1f2d3a;
+                
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -52,6 +64,113 @@
             background-color: var(--bg-body);
             color: var(--text-primary);
         }
+        
+        
+        /* 布局：主内容区 + 右侧目录 */
+        .page-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        /* 目录侧边栏 */
+        .toc-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            background-color: var(--toc-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .toc-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-primary);
+        }
+        .toc-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .toc-list ul {
+            list-style: none;
+            margin: 0;
+            padding-left: 1rem;
+        }
+        .toc-item {
+            margin: 0.25rem 0;
+        }
+        .toc-link {
+            display: inline-block;
+            padding: 0.2rem 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.1s ease;
+        }
+        .toc-link:hover {
+            background-color: var(--toc-hover);
+            color: var(--text-primary);
+        }
+        .toc-link.active {
+            color: var(--toc-active);
+            background-color: var(--toc-active-bg);
+            font-weight: 500;
+        }
+        .toc-toggle {
+            cursor: pointer;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+            margin-right: 0.25rem;
+            color: var(--text-secondary);
+        }
+        .toc-toggle:hover {
+            color: var(--text-primary);
+        }
+        .toc-toggle-icon {
+            display: inline-block;
+            width: 1rem;
+            text-align: center;
+        }
+        .toc-children {
+            margin-left: 1rem;
+            overflow: hidden;
+            transition: max-height 0.2s ease;
+        }
+        .toc-children.collapsed {
+            display: none;
+        }
+        /* 响应式：小屏隐藏侧边栏 */
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .page-wrapper { flex-direction: column; }
+            .toc-sidebar {
+                position: static;
+                width: 100%;
+                max-height: 300px;
+                order: -1;
+                margin-bottom: 1rem;
+            }
+        }
+    
         .markdown-body {
             max-width: 1200px;
             margin: 0 auto;
@@ -72,7 +191,6 @@
             color: var(--line-numbers-color) !important;
             background-color: var(--code-bg) !important;
         }
-        
         .code-wrapper {
             margin: 1rem 0;
             border-radius: 6px;
@@ -140,12 +258,10 @@
             border-radius: 4px;
         }
         @media (max-width: 768px) {
-            body { padding: 1rem; }
             .markdown-body { padding: 1rem; }
             
         }
     </style>
-    
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
         delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
@@ -154,9 +270,11 @@
     });"></script>
 </head>
 <body>
-
-<div class="markdown-body"><h2>D1</h2>
-<h3>D1T1</h3>
+<div class="page-wrapper">
+    <div class="main-content">
+        
+        <div class="markdown-body"><h2 id="d1">D1</h2>
+<h3 id="d1t1">D1T1</h3>
 <p>对于 $n\equiv 1,3\pmod 4$ 的，$\frac{n-1}{2}$ 是在 $\frac{n}{2}$ 及以下的最大的整数。$gcd(n,\frac{n-1}{2})=\gcd(1,\frac{n-1}{2})=1$。</p>
 <p>对于 $n\equiv 2\pmod 4$ 的，最大的数依次为 $\frac{n}{2},\frac{n}{2}-1,\frac{n}{2}-2,\dots$。</p>
 <p>$gcd(n,\frac{n}{2})=\frac{n}{2}>1$，不成立。</p>
@@ -166,20 +284,20 @@
 <p>$gcd(n,\frac{n}{2})=\frac{n}{2}>1$，不成立。</p>
 <p>$gcd(n,\frac{n}{2}-1)=\gcd(\frac{n}{2}-1,2)$。又因为 $n\equiv 0\pmod 4$，所以 $\frac{n}{2}\equiv 0\pmod 2,\frac{n}{2}-1\equiv 1\pmod 2,\gcd(\frac{n}{2}-1,2)=1$，成立。</p>
 <p>原命题得证。</p>
-<h3>D1T2</h3>
+<h3 id="d1t2">D1T2</h3>
 <p>在任意的 $2n-1$ 个数中，有 $n$ 个数的和是 $n$ 的倍数，对 $m$ 也成立，证明在任意的 $2nm-1$ 个数中，有 $nm$ 的数的和是 $nm$ 的倍数。</p>
 <p>显然我们可以从 $2mn-1$ 个数中选出 $m(2n-1)$ 个数，再从其中分出 $m$ 组 $(2n-1)$ 个数，形成和为 $n$ 的倍数的 $m$ 个数，加起来就是 $nm$ 的倍数。</p>
-<h3>D1T3</h3>
+<h3 id="d1t3">D1T3</h3>
 <p>证明若 $\gcd_{i=1}^na_i=1$，则方程 $\sum_{i=1}^na_ix_i=s$ 有解。</p>
 <p>由裴蜀定理得，$ax+by=\gcd(a,b)$ 有解。因此，$\sum_{i=1}^na_ix_i=\gcd_{i=1}^na_i$ 有解和 $\sum_{i=1}^{n-1}a_ix_i=\gcd_{i=1}^{n-1}a_i$ 有解是等价的。</p>
 <p>而显然 $n=1$ 的时候一定有解。</p>
 <p>所以你只需要把上述过程改成数归的写法就完了。</p>
-<h3>D1T4</h3>
+<h3 id="d1t4">D1T4</h3>
 <p>$v(n)=2^{2^n}+1$，则 $i\neq j$ 时 $\gcd(v(i),v(j))=1$。</p>
 <p>令 $i<j$，我们不难注意到 $v(j)=(2^{2^j}-1)+2$。我们再令 $t=2^{2^i}$。</p>
 <p>所以有 $2^{2^j}-1=t^{2^{j-i}}-1=(t+1)(t^{2^{j-i}-1}-t^{2^{j-i}-2}+t^{2^{j-i}-3}-t^{2^{j-i}-4}+\dots+t-1)=v(i)(\dots)$。</p>
 <p>所以有 $v(j)\equiv2\pmod{v(i)}$。而显然 $v(i)\equiv1\pmod2$。所以 $\gcd(v(i),v(j))=1$。</p>
-<h3>D1T5</h3>
+<h3 id="d1t5">D1T5</h3>
 <p>证明 $n>m\ge0,a>b，\gcd(a^m-a^m,a^n-b^n)=a^{\gcd(m,n)}-b^{\gcd(m,n)}$。</p>
 <p>考虑证明 $\forall l\nmid r,a^l-b^l\nmid a^r-b^r$。</p>
 <p>采用试除法：$\frac{a^r-b^r}{a^l-b^l}=\frac{\sum_{i=0}^{r-1}a^ib^{r-i-1}}{\sum_{i=0}^{l-1}a^ib^{r-i-1}}$。</p>
@@ -189,36 +307,36 @@
 <p>但是对于 $l\nmid r$ 的情况，不难发现最后会剩下一部分。我们将这一部分写出来：$b^{r-1}+b^{r-2}a+\dots+b^{...}a^{(r\mod l)-1}$。</p>
 <p>又因为 $\gcd(a,b)=1$，所以 $b^{r-1}$ 项只能通过 $b^{r-l}f(l)$ 来提供，显然因为上式少了几项，二者不相等且无法弥补。</p>
 <p>证毕。</p>
-<h3>D1T6</h3>
+<h3 id="d1t6">D1T6</h3>
 <p>先推充分性。不妨设 $|A|\le|B|$。</p>
 <p>如果 $|A|\ |\ |B|$，那显然成立。</p>
 <p>而如果 $|A|\ \nmid\ |B|$，那 $B$ 后面会多出来一坨。而多的这一坨会循环的匹配 $A$，直到匹配完成一个周期。</p>
 <p>其实在第一次匹配和最后一次匹配的时候，他验证了 $B$ 最开始的 $|A|$ 个字符与最后 $|A|$ 个字符和 $A$ 一样，中间的纯 $B$ 部分则被剩下的匹配以基本一样的道理证明了二者一样。</p>
 <p>再推必要性。我们发现上面的步骤可逆，证毕？</p>
-<h3>D1T7</h3>
+<h3 id="d1t7">D1T7</h3>
 <p>我也只能思考到哪里写到哪里了。</p>
 <p>首先题目可以简化为只输入两个数，第三个留白。因为第一次操作必定会使一个数消失，也就是使得一个输入无效。</p>
 <p>在搜索了 $267950000$ 组数据后，我们发现如果初始值是 $x,y$ 那么凑出来的数一定可以用 $ax+by$ 表示，并且 $a,b$ <strong>互质</strong>。</p>
 <p>目前可以感性证明正确性：和辗转相除法的对应关系。</p>
 <p>所以我们就是在 $c>x+y$ 时分三次检验 $ax+by=c$ 在 $a\ge 1,b\ge 1,\gcd(a,b)=1$ 时有没有解。不知道怎么维护。</p>
-<h2>D2</h2>
-<h3>D2T1</h3>
-<h4>D2T1P1</h4>
+<h2 id="d2">D2</h2>
+<h3 id="d2t1">D2T1</h3>
+<h4 id="d2t1p1">D2T1P1</h4>
 <p>令 $c=a\times b,(a,b)=1$，那么 $gcd(c,k)=gcd(ab,k)$。</p>
 <p>又知道若 $n=\prod_{i=1}^cp_i^{k_i},m=\prod_{i=1}^{c^\prime}{p_i^\prime}^{k_i^\prime},P=\{p\}\cup\{p^\prime\}$，则 $\gcd(n,m)=\prod_{p\in P}p^{\min(k,k^\prime)}$。</p>
 <p>而因为 $(a,b)=1$，所以 $a,b$ 的 $p$ 没有交集。也就是对于 $k$ 有的 $p$，他只可能不在 $c$ 中，或者只在 $a$ 或 $b$ 中的一个数中出现。不会对结果的 $\min(k,k^\prime)$ 造成影响。</p>
 <p>所以 $\gcd(ab,k)=\gcd(a,k)\times\gcd(b,k),(a,b)=1$。</p>
-<h4>D2T1P2</h4>
+<h4 id="d2t1p2">D2T1P2</h4>
 <p>$n=\prod_{i=1}^cp_i^{k_i}$。我们不难发现原式在枚举因数。而枚举因数时将这些因数也给拆分掉，其实本质上就是在枚举 $k_i^\prime\in[0,k_i]$。</p>
 <p>不难注意到，不同的 $p$ 之间是相对独立的，并且以一种类似乘法原理的形式拼接到了一起。</p>
 <p>我们考虑一下对于 $p$，不同的 $k$ 的乘法权值：$1+p(p-1)+p^3(p-1)+p^5(p-1)+\dots+p^{2k-1}(p-1)$。</p>
 <p>这个式子，我们再拆一下：$1-p+p^2-p^3+p^4-\dots+p^{2k}=\frac{p^{2k+1}+1}{p+1}$。</p>
 <p>所以 $g(n)=\prod_{i=1}^c\frac{p_i^{2k_i+1}+1}{p_i+1}$。又因为 $(n,m)=1$，所以 $n,m$ 所含有的 $p$ 完全不相交。显然就具有积性了。</p>
-<h4>D2T1P3</h4>
+<h4 id="d2t1p3">D2T1P3</h4>
 <p>我们令 $n=\prod_{i=1}^cp_i^{k_i},m=\prod_{i=1}^cp_i^{k_i^\prime}$。其中 $k_i,k_i^\prime$ 可以为 $0$，那么 $f(n)f(m)=\prod_{i=1}^cf(p_i^{k_i})f(p_i^{k_i^\prime})$。</p>
 <p>显然我们还有 $\gcd(n,m)=\prod_{i=1}^cp_i^{\min(k_i,k_i^\prime)},\operatorname{lcm}(n,m)=\prod_{i=1}^cp_i^{\max(k_i,k_i^\prime)}$，所以 $f(\gcd(n,m))f(\operatorname{lcm}(n,m))=\prod_{i=1}^cf(p_i^{min(k_i,k_i^\prime)})f(p_i^{max(k_i,k_i^\prime)})$。</p>
 <p>显然两式相等。</p>
-<h3>D2T2</h3>
+<h3 id="d2t2">D2T2</h3>
 <p>先给出模板，方便后面叙述：</p>
 <div class="code-wrapper">
 <div class="code-header">
@@ -251,46 +369,46 @@ inline void sieve(){ \\3
 </code></pre>
 </div>
 </div>
-<h4>D2T2P1</h4>
+<h4 id="d2t2p1">D2T2P1</h4>
 <p>显然 $f(n)$ 是一个完全积性函数。在扩展的过程中，我们直接 $f(i\times p_j)=f(i)f(p_j)$ 即可。显然由实现过程，$i\times p_j$ 至多被算一次，而且由于 $p_j\le i$，$f(i)$ 和 $f(p_j)$ 都已经被算出来。</p>
 <p>边界情况就是对于质数 $p$ 而言的 $f(p)$，这时候直接使用快速幂进行计算即可。总复杂度为 $O(n+\frac{n}{\ln n}\times \log n)=O(n)$。</p>
-<h4>D2T2P2</h4>
+<h4 id="d2t2p2">D2T2P2</h4>
 <p>令 $n=\prod_{i=1}^cp_i^{k_i}$，则 $f(n)=\prod_{i=1}^c(k_i+1)$。</p>
 <p>而我们知道在线性筛的第 $7,8$ 行中，对于不进入第 $8$ 行的，显然 $p_j$ 是一个新的质因数，$f(i\times f_j)=2f(i)$。对于进入第 $8$ 行的，$p_j$ 是一个已有的质因数。此时我们记录出一个数的最小质因数出现的次数 $c_i$，则 $f(i\times f_j)=f(i)\times\frac{c_i+2}{c_i+1}$。</p>
-<h4>D2T2P3</h4>
+<h4 id="d2t2p3">D2T2P3</h4>
 <p>由 D2T1P2 得，$g(n)$ 是积性函数。因此若 $n=\prod_{i=1}^cp_i^{k_i}$，则 $g(n)=g(\prod_{i=1}^cp_i^{k_i})=g(\prod_{i=1}^{c-1}p_i^{k_i})g(p_c^{k_c})$。</p>
 <p>显然我们可以做到对于每一个位置求出他的那几坨东西。现在重点在于 $O(1)$ 求出 $g(p_c^{k_c})$。</p>
 <p>不难发现我们要求的 $k_c$ 是连续的，由 D2T1P2 的式子，我们可以继承 $k_c-1$ 的结果并进行计算，达到 $O(1)$ 的时间复杂度。</p>
-<h3>D2T3</h3>
+<h3 id="d2t3">D2T3</h3>
 <p>引理：在 $[1,n]$ 中是 $k$ 的倍数的数的个数是 $\lfloor\frac{n}{k}\rfloor$。正确性显然。</p>
 <p>所以 $n!$ 中素数 $p$ 的次数为 $[1,n]$ 中是 $p$ 的倍数的数的个数加是 $p^2$ 的倍数的数的个数加是 $p^3$ 的倍数的数的个数加......</p>
 <p>上式相当于 $p$ 至少为 $1$ 次项的数的个数，加上至少为 $2$ 次项的数的个数，加上至少为 $3$ 次项的数的个数，......显然结果就是 $n!$ 中素数 $p$ 的次数。</p>
 <p>所以答案是 $\sum_{k=1}\frac{n}{p^k}$。</p>
-<h3>D2T4</h3>
+<h3 id="d2t4">D2T4</h3>
 <p>$\sum_{i=1}^n\sum_{j=1}^m\gcd(i,j)=\sum_{i=1}^n\sum_{j=1}^m\sum_{k|i,k|j}\varphi(k)=\sum_{k\ge1}\sum_{k|i}\sum_{k|j}\varphi(k)=\sum_{k\ge1}\varphi(k)\times\lfloor\frac{n}{k}\rfloor\times\lfloor\frac{m}{k}\rfloor$。</p>
-<h3>D2T5</h3>
+<h3 id="d2t5">D2T5</h3>
 <p>由裴蜀定理得：$ax+by=\gcd(a,b)$ 一定有解。因此，如果 $2^a\equiv1\pmod n$ 和 $2^b\equiv1\pmod n$ 都成立，则 $2^{\gcd(a,b)}\equiv1\pmod n$ 也成立。</p>
 <p>假设存在 $2^n\equiv1\pmod n$，我们找到 $n$ 的最小质因数 $p$，必定有 $2^n\equiv1\pmod p$ 和 $2^{p-1}\equiv1\pmod p$。从而 $2^{\gcd(p-1,n)}\equiv1\pmod p$。又因为 $p$ 是 $n$ 最小的质因数，$\gcd(p-1,n)=1$，即 $2\equiv1\pmod p$。</p>
 <p>显然，这对于任意一个质数都不成立，只有 $n=1$ 时原式才可能成立。</p>
-<h3>D2T6</h3>
+<h3 id="d2t6">D2T6</h3>
 <p>我们知道 $n=\prod_{i=1}^cp_i^{k_i}$，则 $\varphi(n)=n\times\prod_{i=1}^c\frac{p_i-1}{p_i}$，也就有 $\frac{n}{\varphi(n)}=\prod_{i=1}^c\frac{p_i}{p_i-1}$。</p>
 <p>显然，质因数越小且越多时最好。我们直接取最小的那些质数。可以从 $2$ 取到 $29$，答案为 $\frac{2\times3\times5\times7\times11\times13\times17\times19\times23\times29}{1\times2\times4\times6\times10\times12\times16\times18\times22\times28}=\frac{6469693230}{1021870080}=\frac{2800733}{442368}$。</p>
 <p>（你猜最后计算是不是手算的）</p>
-<h2>D3</h2>
-<h3>D3T1</h3>
+<h2 id="d3">D3</h2>
+<h3 id="d3t1">D3T1</h3>
 <p>不管怎么分配帽子，$\sum_{i=1}^na_i\bmod n$ 总是一个确定的值。因此我们让第 $i$ 个人回答 $s_i$，满足 $\sum_{j\neq i}a_j+s_i\bmod n=(i-1)$，在帽子的范围也是 $[1,n]$ 的情况下，总有一个人会答对。</p>
-<h3>D3T2</h3>
-<p>在证明威尔逊定理的时候，我们针对 $p&gt;2$ 的证明的时候用到了逆元配对证明。因此对证明 $p&gt;2$ 的情况有帮助。先考虑 $p&gt;2$ 的。</p>
-<p>对于 $p&gt;2$ 时，我们仍然考虑将逆元两两配对。假设在 $p^1$ 的情况下 $a$ 的逆元是 $b$。那么 $a\times p^t$ 和 $b\times p^{q-t}$ 配对，这样总共有 $q$ 个不同的，显然 $\bmod p^q$ 后就只剩 $1$ 了。</p>
+<h3 id="d3t2">D3T2</h3>
+<p>在证明威尔逊定理的时候，我们针对 $p>2$ 的证明的时候用到了逆元配对证明。因此对证明 $p>2$ 的情况有帮助。先考虑 $p>2$ 的。</p>
+<p>对于 $p>2$ 时，我们仍然考虑将逆元两两配对。假设在 $p^1$ 的情况下 $a$ 的逆元是 $b$。那么 $a\times p^t$ 和 $b\times p^{q-t}$ 配对，这样总共有 $q$ 个不同的，显然 $\bmod p^q$ 后就只剩 $1$ 了。</p>
 <p>剩余的 $1,-1$ 配对之后答案为 $-1$。</p>
-<p>对于 $p=2$ 的，在 $q$ 较大时容易观察到不能通过逆元配对的是 $2^{p-1}\pm1,\pm1$，并且当这四者不重复时 $(-1)(1)(2^{p-1}+1)(2^{p-1}-1)\equiv1\pmod{2^q}$，所以 $q&gt;2$ 时答案为 $1$。</p>
+<p>对于 $p=2$ 的，在 $q$ 较大时容易观察到不能通过逆元配对的是 $2^{p-1}\pm1,\pm1$，并且当这四者不重复时 $(-1)(1)(2^{p-1}+1)(2^{p-1}-1)\equiv1\pmod{2^q}$，所以 $q>2$ 时答案为 $1$。</p>
 <p>不难手算得到 $q=2$ 时答案为 $-1$，而 $q=1$ 时答案为 $\pm1$。</p>
-<h3>D3T3P1</h3>
+<h3 id="d3t3p1">D3T3P1</h3>
 <p>$n^2\equiv-1\pmod p$ 且 $n^{p-1}\equiv 1\pmod p$。但是因为 $p=4k+3$，所以显然 $n^{p-1}=(n^2)^{\frac{p-1}{2}}\equiv(-1)^{\frac{p-1}{2}}\equiv-1\pmod p$。矛盾。</p>
-<h3>D3T3P2</h3>
+<h3 id="d3t3p2">D3T3P2</h3>
 <p>令 $p=4k+1$，$n=(2k)!$。检验一下：</p>
 <p>首先显然 $n(p-n)\equiv-n^2\pmod p$。因此 $(p-1)!\equiv(-1^2)\times(-2^2)\times\dots\times(-(2k)^2)\equiv(-1)^{2k}((2k)!)^2\equiv n^2$。因此 $n^2+1\equiv0\pmod p$。</p>
-<h3>D3T4</h3>
+<h3 id="d3t4">D3T4</h3>
 <p>经手<del>打的程序</del>算得答案为 $2\times10^{249}$，代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
@@ -327,17 +445,17 @@ int main(){
 </code></pre>
 </div>
 </div>
-<h3>D3T5</h3>
+<h3 id="d3t5">D3T5</h3>
 <p>$\frac{1}{A}=\frac{1}{B}+\frac{1}{C}\iff BC=AB+AC\iff (B-A)(C-A)=A^2$。</p>
 <p>而 $B,C>A$，$A,B,C$ 都是整数，所以答案为 $\tau(A^2)$。</p>
-<h3>D3T6</h3>
-<h3>D3T7</h3>
-<h2>D4</h2>
+<h3 id="d3t6">D3T6</h3>
+<h3 id="d3t7">D3T7</h3>
+<h2 id="d4">D4</h2>
 <p>note: T5/7 是编程题。</p>
-<h3>D4T1</h3>
-<h4>D4T1P1</h4>
+<h3 id="d4t1">D4T1</h3>
+<h4 id="d4t1p1">D4T1P1</h4>
 <p>等同于向 $n$ 个可空的篮子中分 $m$ 个球的方案数，又等同于向 $n$ 个不可空的篮子中分 $m+n$ 个球的方案数，又等同于在 $m+n-1$ 个空隙中插入 $n-1$ 个挡板的方案数，等于 $C_{n+m-1}^{n-1}$。</p>
-<h4>D4T1P2</h4>
+<h4 id="d4t1p2">D4T1P2</h4>
 <p>$\begin{aligned}
 & g(S) = \sum_{T\sube S}(-1)^{|S|-|T|}f(T)\\
 \iff & g(S)=\sum_{T\sube S}(-1)^{|S|-|T|}\sum_{P\sube T}g(P) \\
@@ -348,7 +466,7 @@ int main(){
 
 \end{aligned}$</p>
 <p>显然成立。</p>
-<h4>D4T1P3</h4>
+<h4 id="d4t1p3">D4T1P3</h4>
 <p>$\begin{aligned}
 & g(S) = \sum_{T\supe S}(-1)^{|S|-|T|}f(T)\\
 \iff & g(S)=\sum_{T\supe S}(-1)^{|S|-|T|}\sum_{P\supe T}g(P) \\
@@ -359,12 +477,12 @@ int main(){
 
 \end{aligned}$</p>
 <p>不难发现，改个符号的方向就完事了。</p>
-<h4>D4T1P4</h4>
+<h4 id="d4t1p4">D4T1P4</h4>
 <p>与 $n$ 互质就是与 $n$ 的所有质因数互质。</p>
 <p>因此，我们可以找出 $n$ 的所有质因数 $P$，答案为 $\sum_{S\sube P}(-1)^{|S|}\lfloor\frac{m}{\prod_{p\in S}p}\rfloor$。约定 $\prod_{p\in\empty}p=1$。</p>
-<h3>D4T2</h3>
+<h3 id="d4t2">D4T2</h3>
 <p>首先，我们知道 $D_n=\sum_{i=0}^n(-1)^i\frac{n!}{i!}$。</p>
-<h4>D4T2P1</h4>
+<h4 id="d4t2p1">D4T2P1</h4>
 <p>首先在 $n=3$ 时式子成立。</p>
 <p>$\begin{aligned}
 (n-1)(D_{n-1}+D_{n-2}) &= (n-1)D_{n-2}+(n-1)D_{n-1} \\
@@ -373,13 +491,13 @@ int main(){
 &= D_n
 \end{aligned}$</p>
 <p>中间步骤证明见 D4T2P2。</p>
-<h4>D4T2P2</h4>
+<h4 id="d4t2p2">D4T2P2</h4>
 <p>$\begin{aligned}
 nD_{n-1}+(-1)^n &= (\sum_{i=0}^{n-1}(-1)^i\frac{n!}{i!})+(-1)^n\frac{n!}{n!} \\
 &= \sum_{i=0}^n(-1)^i\frac{n!}{i!} \\
 &= D_n
 \end{aligned}$</p>
-<h3>D4T3</h3>
+<h3 id="d4t3">D4T3</h3>
 <p>有 $i$ 个不重叠的非法对的方案数为 $(_i^{n-1})(n-i)!$。因此 $Q_n=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)!$。</p>
 <p>$\begin{aligned}
 Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
@@ -389,22 +507,22 @@ Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
 & = D_n-(-1)^n+D_{n-1}-(-1)^{n-1} \\
 & = D_n+D_{n-1}
 \end{aligned}$</p>
-<h3>D4T4</h3>
+<h3 id="d4t4">D4T4</h3>
 <p>$F(K)=|\set {x|\forall i\notin K,x\in A_i,\forall j\in K,x\notin A_j}|,G(K)=\set{x|\exist i\notin K,x\in A_i,\forall j\in K,x\notin A_j}$。</p>
 <p>那么我们有 $G(K)=\sum_{P\sube K}F(P)\iff F(K)=\sum_{P\sube K}(-1)^{|K|-|L|}G(P)$。</p>
 <p>我们令 $K=[1,n]\cap \mathbb{Z}$，则 $F(K)=\sum_{P\sube K}(-1)^{n-|P|}G(P)$。</p>
 <p>而显然，$G(K)=|\cap_{i\notin K}A_i|,F(K)=|\cap\overline{A_i}|$。</p>
 <p>这正是容斥原理的补集形式。</p>
-<h3>D4T5</h3>
+<h3 id="d4t5">D4T5</h3>
 <p><a href="https://oi-wiki.org/math/combinatorics/inclusion-exclusion-principle/#pkuwc2018-%E9%9A%8F%E6%9C%BA%E6%B8%B8%E8%B5%B0">https://oi-wiki.org/math/combinatorics/inclusion-exclusion-principle/#pkuwc2018-%E9%9A%8F%E6%9C%BA%E6%B8%B8%E8%B5%B0</a></p>
 <p>编程题不过多阐释，树上消元没学过，后面得再额外花一些时间。暂时跳了。</p>
-<h3>D4T6</h3>
+<h3 id="d4t6">D4T6</h3>
 <p><a href="https://oi-wiki.org/math/combinatorics/inclusion-exclusion-principle/#min-max-%E5%AE%B9%E6%96%A5">https://oi-wiki.org/math/combinatorics/inclusion-exclusion-principle/#min-max-%E5%AE%B9%E6%96%A5</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/348846716">https://zhuanlan.zhihu.com/p/348846716</a></p>
 <p>更推荐第二个链接里面的办法，有点像待定系数法。</p>
-<h2>D5</h2>
-<h3>D5T1</h3>
-<h4>D5T1P0</h4>
+<h2 id="d5">D5</h2>
+<h3 id="d5t1">D5T1</h3>
+<h4 id="d5t1p0">D5T1P0</h4>
 <p>$\begin{aligned}
 \sum_{i=0}^k(-1)^i(_i^k)f(i)&=\sum_{i=0}^k(-1)^i(_i^k)\sum_{j=0}^i(-1)^j(_j^i)g(j)\\
 &=\sum_{j=0}^k(-1)^j(_j^k)(\sum_{i=j}^k(-1)^i(_{i-j}^{k-j}))g(j)\\
@@ -413,7 +531,7 @@ Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
 &=g(k)
 \end{aligned}$</p>
 <p>式子是完全对称的，不用反着来。</p>
-<h4>D5T1P1</h4>
+<h4 id="d5t1p1">D5T1P1</h4>
 <p>$\begin{aligned}
 ((a*b)*c)(n) &= \sum_{d\mid n}(a*b)(d)\times c(\frac{n}{d})\\
 & =\sum_{d\mid n}\sum_{t\mid d}a(t)b(\frac{d}{t})c(\frac{n}{d})\\
@@ -423,20 +541,20 @@ Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
 <p>我们可以假定 $d=vt$。</p>
 <p>$((a*b)*c)(n) = b(v)\sum_{vt|n}a(t)c(\frac{n}{vt})=b(v)(a*c)(\frac{n}{v})\\
 (a*(b*c))(n) = b(v)\sum_{vt|n}c(t)a(\frac{n}{vt})=b(v)(a*c)(\frac{n}{v})$</p>
-<h4>D5T1P2</h4>
+<h4 id="d5t1p2">D5T1P2</h4>
 <p>首先由积性函数的定义，$a(1)=1$，也就是 $b(1)=c(1)$。</p>
 <p>由此我们得到在 $n\le1$ 时，$b(n)=c(n)$。</p>
 <p>$\sum_{d\mid n}a(d)b(\frac{n}{d})=\sum_{d\mid n}a(d)c(\frac{n}{d})$</p>
 <p>假设我们已经证明在 $k<n$ 时 $b(k)=c(k)$，右式减去左式即可得到 $a(1)b(n)-a(1)c(n)=0$，即 $b(n)=c(n)$。也就是说 $k<n,b(k)=c(k)\implies k\le n,b(k)=c(k)$。得证。</p>
-<h3>D5T2</h3>
+<h3 id="d5t2">D5T2</h3>
 <p>$(\mu*\sigma_0)(n)=(\mu*(1*1))(n)=((\mu*1)*1)(n)=(\epsilon*1)(n)=1$。</p>
-<h3>D5T3</h3>
+<h3 id="d5t3">D5T3</h3>
 <p>$\begin{aligned}
 \sum_{i=1}^{n}\sum_{j=1}^{n}[gcd(i,j)=1] &= \sum_{i=1}^{n}\sum_{j=1}^{n}\sum_{k\mid i,k\mid j}\mu(k)\\
 &=\sum_{k=1}\mu(k)\sum_{k\mid i}\sum_{k\mid j}1\\
 &=\sum_{d=1}\mu(d)\lfloor\frac{n}{d}\rfloor^2
 \end{aligned}$</p>
-<h3>D5T4</h3>
+<h3 id="d5t4">D5T4</h3>
 <p>事实上 $(n\mod k)+(m\mod k)\ge k$ 等价于 $\lfloor\frac{n}{k}\rfloor+\lfloor\frac{m}{k}\rfloor+1=\lfloor\frac{n+m}{k}\rfloor$。所以答案可以初步写为 $\sum_{k\ge 1}\varphi(k)[\lfloor\frac{n}{k}\rfloor+\lfloor\frac{m}{k}\rfloor+1=\lfloor\frac{n+m}{k}\rfloor]=\sum_{k\ge 1}\varphi(k)(\lfloor\frac{n+m}{k}\rfloor-\lfloor\frac{n}{k}\rfloor-\lfloor\frac{m}{k}\rfloor)$。</p>
 <p>由此我们可以开始变形：</p>
 <p>$\begin{aligned}
@@ -445,7 +563,7 @@ Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
 &=nm
 \end{aligned}$</p>
 <p>中间省略了不止一点步骤，但那恰恰是 D5T6，所以省略，自己看下面去。</p>
-<h3>D5T5</h3>
+<h3 id="d5t5">D5T5</h3>
 <p>$\sum_{d|n}d=\sigma_1(n)=\prod_{i=1}^k\frac{p_i^{c_i+1}-1}{p_i-1}$。</p>
 <p>我们要维持这个结果只能有 $2$ 这个质因子。首先我们验证 $p$ 不可以为 $2$，事实上确实如此。</p>
 <p>然后我们不难发现在 $p$ 是奇数的情况下当且仅当 $c$ 是奇数的时候 $\frac{p_i^{c_i+1}-1}{p_i-1}$ 是一个偶数。所以 $c$ 必然是奇数。</p>
@@ -453,7 +571,7 @@ Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
 <p>我们再令 $a=p_i^2$，$(1+p_i^2+\dots)=(1+a+a^2+\dots)=\frac{a^{...}-1}{a-1}$。而这时候他是 $2^s$ 一类数的条件仍然是 $a=2^l-1$。</p>
 <p>事实上我们用 $(2^t-1)^2$ 展开 $a$ 后，不难解出来 $t=l=1$ 是唯一的解。</p>
 <p>因此 $n$ 是不同的梅森素数的积。</p>
-<h3>D5T6</h3>
+<h3 id="d5t6">D5T6</h3>
 <p>事实上，由于 $k$ 和 $d$ 都是整数，如果 $a,b$ 是整数，$\Delta a\in[0,1)$，那么不存在 $\lfloor\frac{a+\Delta a}{b}\rfloor\neq\lfloor\frac{a}{b}\rfloor$。因此 $\sum_{d\ge 1}\phi(\frac{x}{d})=\sum_{d\ge 1}\phi(\frac{\lfloor x\rfloor}{d})$。</p>
 <p>我们可以只用考虑整数情况了。也就是我们只需要证明 $\sum_{d\ge 1}\phi(\frac{\lfloor x\rfloor}{d})=\frac{x(x+1)}{2}$：</p>
 <p>$\begin{aligned}
@@ -464,11 +582,11 @@ Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
 &=\frac{n(n+1)}{2}
 \end{aligned}$</p>
 <p>将 $n$ 替换回 $\lfloor x\rfloor$，得证。</p>
-<h3>D5T7</h3>
+<h3 id="d5t7">D5T7</h3>
 <p>由 Polya 定理可得答案为 $\frac{1}{n}\sum_{i=1}^nk^{\gcd(n,i)}$。而显然 $\gcd(n,i)\mid n$。所以我们枚举 $n$ 的因数 $d$。实际上满足要求的 $i$ 还必须 $(\frac{i}{d},\frac{n}{d})=1$，所以说能取到 $k^{\frac{n}{d}}$ 项的个数为 $\phi(d)$。</p>
-<h3>D5T8</h3>
+<h3 id="d5t8">D5T8</h3>
 <p>题意不明，应该是课上讲了，但是我们听不了课。</p>
-<h3>D5T9</h3>
+<h3 id="d5t9">D5T9</h3>
 <p>必要性：</p>
 <p>$\begin{aligned}
 \sum_{d\mid n}f(n)&=\sum_{d\mid n}\sum_{n\mid N}g(N)\mu(\frac{N}{n})\\
@@ -484,7 +602,7 @@ Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
 &=f(d)
 \end{aligned}$</p>
 <p>中间跳了一些步骤，但是那是因为和必要性的证明重了，无需再写一次。</p>
-<h3>D5T10</h3>
+<h3 id="d5t10">D5T10</h3>
 <p>$\begin{aligned}
 \prod_{d|n}F(d)^{\mu(\frac{n}{d})}&=\prod_{d|n}\prod_{p|d}f(p)^{\mu(\frac{n}{d})}\\
 &=\prod_{p|n}f(p)^{\sum_{d|\frac{n}{p}}\mu(d)}\\
@@ -492,25 +610,161 @@ Q_n&=\sum_{i=0}^{n-1}(-1)^i(_i^{n-1})(n-i)! \\
 \end{aligned}$</p>
 <p>最后也跳了步，但还是因为 D5T9 证了相关步骤，懒得再写一次了。</p>
 </div>
-<div class="footer">
-    <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    <div class="toc-sidebar" id="toc-sidebar">
+        <div class="toc-title">目录</div>
+        <div id="toc-container"></div>
+    </div>
 </div>
 <script>
-    (function() {
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const code = btn.getAttribute('data-code');
-                if (code) {
-                    await navigator.clipboard.writeText(code);
-                    const orig = btn.textContent;
-                    btn.textContent = '已复制！';
-                    btn.classList.add('copied');
-                    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    // 构建目录树
+    function buildTOC() {
+        const headings = document.querySelectorAll('.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6');
+        if (headings.length === 0) return;
+        const root = { children: [] };
+        const stack = [{ level: 0, node: root }];
+        headings.forEach(heading => {
+            const level = parseInt(heading.tagName[1]);
+            const id = heading.id;
+            const text = heading.textContent;
+            if (!id) return;
+            const item = { level: level, id: id, text: text, children: [] };
+            while (stack.length > 0 && stack[stack.length-1].level >= level) stack.pop();
+            const parent = stack[stack.length-1].node;
+            parent.children.push(item);
+            stack.push({ level: level, node: item });
+        });
+        return root.children;
+    }
+
+    function escapeHtmlForTOC(str) {
+        return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]);
+    }
+
+    function renderTOC(items) {
+        if (!items || items.length === 0) return '';
+        let html = '<ul class="toc-list">';
+        for (const item of items) {
+            const hasChildren = item.children && item.children.length > 0;
+            const toggleIcon = hasChildren ? '<span class="toc-toggle-icon">▼</span>' : '<span class="toc-toggle-icon" style="opacity:0;">•</span>';
+            html += '<li class="toc-item" data-level="' + item.level + '">';
+            html += '<div class="toc-line">';
+            if (hasChildren) {
+                html += '<span class="toc-toggle" data-id="' + item.id + '">' + toggleIcon + '</span>';
+            } else {
+                html += '<span class="toc-toggle" style="visibility:hidden;">' + toggleIcon + '</span>';
+            }
+            html += '<a class="toc-link" data-id="' + item.id + '">' + escapeHtmlForTOC(item.text) + '</a>';
+            html += '</div>';
+            if (hasChildren) {
+                html += '<div class="toc-children" id="toc-children-' + item.id + '">' + renderTOC(item.children) + '</div>';
+            }
+            html += '</li>';
+        }
+        html += '</ul>';
+        return html;
+    }
+
+    function initSidebar() {
+        const tocContainer = document.getElementById('toc-container');
+        if (!tocContainer) return;
+        const tocItems = buildTOC();
+        if (!tocItems || tocItems.length === 0) {
+            tocContainer.innerHTML = '<p style="color: var(--text-secondary); font-size:0.85rem;">无标题</p>';
+            return;
+        }
+        tocContainer.innerHTML = renderTOC(tocItems);
+
+        // 折叠/展开
+        document.querySelectorAll('.toc-toggle').forEach(toggle => {
+            const targetId = toggle.getAttribute('data-id');
+            if (!targetId) return;
+            const childrenDiv = document.getElementById('toc-children-' + targetId);
+            if (childrenDiv) {
+                childrenDiv.classList.add('collapsed');
+                const icon = toggle.querySelector('.toc-toggle-icon');
+                if (icon) icon.textContent = '▶';
+                toggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isCollapsed = childrenDiv.classList.contains('collapsed');
+                    if (isCollapsed) {
+                        childrenDiv.classList.remove('collapsed');
+                        if (icon) icon.textContent = '▼';
+                    } else {
+                        childrenDiv.classList.add('collapsed');
+                        if (icon) icon.textContent = '▶';
+                    }
+                });
+            }
+        });
+
+        // 点击跳转
+        document.querySelectorAll('.toc-link').forEach(link => {
+            const targetId = link.getAttribute('data-id');
+            if (!targetId) return;
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    document.querySelectorAll('.toc-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
                 }
             });
         });
-        
-    })();
+
+        // 滚动高亮
+        function updateActiveOnScroll() {
+            const headings = document.querySelectorAll('.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6');
+            let activeId = null;
+            let minDist = Infinity;
+            const viewportTop = window.scrollY;
+            for (const heading of headings) {
+                const rect = heading.getBoundingClientRect();
+                const offset = rect.top + window.scrollY;
+                const dist = Math.abs(offset - viewportTop - 100);
+                if (dist < minDist) {
+                    minDist = dist;
+                    activeId = heading.id;
+                }
+            }
+            if (activeId) {
+                document.querySelectorAll('.toc-link').forEach(link => {
+                    if (link.getAttribute('data-id') === activeId) link.classList.add('active');
+                    else link.classList.remove('active');
+                });
+            }
+        }
+        window.addEventListener('scroll', updateActiveOnScroll);
+        updateActiveOnScroll();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSidebar);
+    } else {
+        initSidebar();
+    }
+    
+    
+})();
 </script>
 </body>
 </html>
