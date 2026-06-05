@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P11918 [PA 2025] 考试 _ Egzamin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>四川省集最后一天讲课的时候 251Sec 将了这道题，感觉非常的牛啊，写一篇题解。</p>
+<p>显然最优解就是将 $p_i$ 从大到小排序选一个前缀作答。于是我们令 $f_{i,j}$ 表示回答完前 $i$ 道题之后分数是 $j$ 的概率。不难发现这个东西直接做的时间复杂度是 $O(n^2)$ 的。</p>
+<p>但是吧，感觉上如果某一个 $f_{i,j}\le eps$，那么保留他似乎并不会对最终的答案造成太大的影响。</p>
+<p>于是我们设置一个小一点的阈值，假设最终要求的精度为 $eps_0$，那么我们设置阈值为 $\frac{eps_0}{n}$ 就行。我们发现通过了。</p>
+<p>考虑证明区间长度的期望界限。上课的时候通过使用并证明了一个结论：$n$ 个独立的以 $0.5$ 的概率取道 $-1,1$ 的随机变量和 $>\sqrt{2n\log(\frac{1}{eps})}$ 的机率 $<eps$。</p>
+<p>但是客观的说，我认为这可能并不是一个好的思考方向，为了使用这个结论的话，会需要大量的说明，尤其是那个 $0.5$ 的概率和这道题说真的并没有感觉到，有什么好处。</p>
+<p>因此我们考虑还一个角度：怎么样做能够尽可能拉长有效值的分布区间？</p>
+<p>显然，我们不会左右横跳，也就是说我们可以只考虑所有的概率都 $>0.5$ 的情况。</p>
+<p>另外，我们考虑如果所有的概率都靠近 $0.5$，就会使得数值摊的太平，很快就会全部失效，因此这样的值可以忽略，他们只带来常数差距。</p>
+<p>如果所有的概率都过于靠近 $1$，就会导致数值并没有全局摊开，甚至一分裂出去就失效了，所以也不行。</p>
+<p>于是我们有一个直觉：似乎，我让他开始的时候快速分裂，等分裂到最大值的时候在一路 $1$ 下去就非常的优秀了。</p>
+<p>然后我们思考什么样的 $p$ 能够分裂到最大值，能够摊的最平。我们考虑别的 $p$ 和 $0.5$ 进行比较：</p>
+<p>如果是 $0.5$，那么左右一路对称走下去，直到到达边界，使得 $f_{min}\ge eps>\frac{f_{min}}{2}$，但是相反别的 $p$ 会导致值向一侧倾倒，实际上，如果略微偏移一点点可以让数值更加集中，有利于保持数值。</p>
+<p>最终，我们通过三分，发现 $p=0.507908$ 时宽度达到了最大值 $2691$，不难发现在此题的数据范围下还是可以通过的。</p>
+<p>参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+#define double long double
+constexpr double eps=1e-12;
+int n,t,l,r,o; double dp[2][100005],p[50005],ans,ant;
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;t;
+	for(int i=1;i&lt;=n;++i) cin&gt;&gt;p[i];
+	sort(p+1,p+n+1,greater&lt;double&gt;());
+	l=r=0; dp[0][0]=1;
+	for(int i=1;i&lt;=n;++i){
+		for(int j=l;j&lt;=r;++j)
+			dp[o^1][j]+=dp[o][j]*(1-p[i]),
+			dp[o^1][j+2]+=dp[o][j]*p[i],
+			dp[o][j]=0;
+		r+=2; o^=1; ant=0;
+		while(dp[o][l]&lt;=eps) dp[o][l++]=0;
+		while(dp[o][r]&lt;=eps) dp[o][r--]=0;
+		for(int j=t+i;j&lt;=r;++j) ant+=dp[o][j];
+		ans=max(ans,ant);
+        assert(r-l&lt;=80);
+		// cerr&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;l&lt;&lt;&quot;:\n&quot;;
+		// for(int j=l;j&lt;=r;++j) cerr&lt;&lt;dp[o][j]&lt;&lt;&quot;\n&quot;;
+	}
+	printf(&quot;%.10Lf\n&quot;,ans);
+}
+//私は猫です!
+/*
+Written by cbc on nyarch linux.
+normal compile:
+g++ -std=c++14 -O2 -lm -o $1 $1.cpp
+ultra fast:
+g++ -O3 -march=native -mtune=native -flto -ffast-math -funroll-loops -finline-functions -fomit-frame-pointer -fno-stack-protector -fno-exceptions -fno-rtti -std=c++14 -pthread -o $1 $1.cpp
+*/
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> double long double</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">double</span> eps=<span class="hljs-number">1e-12</span>;
+<span class="hljs-type">int</span> n,t,l,r,o; <span class="hljs-type">double</span> dp[<span class="hljs-number">2</span>][<span class="hljs-number">100005</span>],p[<span class="hljs-number">50005</span>],ans,ant;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;t;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;p[i];
+	<span class="hljs-built_in">sort</span>(p<span class="hljs-number">+1</span>,p+n<span class="hljs-number">+1</span>,<span class="hljs-built_in">greater</span>&lt;<span class="hljs-type">double</span>&gt;());
+	l=r=<span class="hljs-number">0</span>; dp[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=l;j&lt;=r;++j)
+			dp[o^<span class="hljs-number">1</span>][j]+=dp[o][j]*(<span class="hljs-number">1</span>-p[i]),
+			dp[o^<span class="hljs-number">1</span>][j<span class="hljs-number">+2</span>]+=dp[o][j]*p[i],
+			dp[o][j]=<span class="hljs-number">0</span>;
+		r+=<span class="hljs-number">2</span>; o^=<span class="hljs-number">1</span>; ant=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span>(dp[o][l]&lt;=eps) dp[o][l++]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span>(dp[o][r]&lt;=eps) dp[o][r--]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=t+i;j&lt;=r;++j) ant+=dp[o][j];
+		ans=<span class="hljs-built_in">max</span>(ans,ant);
+        <span class="hljs-built_in">assert</span>(r-l&lt;=<span class="hljs-number">80</span>);
+		<span class="hljs-comment">// cerr&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;l&lt;&lt;&quot;:\n&quot;;</span>
+		<span class="hljs-comment">// for(int j=l;j&lt;=r;++j) cerr&lt;&lt;dp[o][j]&lt;&lt;&quot;\n&quot;;</span>
+	}
+	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%.10Lf\n&quot;</span>,ans);
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">/*
+Written by cbc on nyarch linux.
+normal compile:
+g++ -std=c++14 -O2 -lm -o $1 $1.cpp
+ultra fast:
+g++ -O3 -march=native -mtune=native -flto -ffast-math -funroll-loops -finline-functions -fomit-frame-pointer -fno-stack-protector -fno-exceptions -fno-rtti -std=c++14 -pthread -o $1 $1.cpp
+*/</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P13695 [CEOI 2025] theseus</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>四川省集 Day4T2 搬的这道题，补完总结一下。</p>
+<p>首先看到数据范围，十有八九能够猜到应该就是 $\log_2 n$ 了，毕竟 $\binom{C}{\frac{C}{2}}<n$，没法使用此类技巧，值域能够对的上的也就只有 $\log$ 了。</p>
+<p>当时磕了 $4h$ 这道题没有磕出来，到底卡在哪里了呢？</p>
+<p>是这样的，我们不难有一个初步的思路就是广搜一下，然后让距离远的指向距离近的。然后我们就愉快的发现我们只需要处理好同距离的边就行了。</p>
+<p>至于怎么指定一条边的方向，额，用你猫耳想一下都知道直接指明走到编号更大的还是编号更小的就行了。</p>
+<p>可是，这样做真的可行吗？我们发现如果从每一个点出发，都有多个可行的出边的话，每一次真的之随便选一个边的话，是势必不可行的。</p>
+<p>可惜可惜，考场上没有想到啊。。。</p>
+<p>总之呢，我们认为，实际上点的编号也应该是一个有效的东西。</p>
+<p>我们考虑这样一个方向：</p>
+<p>原图实际上在经过广搜之后会形成一个最短路有向无环图，我们不妨从中生成出来一颗树，并尽可能的将任意一个点出发的位置驱赶到树上。</p>
+<p>可是实践上这似乎几乎不可行：你并没有从根源上解决掉同层之间的转移问题。</p>
+<p>我们不妨这样想：我们强制要求在最后选择节点的时候必须选择最小的可行节点。然后我们是不是就有一些操作空间了呢？毕竟，这样下来，最短路 DAG 立刻进化成为了最短路树。</p>
+<p>我们思考对于同一层的点我们强制让最小的点最小的边最先纳入考虑就行了。</p>
+<p>于是呢，我们现在考虑怎么样满足 $\log$ 的限制。一个非常合理的想法就是按秩合并，也就是子结点少的合并到子结点多的。合并完之后认为合并进去的那一个点的大小变成 $0$ 了。这样就可以防止一个点被重复统计，同时也不难发现这样子别的点不会进入到这个点来。</p>
+<p>不过你可能会问：如果两个清 $0$ 的点之间需要给边定向，那你不就爆炸了吗？</p>
+<p>可是我们注意到我们是按照最小的点最小的边进行排序的，一个点被清 $0$ 必然意味着其有一个更小的边，并且被定向出去了，所以 $0$ 内部的连边最终一定不会被选择。</p>
+<p>于是此题可解，代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int d[10005],sz[10005]; queue&lt;int&gt;q; bool vis[50005];
+vector&lt;pair&lt;int,int&gt;&gt;son[10005];
+struct node{int l,r,md,id;}; vector&lt;node&gt;ev;
+vector&lt;int&gt;label(int n,vector&lt;pair&lt;int,int&gt;&gt;e,int t){
+	for(int i=0;i!=e.size();++i)
+		son[e[i].first].emplace_back(e[i].second,i),
+		son[e[i].second].emplace_back(e[i].first,i);
+	q.emplace(t); d[t]=1;
+	while(q.size()){
+		int p=q.front();q.pop();
+		for(const auto&amp; sp:son[p]) if(!d[sp.first])
+			d[sp.first]=d[p]+1,q.emplace(sp.first);
+	}
+	for(int i=1;i&lt;=n;++i) sz[i]=1;
+	vector&lt;int&gt;ret(e.size(),0);
+	for(int i=0;i!=e.size();++i)
+		ev.push_back(node{
+			min(e[i].first,e[i].second),
+			max(e[i].first,e[i].second),
+			max(d[e[i].first],d[e[i].second]),
+			i
+		});
+	sort(ev.begin(),ev.end(),[](const node&amp;l,const node&amp;r){
+		if(l.md!=r.md) return l.md&gt;r.md;
+		if(l.r!=r.r) return l.r&lt;r.r;
+		return l.l&lt;r.l;
+	});
+	for(auto&amp;v:ev){
+		if(d[v.l]!=d[v.r]){
+			if(d[v.l]&gt;d[v.r]) swap(v.l,v.r);
+		}
+		else{
+			if(sz[v.l]&lt;sz[v.r]) swap(v.l,v.r);
+		}
+		ret[v.id]=v.l&gt;v.r;
+		sz[v.l]+=sz[v.r]; sz[v.r]=0;
+	}
+	return ret;
+}
+int travel(int n, int node, vector&lt;pair&lt;int, int&gt;&gt; directions){
+	sort(directions.begin(), directions.end());
+    for(const auto&amp;v:directions){
+        if(v.first&lt;node&amp;&amp;v.second==0) return v.first;
+        if(v.first&gt;node&amp;&amp;v.second==1) return v.first;
+    }
+	return -1;
+}
+//私は猫です!
+/*
+Written by cbc on nyarch linux.
+normal compile:
+g++ -std=c++14 -O2 -lm -o $1 $1.cpp
+ultra fast:
+g++ -O3 -march=native -mtune=native -flto -ffast-math -funroll-loops -finline-functions -fomit-frame-pointer -fno-stack-protector -fno-exceptions -fno-rtti -std=c++14 -pthread -o $1 $1.cpp
+*/
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-type">int</span> d[<span class="hljs-number">10005</span>],sz[<span class="hljs-number">10005</span>]; queue&lt;<span class="hljs-type">int</span>&gt;q; <span class="hljs-type">bool</span> vis[<span class="hljs-number">50005</span>];
+vector&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&gt;son[<span class="hljs-number">10005</span>];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>{<span class="hljs-type">int</span> l,r,md,id;}; vector&lt;node&gt;ev;
+vector&lt;<span class="hljs-type">int</span>&gt;<span class="hljs-built_in">label</span>(<span class="hljs-type">int</span> n,vector&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&gt;e,<span class="hljs-type">int</span> t){
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=e.<span class="hljs-built_in">size</span>();++i)
+		son[e[i].first].<span class="hljs-built_in">emplace_back</span>(e[i].second,i),
+		son[e[i].second].<span class="hljs-built_in">emplace_back</span>(e[i].first,i);
+	q.<span class="hljs-built_in">emplace</span>(t); d[t]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">while</span>(q.<span class="hljs-built_in">size</span>()){
+		<span class="hljs-type">int</span> p=q.<span class="hljs-built_in">front</span>();q.<span class="hljs-built_in">pop</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp; sp:son[p]) <span class="hljs-keyword">if</span>(!d[sp.first])
+			d[sp.first]=d[p]<span class="hljs-number">+1</span>,q.<span class="hljs-built_in">emplace</span>(sp.first);
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) sz[i]=<span class="hljs-number">1</span>;
+	vector&lt;<span class="hljs-type">int</span>&gt;<span class="hljs-built_in">ret</span>(e.<span class="hljs-built_in">size</span>(),<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=e.<span class="hljs-built_in">size</span>();++i)
+		ev.<span class="hljs-built_in">push_back</span>(node{
+			<span class="hljs-built_in">min</span>(e[i].first,e[i].second),
+			<span class="hljs-built_in">max</span>(e[i].first,e[i].second),
+			<span class="hljs-built_in">max</span>(d[e[i].first],d[e[i].second]),
+			i
+		});
+	<span class="hljs-built_in">sort</span>(ev.<span class="hljs-built_in">begin</span>(),ev.<span class="hljs-built_in">end</span>(),[](<span class="hljs-type">const</span> node&amp;l,<span class="hljs-type">const</span> node&amp;r){
+		<span class="hljs-keyword">if</span>(l.md!=r.md) <span class="hljs-keyword">return</span> l.md&gt;r.md;
+		<span class="hljs-keyword">if</span>(l.r!=r.r) <span class="hljs-keyword">return</span> l.r&lt;r.r;
+		<span class="hljs-keyword">return</span> l.l&lt;r.l;
+	});
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;v:ev){
+		<span class="hljs-keyword">if</span>(d[v.l]!=d[v.r]){
+			<span class="hljs-keyword">if</span>(d[v.l]&gt;d[v.r]) <span class="hljs-built_in">swap</span>(v.l,v.r);
+		}
+		<span class="hljs-keyword">else</span>{
+			<span class="hljs-keyword">if</span>(sz[v.l]&lt;sz[v.r]) <span class="hljs-built_in">swap</span>(v.l,v.r);
+		}
+		ret[v.id]=v.l&gt;v.r;
+		sz[v.l]+=sz[v.r]; sz[v.r]=<span class="hljs-number">0</span>;
+	}
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">travel</span><span class="hljs-params">(<span class="hljs-type">int</span> n, <span class="hljs-type">int</span> node, vector&lt;pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt; directions)</span></span>{
+	<span class="hljs-built_in">sort</span>(directions.<span class="hljs-built_in">begin</span>(), directions.<span class="hljs-built_in">end</span>());
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp;v:directions){
+        <span class="hljs-keyword">if</span>(v.first&lt;node&amp;&amp;v.second==<span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> v.first;
+        <span class="hljs-keyword">if</span>(v.first&gt;node&amp;&amp;v.second==<span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> v.first;
+    }
+	<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">/*
+Written by cbc on nyarch linux.
+normal compile:
+g++ -std=c++14 -O2 -lm -o $1 $1.cpp
+ultra fast:
+g++ -O3 -march=native -mtune=native -flto -ffast-math -funroll-loops -finline-functions -fomit-frame-pointer -fno-stack-protector -fno-exceptions -fno-rtti -std=c++14 -pthread -o $1 $1.cpp
+*/</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
