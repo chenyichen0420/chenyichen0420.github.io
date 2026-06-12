@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算法竞赛知识点审计报告</title>
+    <style>
+        /* 基础变量（亮色主题） */
+        :root {
+            --bg-body: #f4f7fc;
+            --bg-card: #ffffff;
+            --text-primary: #1e2a3a;
+            --text-secondary: #4a627a;
+            --border-light: #e2edf2;
+            --card-border: #e0edf3;
+            --header-hover: #f9fbfd;
+            --badge-bg: #eef2f5;
+            --stat-bg: #f8fafc;
+            --stat-border: #dce5ec;
+            --shadow: rgba(0,0,0,0.05);
+            --shadow-hover: rgba(0,0,0,0.1);
+            --link-color: #2c7da0;
+        }
+
+        /* 暗色主题跟随系统 */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #121212;
+                --bg-card: #1e1e2f;
+                --text-primary: #e0e0e0;
+                --text-secondary: #b0b0b0;
+                --border-light: #2a2a3a;
+                --card-border: #2a2a3a;
+                --header-hover: #2a2a3a;
+                --badge-bg: #2a2a3a;
+                --stat-bg: #1e1e2f;
+                --stat-border: #2a2a3a;
+                --shadow: rgba(0,0,0,0.2);
+                --shadow-hover: rgba(0,0,0,0.3);
+                --link-color: #5e9fc3;
+            }
+            .status-badge.green { background: #1f3a2f; color: #6fbf8c; }
+            .status-badge.orange { background: #3d2a1a; color: #f0a34b; }
+            .status-badge.red { background: #3d1e1a; color: #e87a6b; }
+            .error-block { background: #2a1a18; border-left-color: #e05a4f; color: #f0a39a; }
+            .integrity-notes { background: #1a2a33; color: #9cc9e3; }
+            .section-title { color: #9cc9e3; }
+            .issue-list li, .suggestion-list li { color: #c0c0d0; }
+            .no-extra { background: #1e2a2a; color: #a0c0c0; }
+            .card-header h3 { color: #e0e0e0; }
+            .fold-indicator { color: #5e9fc3; }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-body);
+            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            padding: 2rem 1.5rem;
+            color: var(--text-primary);
+            transition: background 0.2s, color 0.2s;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        /* 头部统计区 */
+        .header {
+            background: var(--bg-card);
+            border-radius: 32px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1e6f9f, #3b8fc2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        .sub {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3b8fc2;
+            padding-left: 1rem;
+        }
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+        .stat-card {
+            background: var(--stat-bg);
+            border-radius: 24px;
+            padding: 0.8rem 1.5rem;
+            min-width: 120px;
+            text-align: center;
+            flex: 1;
+            border: 1px solid var(--stat-border);
+        }
+        .stat-number { font-size: 2.4rem; font-weight: 800; line-height: 1.2; }
+        .stat-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); }
+        .stat-card.total .stat-number { color: #2c3e66; }
+        .stat-card.complete .stat-number { color: #2e7d64; }
+        .stat-card.need-fix .stat-number { color: #e68a2e; }
+        .stat-card.incomplete .stat-number { color: #e68a2e; }
+        .stat-card.error .stat-number { color: #c23b22; }
+        @media (prefers-color-scheme: dark) {
+            .stat-card.total .stat-number { color: #7f9fbf; }
+            .stat-card.complete .stat-number { color: #6fbf8c; }
+            .stat-card.need-fix .stat-number { color: #f0a34b; }
+            .stat-card.incomplete .stat-number { color: #f0a34b; }
+            .stat-card.error .stat-number { color: #e87a6b; }
+        }
+        
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+        .search-box { flex: 2; min-width: 200px; }
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 48px;
+            border: 1px solid var(--border-light);
+            font-size: 1rem;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: all 0.2s;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #3b8fc2;
+            box-shadow: 0 0 0 3px rgba(59,143,194,0.1);
+        }
+        .filter-buttons { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+        .filter-btn {
+            background: var(--badge-bg);
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+        .filter-btn.active { background: #1e6f9f; color: white; box-shadow: 0 2px 8px rgba(30,111,159,0.2); }
+        .filter-btn:hover { background: #cfdfea; color: #1e2a3a; }
+        @media (prefers-color-scheme: dark) {
+            .filter-btn:hover { background: #3a6a8a; color: white; }
+        }
+        
+        /* 卡片垂直布局 */
+        .cards-list { display: flex; flex-direction: column; gap: 1.2rem; }
+        .card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px var(--shadow);
+            border: 1px solid var(--card-border);
+            transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: 0 8px 25px var(--shadow-hover); }
+        .card-header {
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.1s;
+        }
+        .card-header:hover { background: var(--header-hover); }
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .fold-indicator { font-size: 1rem; display: inline-block; width: 1.2rem; text-align: center; color: #3b8fc2; font-weight: normal; }
+        .status-badge { font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.8rem; border-radius: 40px; background: var(--badge-bg); }
+        .status-badge.green { background: #dff0e8; color: #1f6e58; }
+        .status-badge.orange { background: #feedd7; color: #b45f1b; }
+        .status-badge.red { background: #fce4e1; color: #bc3900; }
+        
+        .card-body { padding: 1.2rem 1.5rem 1.5rem; border-top: 1px solid var(--border-light); }
+        .error-block { background: #fff3f0; border-left: 4px solid #e05a4f; padding: 0.75rem; border-radius: 12px; font-size: 0.9rem; color: #ac3a2a; }
+        .integrity-notes { background: #f0f6fa; padding: 0.6rem 0.9rem; border-radius: 14px; font-size: 0.85rem; margin-bottom: 1rem; color: #2c627e; }
+        .section-title { font-weight: 700; margin: 0.8rem 0 0.3rem 0; font-size: 0.85rem; color: #2c627e; }
+        .issue-list, .suggestion-list { margin: 0 0 0.5rem 1.2rem; font-size: 0.85rem; line-height: 1.5; }
+        .issue-list li, .suggestion-list li { margin: 0.3rem 0; color: var(--text-primary); }
+        .no-extra { color: #507d8f; font-style: italic; font-size: 0.85rem; background: #fafefc; padding: 0.5rem; border-radius: 12px; text-align: center; }
+        
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            border-top: 1px solid var(--border-light);
+            padding-top: 1.5rem;
+        }
+        footer a {
+            color: var(--link-color);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .card-header h3 { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 算法竞赛知识点审计报告</h1>
+        <div class="sub">动态规划 · 图论 · 数据结构 · 数学 · 字符串 · 杂项</div>
+        <div class="stats-grid">
+            <div class="stat-card total"><div class="stat-number">125</div><div class="stat-label">总章节</div></div>
+            <div class="stat-card complete"><div class="stat-number">96</div><div class="stat-label">完整</div></div>
+            <div class="stat-card need-fix"><div class="stat-number">29</div><div class="stat-label">待完善</div></div>
+            <div class="stat-card incomplete"><div class="stat-number">25</div><div class="stat-label">不完整</div></div>
+            <div class="stat-card error"><div class="stat-number">4</div><div class="stat-label">错误/空</div></div>
+        </div>
+    </div>
+    
+    <div class="toolbar">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 搜索章节标题..." autocomplete="off">
+        </div>
+        <div class="filter-buttons" id="filterGroup">
+            <button class="filter-btn active" data-filter="all">全部</button>
+            <button class="filter-btn" data-filter="complete">✅ 完整</button>
+            <button class="filter-btn" data-filter="need_fix">⚠️ 待完善</button>
+        </div>
+    </div>
+    
+    <div class="cards-list" id="cardsContainer">
+        
+    <div class="card" data-title="常见基础动态规划" data-status="need_fix">
+        <div class="card-header" data-card-idx="0">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                常见基础动态规划
+            </h3>
+            <span class="status-badge red">❌ 错误 / 空</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="error-block">❌ 错误信息：内容为空</div>
+        </div>
+    </div>
+    
+    <div class="card" data-title="背包" data-status="need_fix">
+        <div class="card-header" data-card-idx="1">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                背包
+            </h3>
+            <span class="status-badge red">❌ 错误 / 空</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="error-block">❌ 错误信息：内容为空</div>
+        </div>
+    </div>
+    
+    <div class="card" data-title="优化综述" data-status="complete">
+        <div class="card-header" data-card-idx="2">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                优化综述
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第4行：建议补充斜率优化和单调队列优化的具体复杂度分析</li><li>第4行：可增加典型例题说明（如最长上升子序列）以增强可读性</li><li>第4行：建议补充四边形不等式优化的适用条件和证明思路</li><li>第4行：可增加状态压缩与决策优化的交叉应用场景说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="倍增优化" data-status="need_fix">
+        <div class="card-header" data-card-idx="3">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                倍增优化
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：代码缺失</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第6行：这里没有写完</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第8行：建议补充复杂度分析</li><li>第30行：建议补充边界条件说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="数据结构优化" data-status="need_fix">
+        <div class="card-header" data-card-idx="4">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                数据结构优化
+            </h3>
+            <span class="status-badge red">❌ 错误 / 空</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="error-block">❌ 错误信息：内容为空</div>
+        </div>
+    </div>
+    
+    <div class="card" data-title="决策单调性优化" data-status="need_fix">
+        <div class="card-header" data-card-idx="5">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                决策单调性优化
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：文档末尾提到缺失例题，属于烂尾</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第100行：这里缺失例题，后面再补充</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>建议补充时间复杂度分析</li><li>建议补充边界条件说明</li><li>建议补充四边形不等式的具体推导过程</li><li>建议补充分治算法的正确性证明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="wqs二分" data-status="complete">
+        <div class="card-header" data-card-idx="6">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                WQS二分
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析</li><li>第15行：建议明确说明&#x27;ant - mid *k&#x27;公式的数学推导依据</li><li>第22行：建议补充边界条件处理说明（如mid的取值范围）</li><li>第28行：建议增加对&#x27;enumer&#x27;结构体功能的注释说明</li><li>第34行：建议补充&#x27;check()&#x27;函数中&#x27;ans = ant - mid *k&#x27;的更新条件说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="动归套动归" data-status="complete">
+        <div class="card-header" data-card-idx="7">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                动归套动归
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充算法名称以明确主题</li><li>第5行：建议明确说明&#x27;内层DP&#x27;和&#x27;外层DP&#x27;的具体定义</li><li>第12行：建议补充时间复杂度分析及优化点说明</li><li>第15行：建议补充边界条件说明（如k=0时的处理）</li><li>第20行：建议补充代码中&#x27;k&lt;=5&#x27;限制的数学推导依据</li><li>第23行：建议补充状态转移方程的数学表达式</li><li>第25行：建议补充代码中&#x27;m&#x27;参数的定义说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="动态动态规划" data-status="complete">
+        <div class="card-header" data-card-idx="8">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                动态动态规划
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充矩阵乘法结合律的具体验证方法</li><li>第18行：建议增加状态压缩后维度大小的数学证明</li><li>第25行：建议补充线段树区间合并的正确性证明</li><li>第35行：建议增加对字符串长度为1的边界条件说明</li><li>第43行：建议补充矩阵乘法运算符重载的潜在溢出风险说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="斯坦纳树" data-status="complete">
+        <div class="card-header" data-card-idx="9">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                斯坦纳树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析</li><li>第8行：建议明确说明状态压缩动态规划的适用条件</li><li>第12行：建议补充边界条件说明（如k=0或n=1的情况）</li><li>第18行：建议解释dp数组的初始化逻辑及0x7f的含义</li><li>第23行：建议补充优先队列在状态转移中的具体作用说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="轮廓线动态规划" data-status="need_fix">
+        <div class="card-header" data-card-idx="10">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                轮廓线动态规划
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：严重逻辑错误且烂尾</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第4行：这里存在逻辑矛盾且明显烂尾</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>建议补充时间复杂度分析</li><li>建议补充轮廓线DP的具体状态转移方程</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="插头动态规划" data-status="complete">
+        <div class="card-header" data-card-idx="11">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                插头动态规划
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析</li><li>第14行：建议补充边界条件说明（如障碍物处理、轮廓线长度限制）</li><li>第22行：括号序列与插头状态的对应关系可进一步明确</li><li>第35行：代码注释中&#x27;今日无事可做&#x27;等非正式表述建议改为规范描述</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="斜率技巧" data-status="complete">
+        <div class="card-header" data-card-idx="12">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                斜率技巧
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：名称的由来解释不够，建议补充正式定义</li><li>第5行：缺少复杂度分析，建议补充时间/空间复杂度说明</li><li>第12行：合并凸壳的步骤跳步，建议补充中间推导</li><li>第15行：边界条件处理未提及，建议补充极端情况说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="最短路" data-status="complete">
+        <div class="card-header" data-card-idx="13">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                最短路
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：Floyd算法的代码注释中提到的条件判断（i!=j&amp;&amp;i!=k&amp;&amp;j!=k）实际上可以删除，建议补充说明该条件的冗余性</li><li>第12行：SPFA代码中变量viq和tc的使用存在歧义，建议明确其含义（如viq应为标记数组，tc记录节点入队次数）</li><li>第18行：Dijkstra代码中q.emplace的参数传递方式不清晰，建议补充说明优先队列的节点结构</li><li>第25行：Johnson算法的势能函数解释可补充具体数学推导过程以增强严谨性</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="差分约束" data-status="complete">
+        <div class="card-header" data-card-idx="14">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                差分约束
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第2行：建议补充时间复杂度分析（如Bellman-Ford的O(N*M)）</li><li>第3行：建议说明需添加超级源点处理所有节点的约束</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="最小生成树" data-status="complete">
+        <div class="card-header" data-card-idx="15">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                最小生成树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：时间复杂度描述存在歧义，&#x27;动用人类智慧&#x27;的表述不清晰，建议明确说明Prim算法的复杂度取决于实现方式（如邻接矩阵O(n²)或优先队列O(m log n)）</li><li>第10行：Kruskal算法未提及时间复杂度分析，建议补充边排序的O(m log m)复杂度说明</li><li>第12行：建议补充&#x27;并查集&#x27;数据结构的路径压缩/按秩合并优化说明</li><li>第14行：建议补充&#x27;连通分量&#x27;的边界条件说明（如孤立点处理）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="最近公共祖先" data-status="complete">
+        <div class="card-header" data-card-idx="16">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                最近公共祖先
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：倍增法代码中条件判断逻辑存在歧义（dep[fa[l][i]] &gt;= dep[r] 应该比较当前节点深度而非祖先深度）</li><li>第12行：Tarjan算法描述中&#x27;将询问同时记录在那两个点上&#x27;表述不清晰，建议补充具体实现方式</li><li>第18行：DFS序部分关于LCA性质的证明建议补充关键推导步骤</li><li>第20行：建议补充三种算法的时间复杂度对比分析</li><li>第20行：DFS序方法中ST表的具体实现细节建议补充</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="tarjan" data-status="complete">
+        <div class="card-header" data-card-idx="17">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                tarjan
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第8行：关于‘一定能到达自己’的表述建议补充更清晰的逻辑说明</li><li>第12行：建议补充时间复杂度分析（如O(V+E)）</li><li>第20行：建议明确说明`son`结构的定义（如邻接表）</li><li>第35行：割点部分根节点的特殊处理建议补充具体判断条件</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="点分治" data-status="complete">
+        <div class="card-header" data-card-idx="18">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                点分治
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析的具体推导过程</li><li>第12行：可补充二分答案转化为存在性检验的具体数学推导</li><li>第15行：建议说明尺取法在本题中的具体应用步骤</li><li>第18行：可补充路径长度为零时的边界条件处理说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="点分树" data-status="need_fix">
+        <div class="card-header" data-card-idx="19">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                点分树
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：存在逻辑中断和核心流程缺失</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第7行：句子在逻辑上明显未说完</li><li>第5行：核心流程描述不够完整，缺少递归处理子树的具体说明</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第6行：建议补充时间复杂度分析</li><li>第3行：建议增加具体示例说明路径信息保留机制</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="二分图" data-status="need_fix">
+        <div class="card-header" data-card-idx="20">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                二分图
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：存在明显逻辑中断和烂尾</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第10行：这里存在明显的逻辑中断和烂尾标记</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充Konig定理的完整证明过程</li><li>第12行：建议补充匈牙利算法的时间复杂度分析</li><li>第15行：建议补充DAG最小路径覆盖问题的详细建模过程</li><li>第18行：建议补充图片内容说明及对应模型的图解分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="霍尔定理" data-status="complete">
+        <div class="card-header" data-card-idx="21">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                霍尔定理
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充时间复杂度分析</li><li>第5行：建议明确说明定理1的数学符号定义</li><li>第12行：建议补充边界条件说明（如空图、单点情况）</li><li>第15行：建议补充定理3的数学符号定义</li><li>第18行：建议补充具体应用示例以增强可理解性</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="网络流" data-status="complete">
+        <div class="card-header" data-card-idx="22">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                网络流
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充最大流-最小割定理的严格证明过程</li><li>第12行：建议补充EK算法的完整代码实现</li><li>第23行：建议补充费用流SSP算法的复杂度分析</li><li>第35行：建议补充上下界流存在性判定的边界条件说明</li><li>第58行：建议补充模拟费用流代码中关键变量的定义说明</li><li>第78行：建议补充最大权闭合子图代码的注释说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="2-sat" data-status="complete">
+        <div class="card-header" data-card-idx="23">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                2-SAT
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充线段树优化建图的具体操作步骤说明</li><li>第21行：建议补充前缀优化建图的复杂度分析</li><li>第27行：建议补充代码中关键变量（如vl数组、stat_lp等）的定义说明</li><li>第34行：建议补充强连通分量处理中缩点的具体实现细节</li><li>第42行：建议补充2-SAT问题中变量取值范围的边界条件说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="二分图最大权匹配" data-status="complete">
+        <div class="card-header" data-card-idx="24">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                二分图最大权匹配
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充时间复杂度分析（O(n³)的推导过程）</li><li>第22行：代码中的`flip`函数逻辑较复杂，建议补充注释说明其作用</li><li>第35行：`ext`数组的用途可进一步解释（用于记录增广路径的扩展量）</li><li>第45行：`pr`数组的含义未明确说明（记录右部点的匹配左部点）</li><li>第52行：`lm`和`rm`的更新逻辑可补充数学推导过程</li><li>第63行：trick部分建议补充权值调整的具体数学证明</li><li>第68行：建议补充边界条件说明（如n=0或m=0的情况）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="最小树形图" data-status="complete">
+        <div class="card-header" data-card-idx="25">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                最小树形图
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：代码注释较少，建议补充关键步骤的注释</li><li>第12行：描述Tarjan优化时，可以补充收缩和伸展的具体步骤</li><li>第20行：变量名如mv、f等可能不够清晰，建议添加注释</li><li>第35行：函数merge的逻辑可以更详细地解释如何处理环的收缩</li><li>第45行：文档结尾可以补充总结或应用场景，使内容更完整</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="仙人掌与圆方树" data-status="complete">
+        <div class="card-header" data-card-idx="26">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                仙人掌与圆方树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第14行：建议补充时间复杂度分析</li><li>第22行：可补充环处理时如何确保点不会被多个环记录的详细解释</li><li>第35行：建议说明cln数组的具体含义及作用</li><li>第47行：可补充基环树DP中如何处理环的详细步骤说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="弦图" data-status="complete">
+        <div class="card-header" data-card-idx="27">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                弦图
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充时间复杂度分析以增强严谨性</li><li>第28行：&#x27;我们直接把询问拍到点上&#x27;的实现细节不够清晰，建议补充具体操作方式</li><li>第45行：&#x27;推论：弦图最多有n个极大团&#x27;的证明过程缺失，建议补充数学推导</li><li>第55行：&#x27;只需判断是否存在w满足next_w=v且|Nu(v)|+1≤|Nu(w)|&#x27;的条件判定逻辑建议补充具体实现方式</li><li>第63行：&#x27;最大独立集：完美消除序列从前往后能选就选&#x27;的实现细节建议补充具体选择规则</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="竞赛图" data-status="complete">
+        <div class="card-header" data-card-idx="28">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                竞赛图
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：兰道定理未提供证明过程，建议补充证明思路或引用来源</li><li>第10行：Moon定理推论可补充具体构造方法示例</li><li>第12行：建议补充竞赛图强连通分量的判定条件说明</li><li>第14行：建议增加时间复杂度分析以完善算法评估</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="支配树" data-status="need_fix">
+        <div class="card-header" data-card-idx="29">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                支配树
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：代码缺失且核心算法步骤未完整展开</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第7行：参考代码待更新但未提供实际代码</li><li>第14行：快速算法部分未给出具体实现方法</li><li>第10行：支配点数关系的证明缺失关键推导</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充支配树构建的复杂度分析</li><li>第12行：建议增加具体示例说明支配关系的传递性</li><li>第15行：建议补充DAG快速算法的实现细节</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="三元环计数" data-status="need_fix">
+        <div class="card-header" data-card-idx="30">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                三元环计数
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心流程或思想严重缺失，导致读者无法理解算法基本逻辑</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第2行：无向图部分核心思路未写，存在明显逻辑中断</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第2行：建议补充无向图三元环计数的具体实现思路</li><li>第12行：建议补充算法时间复杂度分析</li><li>第12行：建议补充边界条件说明（如节点度数限制）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="dilworth定理" data-status="complete">
+        <div class="card-header" data-card-idx="31">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                dilworth定理
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充最大匹配数推导的详细步骤</li><li>第11行：建议移除或解释代码中的无关注释</li><li>第25行：建议补充数据结构的说明</li><li>第30行：建议解释变量C_U和T的定义</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="树状数组" data-status="complete">
+        <div class="card-header" data-card-idx="32">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                树状数组
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第17行：建议补充更严谨的数学证明，当前证明存在模糊表述</li><li>第21行：代码中的lowbit计算存在潜在错误，应明确说明p += p &amp; ~p +1的正确性</li><li>第22行：建议补充时间复杂度分析，当前仅提及O(log n)但未展开</li><li>第23行：建议补充边界条件说明，如p=0时的处理逻辑</li><li>第25行：建议补充代码注释，解释循环终止条件(p &lt;= n)的合理性</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="分治" data-status="complete">
+        <div class="card-header" data-card-idx="33">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                分治
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析以明确各步骤的复杂度来源</li><li>第23行：代码中的ta.ins和ta.que需补充具体功能说明以增强可读性</li><li>第32行：TATT问题讲解可补充具体例子或步骤说明以增强理解</li><li>第45行：整体二分部分建议详细解释&#x27;可二分性&#x27;等条件的具体含义</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="线段树" data-status="complete">
+        <div class="card-header" data-card-idx="34">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                线段树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充时间复杂度分析</li><li>第22行：建议补充值域线段树的离散化步骤说明</li><li>第35行：建议补充可持久化线段树的版本回滚具体实现细节</li><li>第45行：建议补充线段树合并的复杂度证明</li><li>第52行：建议补充线段树分裂的递归终止条件说明</li><li>第58行：建议补充分裂操作中&#x27;pos&amp; r&#x27;参数的类型定义</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="并查集" data-status="complete">
+        <div class="card-header" data-card-idx="35">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                并查集
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析，明确说明按秩合并和按大小合并的具体复杂度差异</li><li>第18行：代码块中存在逻辑错误，例如食物环例题的条件判断存在重复和冗余，建议优化条件判断逻辑</li><li>第25行：权值并查集的find函数缺少对v数组初始化的说明，建议补充数据结构定义</li><li>第28行：建议补充路径压缩时信息合并的数学推导过程，增强算法严谨性</li><li>第32行：扩展域并查集的代码示例缺少对id函数定义的说明，建议补充辅助函数实现细节</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="分块" data-status="need_fix">
+        <div class="card-header" data-card-idx="36">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                分块
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：多个代码缺失和烂尾问题</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第5行：参考程序缺失</li><li>第12行：参考程序缺失</li><li>第20行：参考程序缺失</li><li>第35行：例题内容未完成</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析</li><li>第12行：建议补充值域分块的边界条件说明</li><li>第20行：建议补充根号重构的重构阈值选择依据</li><li>第35行：建议完善T1例题的完整解题思路</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="莫队" data-status="complete">
+        <div class="card-header" data-card-idx="37">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                莫队
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充复杂度分析，例如普通莫队的复杂度为何是O((n+m)√n)</li><li>第25行：建议详细解释add和del函数的作用，以增强可读性</li><li>第45行：建议补充边界条件说明，例如当n=0或m=0时的处理</li><li>第68行：建议更详细地解释时间戳的处理方式，例如如何与查询排序结合</li><li>第95行：建议补充欧拉序的构建过程说明，例如进子树和出子树的标记逻辑</li><li>第132行：建议更详细地解释各个操作类别的具体含义，例如t=4/5/6等参数的用途</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="哈希" data-status="need_fix">
+        <div class="card-header" data-card-idx="38">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                哈希
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：段落明显未完成，核心内容缺失</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第1行：段落开头明确标注未完成</li><li>第2行：段落结尾出现明显烂尾标记</li><li>第3行：段落开头明确标注未完成</li><li>第4行：段落结尾出现明显烂尾标记</li><li>第5行：段落开头明确标注未完成</li><li>第6行：段落结尾出现明显烂尾标记</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第7行：建议补充动态哈希的完整数学推导过程</li><li>第8行：建议增加算法复杂度分析</li><li>第9行：建议补充边界条件处理说明</li><li>第10行：建议完善例题的解题步骤说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="笛卡尔树" data-status="complete">
+        <div class="card-header" data-card-idx="39">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                笛卡尔树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充栈的具体维护方式（如如何记录右链节点）</li><li>第11行：建议明确说明线性复杂度的证明思路</li><li>第11行：建议补充边界条件说明（如单个节点或全递增序列的情况）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="树套树" data-status="complete">
+        <div class="card-header" data-card-idx="40">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                树套树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析（如树状数组和线段树的嵌套复杂度推导）</li><li>第12行：建议补充边界条件说明（如k=0或k超出值域范围的处理）</li><li>第15行：建议补充具体示例的中间推导（如模板题中如何实际构建树状数组和线段树）</li><li>第18行：建议明确说明多树二分的具体实现方式（如如何合并不同线段树的查询结果）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="严格次小生成树" data-status="complete">
+        <div class="card-header" data-card-idx="41">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                严格次小生成树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充算法核心思想的简要说明（如最小生成树与倍增法的结合）</li><li>第12行：建议补充时间复杂度分析（如Kruskal算法O(m log m) + 倍增预处理O(n log n)）</li><li>第22行：建议说明边界条件处理（如图不连通时的特殊处理）</li><li>第35行：建议补充变量msz、ap的含义说明（如msz为最小生成树总权值，ap为最优替换边权）</li><li>第43行：建议补充getmv函数的作用说明（如获取路径上的最大值和次大值）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="线段树分治" data-status="complete">
+        <div class="card-header" data-card-idx="42">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                线段树分治
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析</li><li>第15行：可补充线段树分治与普通线段树处理动态问题的核心差异说明</li><li>第22行：建议明确说明可撤销并查集与普通并查集的关键区别（如按时间戳回滚机制）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="重链剖分" data-status="complete">
+        <div class="card-header" data-card-idx="43">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                重链剖分
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充时间复杂度分析的详细推导过程</li><li>第15行：建议补充重链剖分与树链剖分的对比说明</li><li>第23行：建议补充线段树具体实现细节（如sz/pup函数）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="长链剖分" data-status="complete">
+        <div class="card-header" data-card-idx="44">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                长链剖分
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充数组越界风险说明（如v数组的大小是否足够容纳所有链的深度）</li><li>第18行：建议补充时间复杂度分析的具体推导过程</li><li>第22行：建议补充边界条件说明（如树退化为链时的处理）</li><li>第25行：建议补充代码中lp指针操作的正确性证明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="平衡树" data-status="complete">
+        <div class="card-header" data-card-idx="45">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                平衡树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充时间复杂度分析</li><li>第25行：建议明确说明split函数中参数v的含义</li><li>第38行：建议补充FHQ-Treap的复杂度分析</li><li>第45行：建议补充区间操作的具体实现原理</li><li>第52行：建议增加代码注释说明关键变量作用</li><li>第60行：建议补充FHQ-Treap的堆性质维护细节</li><li>第68行：建议明确说明split和merge操作的递归终止条件</li><li>第75行：建议补充多维操作（如区间翻转）的实现原理</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="动态树" data-status="complete">
+        <div class="card-header" data-card-idx="46">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                动态树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第15行：函数bel和dnr未实现，建议补充说明或实现细节</li><li>第32行：代码注释中提到的&#x27;省略部分重复的代码&#x27;实际未省略，建议明确标注</li><li>第58行：&#x27;delheap&#x27;结构体的实现未展示，建议补充或说明其作用</li><li>第68行：&#x27;sipt&#x27;和&#x27;sopt&#x27;宏定义未展示，建议补充说明</li><li>第112行：&#x27;dfs&#x27;函数中&#x27;c[p]&#x27;的用途未明确说明，建议补充</li><li>第125行：&#x27;lct[0]&#x27;和&#x27;lct[1]&#x27;的用途未明确说明，建议补充</li><li>第138行：&#x27;c[p] ^= 1&#x27;的操作未解释，建议补充逻辑说明</li><li>第145行：&#x27;lct[0].chg&#x27;和&#x27;lct[1].chg&#x27;的同步机制未说明，建议补充</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="李超线段树" data-status="complete">
+        <div class="card-header" data-card-idx="47">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                李超线段树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第14行：建议补充时间复杂度分析（单次修改O(log²n)、查询O(logn)）</li><li>第23行：&#x27;pode&#x27;类型未定义，建议补充说明或修正代码</li><li>第32行：&#x27;chg_intv&#x27;函数逻辑需补充边界条件处理说明</li><li>第38行：&#x27;que&#x27;函数递归终止条件不完整，建议补充nl==nr时的处理逻辑</li><li>第45行：建议补充线段覆盖区间判断的数学证明</li><li>第50行：&#x27;标记永久化&#x27;概念需更详细解释其与传统线段树的区别</li><li>第54行：&#x27;势能分析&#x27;相关的内容建议补充具体分析过程</li><li>第58行：建议补充线段斜率相同情况的处理说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="zkw线段树" data-status="complete">
+        <div class="card-header" data-card-idx="48">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                ZKW线段树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析</li><li>第10行：查询函数逻辑存在歧义，建议补充具体操作步骤说明</li><li>第14行：代码中que函数的循环条件和操作符优先级可能存在歧义，建议补充注释</li><li>第18行：建议补充边界条件说明，例如区间端点处理细节</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="prufer序列" data-status="complete">
+        <div class="card-header" data-card-idx="49">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                prufer序列
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第4行：建议补充时间复杂度分析的具体推导过程</li><li>第9行：建议补充典型例题说明以增强实用性</li><li>第7行：建议明确&#x27;线性构造&#x27;的具体实现细节</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="可并堆" data-status="complete">
+        <div class="card-header" data-card-idx="50">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                可并堆
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充斜堆合并操作的具体递归逻辑说明</li><li>第10行：建议补充随机堆的期望树高分析过程</li><li>第14行：建议补充左偏树并查集维护的具体实现方式</li><li>第19行：建议补充线性建堆的递归建树过程示意图</li><li>第22行：建议补充复杂度分析（如均摊时间复杂度证明）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="kd-tree" data-status="complete">
+        <div class="card-header" data-card-idx="51">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                kd-tree
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析的具体推导过程</li><li>第14行：建议说明二进制分组方法中&#x27;均摊 O(n log²n)&#x27;的证明思路</li><li>第23行：建议补充空间复杂度分析</li><li>第28行：建议解释模板参数 wd 的实际含义和使用限制</li><li>第35行：建议补充节点结构体中 sm、f 等字段的用途说明</li><li>第45行：建议说明 nth_element 的使用是否符合算法要求</li><li>第55行：建议补充 que 函数中 ninter/finter 的几何意义</li><li>第63行：建议说明 add 函数中 mt 向量的维护逻辑</li><li>第68行：建议补充 que 函数中递归终止条件的数学依据</li><li>第73行：建议说明主函数中异或操作的加密逻辑背景</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="颜色段均摊" data-status="complete">
+        <div class="card-header" data-card-idx="52">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                颜色段均摊
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第14行：建议补充时间复杂度分析</li><li>第23行：建议明确说明CDQ分治的具体实现方式</li><li>第35行：建议补充边界条件处理说明</li><li>第42行：建议补充关于split函数具体实现的细节</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="质数的判定" data-status="complete">
+        <div class="card-header" data-card-idx="53">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                质数的判定
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充暴力法的代码实现（原文提到‘不给代码了’但未提供）</li><li>第12行：欧拉筛部分提到‘线性筛可以做到只被最小的质数标记’，建议补充具体实现原理的说明</li><li>第21行：Pollard-Rho部分提到‘具体推导过程不用去记’，建议补充生日悖论的数学推导</li><li>第30行：Miller-Rabin部分提到‘取2,3,5,7,11,13,17,37’的正确率，建议补充数学依据</li><li>第45行：Pollard-Rho代码中‘solve函数’的递归分解逻辑，建议补充边界条件说明</li><li>第52行：建议补充各算法的时间复杂度对比分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="更相减损法" data-status="complete">
+        <div class="card-header" data-card-idx="54">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                更相减损法
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析（如O(log min(a,b))）</li><li>第6行：可补充说明算法在处理大数时的优化细节（如避免重复除以2的操作）</li><li>第4行：建议补充边界条件说明（如a=0或b=0时的处理）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="欧几里得法" data-status="need_fix">
+        <div class="card-header" data-card-idx="55">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                欧几里得法
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心流程缺失，缺乏详细步骤和示例</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第1行：核心公式未展开算法步骤说明</li><li>第2行：缺乏时间复杂度分析和示例推导</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充算法步骤和正确性证明</li><li>第2行：建议补充时间复杂度分析和示例推导</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="裴蜀定理" data-status="need_fix">
+        <div class="card-header" data-card-idx="56">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                裴蜀定理
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心算法流程缺失且段落烂尾</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第2行：扩展欧拉定理的求解过程未展开，核心算法流程缺失</li><li>第3行：段落突然结束未完成逻辑闭环</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充裴蜀定理与扩展欧拉定理的数学推导过程</li><li>第2行：建议增加算法的时间复杂度分析</li><li>第3行：建议补充典型例题的求解步骤说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="扩展欧几里得法" data-status="complete">
+        <div class="card-header" data-card-idx="57">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                扩展欧几里得法
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：推导过程可补充具体代数变换步骤以增强严谨性</li><li>第9行：建议补充时间复杂度分析（与欧几里得算法相同，为O(log min(a,b)))</li><li>第11行：可补充说明当c不能被gcd(a,b)整除时无解的数学证明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="欧拉定理" data-status="complete">
+        <div class="card-header" data-card-idx="58">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                欧拉定理
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第2行：集合A的定义应为&#x27;小于p且与p互质的数&#x27;，原文&#x27;小于等于p&#x27;存在数学表述错误</li><li>第7行：需补充说明&#x27;构造B集合的目的是建立与A集合的同余关系&#x27;以增强逻辑衔接</li><li>第11行：乘积推导过程建议补充&#x27;根据消去律，可约去所有a_i项&#x27;的说明</li><li>第13行：建议增加&#x27;该结论即为欧拉定理的严格证明&#x27;的总结句</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="拓展欧拉定理" data-status="need_fix">
+        <div class="card-header" data-card-idx="59">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                拓展欧拉定理
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心流程或思想严重缺失，导致读者无法理解算法基本逻辑</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第2行：公式未说明应用场景和输入输出定义</li><li>第3行：证明部分仅提供感性理解且未展开严格推导</li><li>第4行：未说明模运算的循环周期与欧拉函数的数学关系</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第2行：建议补充算法应用场景说明</li><li>第3行：建议增加欧拉定理的严格数学证明过程</li><li>第4行：建议补充时间复杂度分析和边界条件说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="中国剩余定理" data-status="complete">
+        <div class="card-header" data-card-idx="60">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                中国剩余定理
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析（如模逆元计算的O(log b_i)复杂度）</li><li>第5行：建议明确说明逆元存在的条件（因模数需互质）</li><li>第5行：建议补充具体示例（如用实际数值演示构造过程）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="扩展中国剩余定理" data-status="complete">
+        <div class="card-header" data-card-idx="61">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                扩展中国剩余定理
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析</li><li>第5行：建议补充边界条件说明（如模数不互质时的处理）</li><li>第5行：建议补充具体示例以增强理解</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="卢卡斯定理" data-status="complete">
+        <div class="card-header" data-card-idx="62">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                卢卡斯定理
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充算法应用场景说明（如数论中的模运算需求）</li><li>第7行：建议补充时间复杂度分析（递归深度与计算次数）</li><li>第13行：建议明确说明当m&gt;n时直接返回0的边界条件</li><li>第15行：建议补充模运算中乘法逆元的计算方式（如费马小定理应用）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="扩展卢卡斯定理" data-status="complete">
+        <div class="card-header" data-card-idx="63">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                扩展卢卡斯定理
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：类比可能让读者困惑，建议补充扩展卢卡斯与原定理的关联说明</li><li>第3行：缺少如何具体计算每个模数下组合数的步骤说明</li><li>第12行：周期性处理的具体计算方法未详细展开</li><li>第13行：建议补充时间复杂度分析和边界条件讨论</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="线性基" data-status="complete">
+        <div class="card-header" data-card-idx="64">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                线性基
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：insert函数的循环条件存在逻辑错误，应为for (int i = 50; i &gt;= 0; i--)</li><li>第12行：solve函数的逻辑描述不够清晰，建议补充具体实现细节</li><li>第21行：求k小异或值的代码缺少复杂度分析和边界条件说明</li><li>第35行：前缀线性基的ins函数实现存在歧义，建议补充时间戳处理逻辑</li><li>第58行：数论线性基部分缺少具体实现步骤和复杂度分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="高维前缀和" data-status="need_fix">
+        <div class="card-header" data-card-idx="65">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                高维前缀和
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：代码缺失且存在语法错误</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第18行：T2代码缺失（未提供有效代码段）</li><li>第28行：T3代码缺失（未提供有效代码段）</li><li>第38行：存在语法错误（&#x27;第二考后的元素下标&#x27;表述不清）</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第18行：建议补充T2的完整代码实现</li><li>第28行：建议补充T3的完整代码实现</li><li>第38行：建议修正表述为&#x27;第二大的元素下标&#x27;以提高可读性</li><li>第12行：建议补充时间复杂度分析以完善算法说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="生成函数" data-status="complete">
+        <div class="card-header" data-card-idx="66">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                生成函数
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析</li><li>第12行：指数生成函数部分可补充典型例题的详细推导过程</li><li>第20行：狄利克雷生成函数公式推导建议增加数学证明过程</li><li>第15行：代码块中变量名v[1][m]的含义建议增加注释说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="狄利克雷卷积" data-status="complete">
+        <div class="card-header" data-card-idx="67">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                狄利克雷卷积
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第7行：建议补充时间复杂度分析，说明O(n log log n)和O(n ln n)的差异原因</li><li>第7行：建议补充具体示例，说明如何通过卷积计算得到g=f×I或g=f×μ</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="莫比乌斯反演" data-status="complete">
+        <div class="card-header" data-card-idx="68">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                莫比乌斯反演
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第3行：建议补充时间复杂度分析</li><li>第4行：建议补充边界条件说明（如n/m为0的情况）</li><li>第5行：建议补充典型例题的详细解题步骤</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="亚线性筛法" data-status="complete">
+        <div class="card-header" data-card-idx="69">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                亚线性筛法
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第18行：公式推导中第二步到第三步的转换缺乏关键中间步骤说明，建议补充详细推导过程</li><li>第30行：&#x27;时间复杂度证明略&#x27;属于关键信息缺失，建议补充简要证明思路</li><li>第45行：代码注释中&#x27;v&#x27;数组的用途未明确说明，建议补充变量定义</li><li>第52行：&#x27;svl&#x27;函数的递归逻辑较为晦涩，建议增加注释说明参数含义</li><li>第58行：代码中&#x27;g&#x27;的转移公式与前文数学推导存在对应关系不明确的问题，建议增加对应说明</li><li>第63行：&#x27;idc&#x27;函数的实现逻辑未明确，建议补充函数作用说明</li><li>第68行：&#x27;svl&#x27;函数中&#x27;j&#x27;循环的枚举顺序与前文分析存在差异，建议补充说明</li><li>第73行：代码中&#x27;v&#x27;数组的初始化逻辑与前文&#x27;lpf&#x27;定义的对应关系需要更清晰的解释</li><li>第78行：&#x27;g1&#x27;和&#x27;g2&#x27;数组的更新公式与前文数学推导的对应关系需要明确说明</li><li>第83行：代码中&#x27;g&#x27;的转移公式与前文数学推导的对应关系需要明确说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="单位根反演" data-status="complete">
+        <div class="card-header" data-card-idx="70">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                单位根反演
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充公式应用场景说明</li><li>第3行：建议增加复数根性质的数学背景解释</li><li>第7行：可补充关于模运算的等价性说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="快速傅里叶变换" data-status="complete">
+        <div class="card-header" data-card-idx="71">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                快速傅里叶变换
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析（如正变换和逆变换的复杂度对比）</li><li>第18行：关于单位根的递归分解过程，建议补充具体数学推导步骤</li><li>第22行：&#x27;n必须是形如2^k-1的数&#x27;的结论需要更严谨的数学证明</li><li>第25行：逆变换公式的推导过程建议补充具体数学推导</li><li>第28行：关于NTT的扩展应用建议补充简要说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="快速数论变换" data-status="complete">
+        <div class="card-header" data-card-idx="72">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                快速数论变换
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充原根选择的数学依据和质数p的构造条件</li><li>第12行：代码中变量tv的初始化存在歧义，建议明确其含义</li><li>第20行：非递归FFT代码缺少对sp数组生成逻辑的详细解释</li><li>第32行：数学公式推导缺少对组合数转化过程的中间步骤说明</li><li>第45行：建议补充NTT与FFT在时间复杂度上的对比分析</li><li>第52行：代码中的mstl等变量未定义，建议补充关键常量说明</li><li>第60行：建议增加对模运算中逆元计算的边界条件说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="seq" data-status="complete">
+        <div class="card-header" data-card-idx="73">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                SEQ
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：组合含义解释不够清晰，建议补充更直观的组合意义说明</li><li>第15行：&#x27;BYD 猫猫虫&#x27;表述不明确，建议改为&#x27;单节猫猫虫&#x27;等规范表述</li><li>第22行：&#x27;唐&#x27;字表述不够专业，建议改为&#x27;繁琐&#x27;或&#x27;复杂&#x27;等学术用语</li><li>第28行：数学推导中多项式展开过程建议补充具体展开步骤</li><li>第33行：最终公式建议补充公式编号和物理意义说明</li><li>第35行：建议补充时间复杂度分析和边界条件讨论</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="拉格朗日插值" data-status="complete">
+        <div class="card-header" data-card-idx="74">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                拉格朗日插值
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第3行：建议补充时间复杂度分析</li><li>第1行：建议明确说明x_i需互不相同</li><li>第5行：建议补充验证解的唯一性说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="bsgs与exbsgs" data-status="complete">
+        <div class="card-header" data-card-idx="75">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                bsgs与exbsgs
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析（已提及O(√p)但可更严谨说明具体步骤）</li><li>第15行：推导过程中的d_i定义建议用更清晰的数学符号标注</li><li>第20行：&#x27;数论题的拓展...&#x27;表述不够严谨，建议改为&#x27;需要处理a与p不互质的情况&#x27;</li><li>第24行：建议补充模运算逆元存在的条件说明（如当a^k/D与p/D互质时）</li><li>第26行：建议明确说明最终转化为BSGS问题时的参数对应关系</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="第一类斯特林数" data-status="complete">
+        <div class="card-header" data-card-idx="76">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                第一类斯特林数
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第7行：建议补充时间复杂度分析</li><li>第13行：例题链接未展开讲解，可补充具体解题思路</li><li>第4行：边界条件说明可更详细（如明确说明为何[_1^x]=0(x≠1)）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="第二类斯特林数" data-status="complete">
+        <div class="card-header" data-card-idx="77">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                第二类斯特林数
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第7行：建议补充斯特林数公式的数学推导过程以增强严谨性</li><li>第13行：例题链接应补充具体分析或说明该例题如何体现算法思想</li><li>第15行：建议补充时间复杂度分析以完善算法说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="斯特林反演" data-status="need_fix">
+        <div class="card-header" data-card-idx="78">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                斯特林反演
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：图片缺失导致内容不完整</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第11行：图片链接存在但实际缺失</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第13行：建议补充具体例子或推导过程说明题解链接的应用方式</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="二项式反演" data-status="complete">
+        <div class="card-header" data-card-idx="79">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                二项式反演
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充具体例题以增强说明</li><li>第10行：建议补充时间复杂度分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="原根" data-status="complete">
+        <div class="card-header" data-card-idx="80">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                原根
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充时间复杂度分析中O(g_p log²p)的具体推导过程</li><li>第25行：建议增加代码注释说明phi函数的数学含义</li><li>第35行：建议补充随机枚举时期望复杂度O(log²m log log m)的数学依据</li><li>第43行：建议增加对特殊处理逻辑（如n=1/2/4）的边界条件说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="burnside定理" data-status="need_fix">
+        <div class="card-header" data-card-idx="81">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                burnside定理
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心流程缺失且结尾未完成</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第10行：这里存在逻辑中断，未完成的例题引用</li><li>第3行：缺少f(g)计算方法的详细说明</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第3行：建议补充f(g)的计算方法（如使用循环节分解）</li><li>第10行：建议补充例题推导过程或链接说明</li><li>第9行：建议补充复杂度分析（如置换群规模与计算效率）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="polya定理" data-status="need_fix">
+        <div class="card-header" data-card-idx="82">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                polya定理
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心流程缺失，缺乏具体示例和推导过程</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第3行：公式推导过程缺失，未说明循环节数的计算方法</li><li>第4行：例题链接未展开，缺乏实际应用演示</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>建议补充循环节数的计算方法示例</li><li>建议增加典型例题的详细解题步骤</li><li>建议补充时间复杂度分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="博弈论" data-status="complete">
+        <div class="card-header" data-card-idx="83">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                博弈论
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第15行：Nim游戏必要性证明可补充更严谨的数学推导</li><li>第28行：Wythoff博弈结论建议补充黄金分割比的数学推导过程</li><li>第35行：Fibonacci博弈证明可增加斐波那契数列的数学特性说明</li><li>第42行：建议补充SG函数计算的复杂度分析</li><li>第50行：图博弈部分可增加最大匹配算法的时间复杂度说明</li><li>第58行：建议补充Anti-SG/Multi-SG等变种游戏的核心差异说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="二次剩余" data-status="need_fix">
+        <div class="card-header" data-card-idx="84">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                二次剩余
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：推导过程存在错误，核心流程缺失</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第5行：推导过程未正确应用费马小定理，展开式存在逻辑错误</li><li>第12行：结论部分未完整解释(a+i)^{(p+1)/2}的数学推导</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第7行：建议补充费马小定理在模p运算中的具体应用说明</li><li>第10行：建议增加二次剩余判定定理的反例验证</li><li>第15行：建议补充随机化算法寻找非二次剩余q的实现细节</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="行列式" data-status="need_fix">
+        <div class="card-header" data-card-idx="85">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                行列式
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：多个定理证明缺失且存在明显未完成标记</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第18行：拉普拉斯定理证明待补充</li><li>第25行：柯西比内公式证明待补充</li><li>第32行：矩阵树定理证明待补充</li><li>第38行：文档末尾存在未完成的&#x27;To-be Updated&#x27;标记</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充高斯消元法的具体实现步骤</li><li>第20行：建议增加范德蒙行列式的具体计算示例</li><li>第28行：建议补充矩阵树定理的严谨证明过程</li><li>第35行：建议增加BEST定理与LGV引理的数学推导</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="形式幂级数" data-status="complete">
+        <div class="card-header" data-card-idx="86">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                形式幂级数
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充形式幂级数与普通生成函数的核心区别</li><li>第8行：建议增加异或卷积的具体数学定义公式</li><li>第10行：建议补充典型应用场景（如数论变换）</li><li>第12行：建议增加时间复杂度分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="集合幂级数" data-status="complete">
+        <div class="card-header" data-card-idx="87">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                集合幂级数
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：此处存在未完成的标记，建议补充完整内容</li><li>第22行：建议补充时间复杂度分析</li><li>第35行：代码示例中部分操作缺乏注释说明</li><li>第40行：建议补充不同卷积类型的应用场景对比</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="子集卷积" data-status="complete">
+        <div class="card-header" data-card-idx="88">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                子集卷积
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析</li><li>第5行：建议说明n的取值范围等边界条件</li><li>第5行：建议补充对popcount函数处理的细节说明</li><li>第5行：建议增加算法应用场景的示例说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="卡特兰数" data-status="complete">
+        <div class="card-header" data-card-idx="89">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                卡特兰数
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充路径反转映射的具体数学证明过程</li><li>第14行：建议补充数学归纳法证明两个式子恒等性的具体步骤</li><li>第16行：建议补充卡特兰数的渐进复杂度分析</li><li>第17行：建议补充边界条件H₀=H₁=1的直观解释</li><li>第20行：建议补充典型例题与卡特兰数的对应关系说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="杨表" data-status="complete">
+        <div class="card-header" data-card-idx="90">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                杨表
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：RSK插入算法的描述缺少时间复杂度分析</li><li>第12行：勾长公式部分建议补充证明思路而非仅提供外部链接</li><li>第18行：建议增加杨表形状变换的具体示例（如旋转操作）</li><li>第22行：排列还原过程缺少关键步骤说明（如&#x27;顶回去&#x27;的具体实现）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="威尔逊定理" data-status="need_fix">
+        <div class="card-header" data-card-idx="91">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                威尔逊定理
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心定理证明缺失且应用场景描述不完整</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第1行：数学公式未配以文字说明</li><li>第3行：&#x27;足够板&#x27;等术语未定义</li><li>第4行：&#x27;第二个&#x27;指代不明导致逻辑断裂</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充威尔逊定理的数学证明过程</li><li>第3行：建议明确&#x27;足够板&#x27;的具体含义</li><li>第4行：建议补充算法应用场景的完整说明</li><li>第5行：建议增加时间复杂度分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="特殊排列问题" data-status="complete">
+        <div class="card-header" data-card-idx="92">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                特殊排列问题
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第4行：建议补充错排列公式的边界条件说明（如n=0时的特殊情况）</li><li>第12行：建议补充多重集排列组合中容斥应用的具体步骤示例</li><li>第15行：建议补充隔板法应用时的限制条件说明（如元素数量限制）</li><li>第18行：建议补充时间复杂度分析以增强严谨性</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="karatsuba快速卷积" data-status="complete">
+        <div class="card-header" data-card-idx="93">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                karatsuba快速卷积
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析的详细推导过程</li><li>第15行：代码注释缺失，建议增加关键步骤的注释说明</li><li>第22行：缺少对递归深度限制和内存使用情况的说明</li><li>第35行：建议补充模运算溢出处理的边界条件说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="字符串哈希" data-status="complete">
+        <div class="card-header" data-card-idx="94">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                字符串哈希
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析</li><li>第10行：可补充哈希冲突概率的说明</li><li>第12行：建议增加参数选择对算法影响的讨论</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="kmp" data-status="complete">
+        <div class="card-header" data-card-idx="95">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                kmp
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第11行：建议补充核心代码示例以增强可读性</li><li>第16行：建议补充模板题的具体实现细节或示例</li><li>第2行：建议补充z函数的计算示例以增强理解</li><li>第10行：建议补充更详细的复杂度分析（如最坏情况与平均情况）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="最小表示法" data-status="complete">
+        <div class="card-header" data-card-idx="96">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                最小表示法
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：步骤2的逻辑描述存在歧义，建议补充&#x27;当s[i+k]&gt;s[j+k]时，i应跳转至i+k+1&#x27;的明确说明</li><li>第8行：缺少时间复杂度分析，建议补充O(n)的复杂度证明</li><li>第9行：建议补充典型应用场景（如最小表示法在字符串匹配中的实际用途）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="kmp自动机" data-status="complete">
+        <div class="card-header" data-card-idx="97">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                kmp自动机
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析的具体推导过程</li><li>第6行：建议详细说明可持久化数组优化的实现原理</li><li>第8行：建议补充例题P3193的详细解题步骤</li><li>第10行：建议讨论模式串长度为0等边界条件的处理</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="失配树" data-status="complete">
+        <div class="card-header" data-card-idx="98">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                失配树
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第2行：建议补充失配树的定义与ACAM的关联性说明</li><li>第10行：建议补充时间复杂度分析</li><li>第15行：建议补充fail树的结构定义</li><li>第22行：建议补充LCA计算的具体实现方式</li><li>第27行：建议补充子树大小计算的原理说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="马拉车" data-status="complete">
+        <div class="card-header" data-card-idx="99">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                马拉车
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析以增强严谨性</li><li>第15行：偶数情况处理部分可补充插入特殊字符的数学原理说明</li><li>第22行：核心代码中v数组的结构定义未明确，建议补充字段含义说明</li><li>第28行：统计特殊字符回文串的逻辑可补充具体实现细节</li><li>第32行：建议补充边界条件处理说明（如空字符串、单字符情况）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="exkmp" data-status="complete">
+        <div class="card-header" data-card-idx="100">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                exkmp
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析以增强说服力</li><li>第12行：可补充边界条件处理的具体实现细节</li><li>第18行：建议说明分隔符选择的合理性及避免冲突的机制</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="ac自动机" data-status="complete">
+        <div class="card-header" data-card-idx="101">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                ac自动机
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第4行：&#x27;反祖&#x27;需明确定义（如是否指反向祖先）</li><li>第10行：&#x27;重链剖分等技巧&#x27;建议补充简要说明</li><li>第16行：&#x27;状压&#x27;建议说明具体压缩的是哪部分状态</li><li>第18行：模板题链接建议补充题意简述</li><li>第21行：&#x27;第推关系&#x27;表述不清晰，建议改为&#x27;递推关系&#x27;</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="后缀自动机" data-status="complete">
+        <div class="card-header" data-card-idx="102">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                后缀自动机
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第14行：关于 endpos 性质的说明可以更明确，建议补充 oi-wiki 中三条定理的具体内容</li><li>第35行：代码注释提到&#x27;没有按讲的来写&#x27;，建议补充具体差异说明或修正</li><li>第58行：Query 部分未给出答案，建议补充更简便求法的说明</li><li>第60行：图片链接未实际展示内容，建议补充图片说明或移除链接</li><li>第63行：应用示例中缺少复杂度分析，建议补充各题的时间复杂度说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="后缀数组" data-status="need_fix">
+        <div class="card-header" data-card-idx="103">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                后缀数组
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：文档末尾突然出现‘# 计算几何’但无后续内容，存在明显烂尾</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第18行：文档末尾出现‘# 计算几何’但无后续内容，存在明显烂尾</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第15行：建议补充SA-IS算法的缓存命中率优势具体说明</li><li>第22行：代码块结束符号存在格式错误（`后缺少反引号）</li><li>第28行：height数组计算部分可补充具体模拟过程的伪代码示例</li><li>第34行：建议补充算法复杂度分析（如SA-IS的O(n)证明）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="计几基础概念" data-status="need_fix">
+        <div class="card-header" data-card-idx="104">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                计几基础概念
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心算法思想和流程缺失</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第1行：仅讨论数据类型处理方式，未提及具体算法</li><li>第2行：标题未体现算法名称或核心思想</li><li>第3行：文档结束无总结性收尾</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充算法名称及核心思想</li><li>第2行：建议说明具体算法的输入输出定义</li><li>第3行：建议补充算法步骤或示例推导</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="构造" data-status="complete">
+        <div class="card-header" data-card-idx="105">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                构造
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充时间复杂度分析</li><li>第15行：代码中的`lnk={i};`可能存在语法错误，应使用`lnk.push_back(i);`</li><li>第22行：代码中的`next_permutation`使用前需确保数组已正确初始化</li><li>第35行：建议补充边界条件说明，如数组越界问题</li><li>第48行：代码中的`ans[l]=ans[r]=p`可能存在索引越界风险</li><li>第55行：建议补充`query`函数的实现细节或替代方案</li><li>第68行：代码中的`vector&lt;vector&lt;int&gt;&gt; query(vector&lt;int&gt; vec);`未提供实现，可能影响理解</li><li>第75行：建议补充`run`函数的逻辑说明</li><li>第82行：代码中的`dfs`函数递归深度可能超出限制</li><li>第95行：建议补充`adj`函数的参数说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="交互" data-status="need_fix">
+        <div class="card-header" data-card-idx="106">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                交互
+            </h3>
+            <span class="status-badge red">❌ 错误 / 空</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="error-block">❌ 错误信息：内容为空</div>
+        </div>
+    </div>
+    
+    <div class="card" data-title="思维" data-status="complete">
+        <div class="card-header" data-card-idx="107">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                思维
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第2行：建议补充具体例子说明&#x27;拆贡献&#x27;的实现方式</li><li>第5行：建议增加多人博弈场景的典型问题示例</li><li>第8行：建议补充势能法在实际算法中的应用案例</li><li>第11行：建议增加复杂度分析部分说明不同方法的时间效率</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="数学常用转化" data-status="complete">
+        <div class="card-header" data-card-idx="108">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                数学常用转化
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第12行：建议补充时间复杂度分析</li><li>第15行：公式推导中&#x27;第2排那部分&#x27;的表述不够清晰，建议明确具体指代的数学表达式</li><li>第8行：关于双射构造的描述存在歧义，建议补充具体映射关系的数学定义</li><li>第17行：未说明最终公式的应用场景和实际计算优势</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="搜索序限制区间" data-status="complete">
+        <div class="card-header" data-card-idx="109">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                搜索序限制区间
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第3行：建议补充时间复杂度分析</li><li>第4行：&#x27;神秘黑科技&#x27;表述不够严谨，建议具体说明扫描线/kdtree/二维线段树等方法的适用场景</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="区间加转差分" data-status="complete">
+        <div class="card-header" data-card-idx="110">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                区间加转差分
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第3行：建议补充时间复杂度分析</li><li>第4行：&#x27;差分转变为点值移动&#x27;的表述可更严谨，建议明确说明差分数组与点值移动之间的数学关系</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="逐步可行" data-status="need_fix">
+        <div class="card-header" data-card-idx="111">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                逐步可行
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：存在烂尾现象</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第6行：这里存在烂尾现象</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>建议补充时间复杂度分析</li><li>建议明确说明调整法的具体步骤</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="上升下降幂预处理组合数" data-status="complete">
+        <div class="card-header" data-card-idx="112">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                上升下降幂预处理组合数
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充时间复杂度分析</li><li>第3行：建议补充边界条件说明（如n/m的取值范围）</li><li>第5行：建议补充预处理的具体实现细节</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="哈希判等价类" data-status="need_fix">
+        <div class="card-header" data-card-idx="113">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                哈希判等价类
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心流程缺失且存在逻辑断层</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第1行：开头表述含糊且缺乏算法核心思想</li><li>第5行：关键步骤描述不完整且存在逻辑矛盾</li><li>第7行：未完成算法流程说明且缺乏数学推导</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第3行：建议补充问题建模的数学形式化描述</li><li>第7行：建议增加时间复杂度分析和随机化算法的正确性证明</li><li>第4行：建议补充边界条件说明（如n=0或空区间处理）</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="尺取法" data-status="complete">
+        <div class="card-header" data-card-idx="114">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                尺取法
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充时间复杂度分析</li><li>第8行：可补充边界条件说明（如k=0时的特殊处理）</li><li>第12行：建议明确决策单调性的数学证明思路</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="折半" data-status="need_fix">
+        <div class="card-header" data-card-idx="115">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                折半
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：代码缺失且存在逻辑矛盾</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第18行：参考代码部分缺失，仅包含注释说明代码丢失</li><li>第5行：未明确说明折半思想与高维前缀和的具体结合方式</li><li>第12行：图片链接未提供实际图像内容</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第7行：建议补充时间复杂度分析</li><li>第14行：可增加具体示例的中间推导过程</li><li>第17行：建议说明&#x27;喵喵题&#x27;的具体含义或难度定位</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="位运算独立性" data-status="complete">
+        <div class="card-header" data-card-idx="116">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                位运算独立性
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第15行：建议补充时间复杂度分析（O(log²n）的详细推导）</li><li>第22行：建议补充位运算对应意义的数学证明</li><li>第35行：建议补充边界条件说明（如全0/全1输入的特殊处理）</li><li>第48行：建议补充val结构体运算符重载的数学含义说明</li><li>第65行：建议补充重链剖分与线段树结合的复杂度分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="min-mex互化" data-status="complete">
+        <div class="card-header" data-card-idx="117">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                min-mex互化
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：引言句式不完整，建议补充完整表述</li><li>第5行：缺少对query函数的定义说明</li><li>第12行：未明确说明h数组和q数组的用途</li><li>第18行：缺少时间复杂度分析</li><li>第22行：未解释s集合的维护逻辑</li><li>第28行：循环条件和终止条件需要更清晰的注释</li><li>第34行：未说明如何保证最终排列的合法性</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="摩尔投票法" data-status="complete">
+        <div class="card-header" data-card-idx="118">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                摩尔投票法
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第3行：建议补充时间复杂度分析</li><li>第10行：建议补充摩尔投票法结果验证的具体步骤</li><li>第22行：建议说明线段树合并操作的边界条件处理</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="常见隐含上界限制" data-status="need_fix">
+        <div class="card-header" data-card-idx="119">
+            <h3>
+                <span class="fold-indicator">▼</span>
+                常见隐含上界限制
+            </h3>
+            <span class="status-badge orange">⚠️ 不完整</span>
+        </div>
+        <div class="card-body" style="display: block;">
+            <div class="integrity-notes">📋 说明：核心流程或思想严重缺失，无法理解算法基本逻辑</div><div class="section-title">🔍 发现的问题：</div><ul class="issue-list"><li>第1行：未说明算法名称和基本逻辑</li><li>第2行：缺乏输入输出定义</li><li>第3行：未阐述算法步骤或原理</li><li>第4行：数学结论未关联具体算法</li><li>第5行：缺少复杂度分析</li><li>第6行：未说明应用场景</li><li>第7行：未定义关键变量含义</li><li>第8行：未建立数学结论与算法的关联</li><li>第9行：缺乏边界条件说明</li></ul><div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第1行：建议补充算法名称和核心思想</li><li>第2行：建议定义输入输出格式</li><li>第3行：建议补充算法步骤说明</li><li>第4行：建议增加数学结论的应用场景</li><li>第5行：建议补充时间复杂度分析</li><li>第6行：建议增加算法适用条件说明</li><li>第7行：建议定义关键变量的数学含义</li><li>第8行：建议建立数学结论与算法的关联</li><li>第9行：建议补充边界条件分析</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="特殊成功判定构造题" data-status="complete">
+        <div class="card-header" data-card-idx="120">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                特殊成功判定构造题
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第2行：建议补充时间复杂度分析</li><li>第8行：&#x27;超集元素设置为0&#x27;的表述可更严谨，建议补充具体操作步骤说明</li><li>第10行：建议补充边界条件说明，例如当所有元素均为0时的处理方式</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="信息熵探路" data-status="complete">
+        <div class="card-header" data-card-idx="121">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                信息熵探路
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：bake_cakes函数返回固定值未体现分治逻辑</li><li>第18行：find_tastiness函数中curid=4的条件未说明其作用</li><li>第25行：代码中qa/qb的初始化逻辑需要更清晰的注释</li><li>第38行：CPC题代码缺少复杂度分析</li><li>第45行：特殊缩减步骤的边界条件未明确说明</li><li>第52行：search函数未处理查询次数限制的边界情况</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="和积互化" data-status="complete">
+        <div class="card-header" data-card-idx="122">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                和积互化
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第8行：建议补充时间复杂度分析</li><li>第9行：建议明确说明type=0和type=1的具体处理方式</li><li>第7行：建议补充对数转换与差分约束的对应关系说明</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="化gcd" data-status="complete">
+        <div class="card-header" data-card-idx="123">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                化gcd
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第10行：建议补充时间复杂度分析</li><li>第18行：建议增加对f数组定义和计算方式的解释</li><li>第35行：建议补充对最终公式推导过程的说明</li><li>第44行：建议增加对代码中swap操作目的的注释</li></ul>
+        </div>
+    </div>
+    
+    <div class="card" data-title="取min卷积转普通卷积" data-status="complete">
+        <div class="card-header" data-card-idx="124">
+            <h3>
+                <span class="fold-indicator">▶</span>
+                取min卷积转普通卷积
+            </h3>
+            <span class="status-badge green">✅ 完整</span>
+        </div>
+        <div class="card-body" style="display: none;">
+            <div class="section-title">💡 改进建议：</div><ul class="suggestion-list"><li>第5行：建议补充数学推导中将min转换为求和的具体过程</li><li>第12行：建议补充时间复杂度分析中O(n√n log n)的推导依据</li><li>第20行：建议补充边界条件说明，如d的取值范围和特殊值处理</li><li>第35行：建议增加代码注释说明关键变量含义（如v1/v2数组用途）</li><li>第45行：建议补充FFT变换参数选择的依据（如rev参数的物理意义）</li></ul>
+        </div>
+    </div>
+    
+    </div>
+    <footer>
+        <div>📅 报告生成日期：2026-06-12</div>
+        <div>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="license">CC BY-NC-SA 4.0</a> 许可协议</div>
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // 折叠/展开功能
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const header = card.querySelector('.card-header');
+            const body = card.querySelector('.card-body');
+            const indicator = header.querySelector('.fold-indicator');
+            if (!header || !body) return;
+            function toggleCard() {
+                if (body.style.display === 'none') {
+                    body.style.display = 'block';
+                    if (indicator) indicator.textContent = '▼';
+                } else {
+                    body.style.display = 'none';
+                    if (indicator) indicator.textContent = '▶';
+                }
+            }
+            header.addEventListener('click', (e) => toggleCard());
+        });
+        
+        // 搜索和过滤 (合并 incomplete 和 error 为 need_fix)
+        const searchInput = document.getElementById('searchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        let currentFilter = 'all';
+        
+        function filterCards() {
+            const keyword = searchInput.value.trim().toLowerCase();
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(card => {
+                const title = card.getAttribute('data-title') || '';
+                let status = card.getAttribute('data-status') || '';
+                let matchesFilter = false;
+                if (currentFilter === 'all') matchesFilter = true;
+                else if (currentFilter === 'complete') matchesFilter = (status === 'complete');
+                else if (currentFilter === 'need_fix') matchesFilter = (status === 'need_fix');
+                
+                const matchesSearch = keyword === '' || title.includes(keyword);
+                card.style.display = (matchesFilter && matchesSearch) ? '' : 'none';
+            });
+        }
+        
+        searchInput.addEventListener('input', filterCards);
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.getAttribute('data-filter');
+                filterCards();
+            });
+        });
+    })();
+</script>
+</body>
+</html>
