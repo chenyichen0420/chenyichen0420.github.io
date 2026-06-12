@@ -291,13 +291,14 @@
 <p>折戟沉沙地，不妨又一搏。</p>
 <p>$\text{CSP RP++!}$。</p>
 <p>我在 2026/06/11~12 进行了一轮自动化扫描，博客中未完成的部分可以参见<a href="./audit.html">审计报告</a>。</p>
+<p>审计报告并非实时生成的：这是在本地运行大约 12h 的大模型得到的产物，因此审计报告可能每一两个月才会更新一次。</p>
 <h1 id="大纲">大纲</h1>
 <blockquote>
 <p><a href="#%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92">动态规划</a></p>
 <blockquote>
 <p>常见基础动态规划</p>
 <p>背包</p>
-<p>优化综述</p>
+<p><a href="#%E4%BC%98%E5%8C%96%E7%BB%BC%E8%BF%B0">优化综述</a></p>
 <p>倍增优化</p>
 <p>数据结构优化</p>
 <p>决策单调性优化</p>
@@ -486,14 +487,14 @@
 <p>PN筛</p>
 </blockquote>
 <p>单位根反演</p>
-<p><a href="#%E5%BF%AB%E9%80%9F%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2">$FFT$</a>(快速傅里叶变换)</p>
-<p><a href="#%E5%BF%AB%E9%80%9F%E6%95%B0%E8%AE%BA%E5%8F%98%E6%8D%A2">$NTT$</a>(快速数论变换)</p>
-<p>多项式工具</p>
+<p><a href="#%E5%BF%AB%E9%80%9F%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2">FFT</a>(快速傅里叶变换)</p>
+<p><a href="#%E5%BF%AB%E9%80%9F%E6%95%B0%E8%AE%BA%E5%8F%98%E6%8D%A2">NTT</a>(快速数论变换)</p>
+<p><a href="#%E4%BB%BB%E6%84%8F%E6%A8%A1%E6%95%B0%E5%BF%AB%E9%80%9F%E6%95%B0%E8%AE%BA%E5%8F%98%E6%8D%A2">MTT</a>(任意模数快速数论变换)</p>
+<p><a href="#%E5%A4%9A%E9%A1%B9%E5%BC%8F%E5%B7%A5%E5%85%B7">多项式工具</a></p>
 <blockquote>
 <p>多项式乘法逆</p>
 <p>多项式 ln</p>
 <p>多项式 exp</p>
-<p>一般模数的处理</p>
 <p>简单应用</p>
 </blockquote>
 <p>多项式算子及组合意义</p>
@@ -502,6 +503,7 @@
 <p>SET</p>
 <p>MSET</p>
 </blockquote>
+<p>分治FFT</p>
 <p><a href="#%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E6%8F%92%E5%80%BC">拉格朗日插值</a></p>
 <p><a href="#bsgs%E4%B8%8Eexbsgs">BSGS与ExBSGS</a></p>
 <p><a href="#%E7%AC%AC%E4%B8%80%E7%B1%BB%E6%96%AF%E7%89%B9%E6%9E%97%E6%95%B0">第一类斯特林数</a></p>
@@ -10066,7 +10068,7 @@ a^{b \bmod \varphi(m)+\varphi(m)} & b\geq\varphi(m)
 <p>中国剩余定理可以求解一类同余方程组：$\forall i\in[1,n], x\equiv a_i\pmod{b_i}$。同时要求 $b_i$ 两两互质。</p>
 <p>中国剩余定理的核心思路就是构造一组可行解。怎么构造呢？如下：</p>
 <p>首先我们令 $m=\prod_{i=1}^nb_i$，并且令 $m_i=\frac{m}{b_i}$。</p>
-<p>此时有一组可行的 $x$ 为 $\sum_{i=1}^nm_i\times a_i\times a_i^{-1}$。其中 $a_i^{-1}$ 是模 $b_i$ 意义下的逆元。</p>
+<p>此时有一组可行的 $x$ 为 $\sum_{i=1}^nm_i\times a_i\times m_i^{-1}$。其中 $m_i^{-1}$ 是模 $b_i$ 意义下的逆元。</p>
 <p>显然吧，代入到每一个方程里面，发现是正确的。</p>
 <h2 id="扩展中国剩余定理">扩展中国剩余定理</h2>
 <p>其实和中国剩余定理毫不相干，核心思路都完全变了。</p>
@@ -11000,7 +11002,7 @@ signed main() {
 <p>也算是为数不多的几个完全不需要掌握其所以然的算法了。可以从 FFT 那里变过来。</p>
 <p>NTT 本质上就干了一件事：把复数映射到了整数集上，然后接着干。</p>
 <p>怎么映射呢？原根。对于质数 $p=qn+1$，且 $n=2^m$，那么原根 $g$ 满足 $g^{qn}\equiv1\pmod p$。此时我们可以将 $g_n=g^q\pmod p$ 看作 $\omega_n$ 的等价。</p>
-<p>说白了，在模 $p$ 意义下可以认为 $g\equiv e^{\frac{2\pi}{q}}$。常见的 $(p,g)$ 有 $(167772161,3),(998244353,3),(1004535809,3)$。</p>
+<p>说白了，在模 $p$ 意义下可以认为 $g\equiv e^{\frac{2\pi}{q}}$。常见的 $(p,g)$ 有 $(167772161,3),(998244353,3),(1004535809,3),(469762049,3)$。</p>
 <p>所以你只需要把代码中对应的那些位置替换一下就行了。</p>
 <h3 id="若干优化">若干优化</h3>
 <p>逐步看。这是 FFT 比较劣的一个版本，模板题要跑 2.77s。</p>
@@ -11364,9 +11366,162 @@ cpx a[<span class="hljs-number">1048576</span>],b[<span class="hljs-number">1048
 </code></pre>
 </div>
 </div>
+<h2 id="任意模数快速数论变换">任意模数快速数论变换</h2>
+<p>全称为 Arbitrary Modulus NTT，MTT 似乎是一个算法竞赛中的一个不太规范的缩写。它之所以必要，是因为 FFT 会受到浮点精度限制，NTT 又对模数有特殊要求，不够通用。为了解决这个矛盾，MTT应运而生。</p>
+<p>一种非常自然的想法是选择三个乘积远大于最终结果的 NTT 友好模数（具体可以参见前文中的那些模数），然后进行 NTT 卷积，最终用 CRT 合并精确结果，但是这样需要 $9$ 次 NTT，常数非常大，不过如果想不起来下面这种更加精妙的方法的话那还是老老实实用这个稳妥的方法吧。</p>
+<p>另一种看起来比较有道理的想法是拆系数。具体来说，我们的核心矛盾仅仅是 FFT 的浮点精度限制，但是如果数字没有那么大的话，这个误差往往是可以接受的，于是我们不妨考虑一下能不能将一个数拆成高低位两部分呢？也就是将原先 $A,B$ 的卷积的每一个数字分成 $\overline{A_1A_2}$ 和 $\overline{B_1B_2}$，用 $A_1B_1,A_2B_1,A_1B_2,A_2B_2$ 来还原结果？显然这样做就是 $8$ 次 FFT，常数略优于 $9$ 次 NTT。</p>
+<p>然而我们还有一些更加进阶的玩法，可以将第二种方法压缩到 $4$ 次 FFT！</p>
+<p>你说，这怎么可能呢？$4$ 次卷积你只用 $4$ 次 FFT，平均下来每一次卷积刚好用了 $1$ 次 FFT，还不够正变换和逆变换的！</p>
+<p>但是我们仔细思考一下，我们能不能做到更好的运算并行，在更少的次数之内计算出 $P=A*B$ 和 $Q=A*C$ 的结果呢？</p>
+<p>我们考虑为什么一般的 FFT 是不好的：他每一次在传入和传出的时候都只用到了实部，原本虚部可以干一点事情的，却被白白浪费掉了！说白了，就是虚部这个信号通道没有用上。</p>
+<p>于是我们考虑在实部塞进去 $A_1$，虚部塞进去 $A_2$，那么传出来的点值真的是我们可用的吗？</p>
+<p>他实际上是 $A_1,A_2$ 的一个混合信息，我们还需要通过一定的操作把他们拆分出来。</p>
+<p>好吧，我们不妨再计算一个实部为 $A_1$，虚部为 $-A_2$，那么传出来的就是新函数的点值。</p>
+<p>总的来说，我们现在知道了 $(A_1+iA_2)(x)$ 和 $(A_1-iA_2)(x)$ 的点值，分别为 $F_1,F_2$，那么 $A_1$ 显然就是 $\frac{F_1+F_2}{2}$，$A_2$ 就是 $\frac{F_1-F_2}{2}$。</p>
+<p>可是我们仔细一看，欸，好像，还使用了两个 FFT。但是还有一定的希望：被求值的函数每一个位置都是共轭的。</p>
+<p>我们推导一下：$\operatorname{FFT}(\overline{x})[k]=\sum_{n=0}^{N-1}\overline{x[n]}\omage_N^{kn}=\sum_{n=0}^{N-1}\overline{x[n]\omega_n^{-kn}}=\overline{\operatorname{FFT}(\overline{x})[-k]}$。</p>
+<p>好耶！我们不用专门再做一次 FFT 来得到 $A_1-iA_2$ 的点值，而是可以直接用 $A_1+iA_2$ 的点值得到！</p>
+<p>不过值得一提的是这里的 IFFT 就不完全一样了。当我们进行完 FFT 和 reverse 之后，就不需要再作额外的操作了。因为本身传入 IFFT 的数据就是频域数据组合，所以传出来的就是解耦后的两组不相干的时域数据，直接拿出来就行。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+using cpx=complex&lt;double&gt;; cpx vt;
+constexpr double pi=3.141592653589793238795028841971;
+vector&lt;cpx&gt;f,g,wn,v; vector&lt;int&gt;cp;
+int n,m,p,lim,l; vector&lt;int&gt;a,b;
+inline void fft(vector&lt;cpx&gt;&amp;v,int lim,const vector&lt;int&gt;&amp;cp,const vector&lt;cpx&gt;&amp;wn){
+	for(int i=0;i!=lim;++i)
+		if(i&lt;cp[i]) swap(v[i],v[cp[i]]);
+	for(int i=1;i!=lim;i&lt;&lt;=1)
+		for(int j=0;j!=lim;j+=i&lt;&lt;1)
+			for(int k=0;k!=i;++k)
+				vt=wn[lim/i*k]*v[j+k+i],
+				v[j+k+i]=v[j+k]-vt, v[j+k]+=vt;
+}
+inline int num(const double&amp; d) {
+	return d&lt;0?(int)(d-0.5)%p:(int)(d + 0.5)%p;
+}
+inline void apolytime(const vector&lt;int&gt;&amp; a,vector&lt;int&gt;&amp;b,int lim,int l){
+	int sp=ceil(sqrt(p)); lim&gt;&gt;=1,l--;
+	// memset(f.data(),0,sizeof(cpx)*lim*2);
+	// memset(g.data(),0,sizeof(cpx)*lim*2);
+	for(int i=0;i!=lim*2;++i)
+		f[i]=cpx(a[i]%sp,a[i]/sp),
+		g[i]=cpx(b[i]%sp,b[i]/sp);
+	for(int i=0;i!=lim*2;++i)
+		cp[i]=(cp[i&gt;&gt;1]&gt;&gt;1)|((i&amp;1)&lt;&lt;l),
+		wn[i]=cpx(cos(pi/lim/2*i),sin(pi/lim/2*i));
+	fft(f,lim*2,cp,wn); fft(g,lim*2,cp,wn);
+	v[0]=(f[0]+conj(f[0]))*cpx(0.5,0);
+	v[1]=(f[0]-conj(f[0]))*cpx(0,-0.5);
+	v[2]=(g[0]+conj(g[0]))*cpx(0.5,0);
+	v[3]=(g[0]-conj(g[0]))*cpx(0,-0.5);
+	for(int i=1;i!=lim*2;++i)
+		v[i&lt;&lt;2|0]=(f[i]+conj(f[lim*2-i]))*cpx(0.5,0),
+		v[i&lt;&lt;2|1]=(f[i]-conj(f[lim*2-i]))*cpx(0,-0.5),
+		v[i&lt;&lt;2|2]=(g[i]+conj(g[lim*2-i]))*cpx(0.5,0),
+		v[i&lt;&lt;2|3]=(g[i]-conj(g[lim*2-i]))*cpx(0,-0.5);
+	for(int i=0;i!=lim*2;++i)
+		f[i]=v[i&lt;&lt;2|0]*v[i&lt;&lt;2|2]+v[i&lt;&lt;2|1]*v[i&lt;&lt;2|3]*cpx(0,1),
+		g[i]=v[i&lt;&lt;2|0]*v[i&lt;&lt;2|3]+v[i&lt;&lt;2|1]*v[i&lt;&lt;2|2]*cpx(0,1);
+	fft(f,lim*2,cp,wn); fft(g,lim*2,cp,wn);
+	reverse(f.data()+1,f.data()+lim*2);
+	reverse(g.data()+1,g.data()+lim*2);
+	for(auto&amp;v:f) v/=lim*2; for(auto&amp;v:g) v/=lim*2;
+	for(int i=0;i!=lim*2;++i)
+		b[i]= (((int)num(g[i].imag())+(int)num(g[i].real()))*sp+
+		(int)num(f[i].real())+(int)num(f[i].imag())*sp*sp%p)%p;
+}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m&gt;&gt;p;
+	lim=1; while(lim&lt;=n+m+1) lim&lt;&lt;=1,l++; 
+	a.resize(lim,0); b.resize(lim,0);
+	f.resize(lim); cp.resize(lim);
+	g.resize(lim); wn.resize(lim);
+	v.resize(lim&lt;&lt;2);
+	for(int i=0;i&lt;=n;++i) cin&gt;&gt;a[i],a[i]%=p;
+	for(int i=0;i&lt;=m;++i) cin&gt;&gt;b[i],b[i]%=p;
+	apolytime(a,b,lim,l); b.resize(n+m+1);
+	for(int v:b) cout&lt;&lt;v&lt;&lt;&quot; &quot;; cout&lt;&lt;endl;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">using</span> cpx=complex&lt;<span class="hljs-type">double</span>&gt;; cpx vt;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">double</span> pi=<span class="hljs-number">3.141592653589793238795028841971</span>;
+vector&lt;cpx&gt;f,g,wn,v; vector&lt;<span class="hljs-type">int</span>&gt;cp;
+<span class="hljs-type">int</span> n,m,p,lim,l; vector&lt;<span class="hljs-type">int</span>&gt;a,b;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">fft</span><span class="hljs-params">(vector&lt;cpx&gt;&amp;v,<span class="hljs-type">int</span> lim,<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp;cp,<span class="hljs-type">const</span> vector&lt;cpx&gt;&amp;wn)</span></span>{
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i)
+		<span class="hljs-keyword">if</span>(i&lt;cp[i]) <span class="hljs-built_in">swap</span>(v[i],v[cp[i]]);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=lim;i&lt;&lt;=<span class="hljs-number">1</span>)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=lim;j+=i&lt;&lt;<span class="hljs-number">1</span>)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k!=i;++k)
+				vt=wn[lim/i*k]*v[j+k+i],
+				v[j+k+i]=v[j+k]-vt, v[j+k]+=vt;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">num</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">double</span>&amp; d)</span> </span>{
+	<span class="hljs-keyword">return</span> d&lt;<span class="hljs-number">0</span>?(<span class="hljs-type">int</span>)(d<span class="hljs-number">-0.5</span>)%p:(<span class="hljs-type">int</span>)(d + <span class="hljs-number">0.5</span>)%p;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">apolytime</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp; a,vector&lt;<span class="hljs-type">int</span>&gt;&amp;b,<span class="hljs-type">int</span> lim,<span class="hljs-type">int</span> l)</span></span>{
+	<span class="hljs-type">int</span> sp=<span class="hljs-built_in">ceil</span>(<span class="hljs-built_in">sqrt</span>(p)); lim&gt;&gt;=<span class="hljs-number">1</span>,l--;
+	<span class="hljs-comment">// memset(f.data(),0,sizeof(cpx)*lim*2);</span>
+	<span class="hljs-comment">// memset(g.data(),0,sizeof(cpx)*lim*2);</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		f[i]=<span class="hljs-built_in">cpx</span>(a[i]%sp,a[i]/sp),
+		g[i]=<span class="hljs-built_in">cpx</span>(b[i]%sp,b[i]/sp);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		cp[i]=(cp[i&gt;&gt;<span class="hljs-number">1</span>]&gt;&gt;<span class="hljs-number">1</span>)|((i&amp;<span class="hljs-number">1</span>)&lt;&lt;l),
+		wn[i]=<span class="hljs-built_in">cpx</span>(<span class="hljs-built_in">cos</span>(pi/lim/<span class="hljs-number">2</span>*i),<span class="hljs-built_in">sin</span>(pi/lim/<span class="hljs-number">2</span>*i));
+	<span class="hljs-built_in">fft</span>(f,lim*<span class="hljs-number">2</span>,cp,wn); <span class="hljs-built_in">fft</span>(g,lim*<span class="hljs-number">2</span>,cp,wn);
+	v[<span class="hljs-number">0</span>]=(f[<span class="hljs-number">0</span>]+<span class="hljs-built_in">conj</span>(f[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>);
+	v[<span class="hljs-number">1</span>]=(f[<span class="hljs-number">0</span>]-<span class="hljs-built_in">conj</span>(f[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	v[<span class="hljs-number">2</span>]=(g[<span class="hljs-number">0</span>]+<span class="hljs-built_in">conj</span>(g[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>);
+	v[<span class="hljs-number">3</span>]=(g[<span class="hljs-number">0</span>]-<span class="hljs-built_in">conj</span>(g[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">0</span>]=(f[i]+<span class="hljs-built_in">conj</span>(f[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>),
+		v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">1</span>]=(f[i]-<span class="hljs-built_in">conj</span>(f[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>),
+		v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">2</span>]=(g[i]+<span class="hljs-built_in">conj</span>(g[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>),
+		v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">3</span>]=(g[i]-<span class="hljs-built_in">conj</span>(g[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		f[i]=v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">0</span>]*v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">2</span>]+v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">1</span>]*v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">3</span>]*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1</span>),
+		g[i]=v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">0</span>]*v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">3</span>]+v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">1</span>]*v[i&lt;&lt;<span class="hljs-number">2</span>|<span class="hljs-number">2</span>]*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	<span class="hljs-built_in">fft</span>(f,lim*<span class="hljs-number">2</span>,cp,wn); <span class="hljs-built_in">fft</span>(g,lim*<span class="hljs-number">2</span>,cp,wn);
+	<span class="hljs-built_in">reverse</span>(f.<span class="hljs-built_in">data</span>()<span class="hljs-number">+1</span>,f.<span class="hljs-built_in">data</span>()+lim*<span class="hljs-number">2</span>);
+	<span class="hljs-built_in">reverse</span>(g.<span class="hljs-built_in">data</span>()<span class="hljs-number">+1</span>,g.<span class="hljs-built_in">data</span>()+lim*<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;v:f) v/=lim*<span class="hljs-number">2</span>; <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;v:g) v/=lim*<span class="hljs-number">2</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		b[i]= (((<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(g[i].<span class="hljs-built_in">imag</span>())+(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(g[i].<span class="hljs-built_in">real</span>()))*sp+
+		(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(f[i].<span class="hljs-built_in">real</span>())+(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(f[i].<span class="hljs-built_in">imag</span>())*sp*sp%p)%p;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m&gt;&gt;p;
+	lim=<span class="hljs-number">1</span>; <span class="hljs-keyword">while</span>(lim&lt;=n+m<span class="hljs-number">+1</span>) lim&lt;&lt;=<span class="hljs-number">1</span>,l++; 
+	a.<span class="hljs-built_in">resize</span>(lim,<span class="hljs-number">0</span>); b.<span class="hljs-built_in">resize</span>(lim,<span class="hljs-number">0</span>);
+	f.<span class="hljs-built_in">resize</span>(lim); cp.<span class="hljs-built_in">resize</span>(lim);
+	g.<span class="hljs-built_in">resize</span>(lim); wn.<span class="hljs-built_in">resize</span>(lim);
+	v.<span class="hljs-built_in">resize</span>(lim&lt;&lt;<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=n;++i) cin&gt;&gt;a[i],a[i]%=p;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=m;++i) cin&gt;&gt;b[i],b[i]%=p;
+	<span class="hljs-built_in">apolytime</span>(a,b,lim,l); b.<span class="hljs-built_in">resize</span>(n+m<span class="hljs-number">+1</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v:b) cout&lt;&lt;v&lt;&lt;<span class="hljs-string">&quot; &quot;</span>; cout&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
 <h2 id="多项式工具">多项式工具</h2>
-<p>这几样工具重在使用，只是用前三个计算工具就已经能够解决绝大部分的题目了，最后一个是专门讲解特殊模数的处理方式的，对于多数方法都是可以通用的，所以就合并进来了。这一部分首先是要能够写出来，但是最好是能够理解性的写出来。</p>
-<p>所以说，前三部分都是针对常见的 NTT 模数而言的，不再特别说明。</p>
+<p>这几样工具重在使用，只是用前三个计算工具就已经能够解决绝大部分的题目了。这一部分首先是要能够写出来，但是最好是能够理解性的写出来。</p>
+<p>所以说，这部分都是针对常见的 NTT 模数而言的，不再特别说明。事实上，如果不是 NTT 模数的话，只要保证是质数，这一部分都还基本上是可做的，大体上就是把 NTT 换成<del>令人作呕的</del> MTT 即可。</p>
 <h3 id="多项式乘法逆">多项式乘法逆</h3>
 <p>即，对于多项式 $F(x)$，求另一个多项式 $G(x)$，满足 $F(x)*G(x)\equiv1\pmod{x^n}$，系数模 $p$。</p>
 <p>我们考虑一个朴素的做法：首先第 $0$ 位是 $[x^0]F(x)[x^0]G(x)=1$，也就是说 $[x^0]G(x)=([x^0]F(x))^{-1}\bmod p$。然后第 $1$ 位是 $[x^0]F(x)[x^1]G(x)+[x^1]F(x)[x^0]G(x)=0$，我们知道 $F(x),[x^0]G(x)$，就能把 $[x^1]G(x)$ 求出来，以此类推。</p>
@@ -11419,6 +11574,236 @@ cpx a[<span class="hljs-number">1048576</span>],b[<span class="hljs-number">1048
 	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i) b[i]=b[i]*iv%mod;
 	<span class="hljs-built_in">memset</span>(b.<span class="hljs-built_in">data</span>()+lim,<span class="hljs-number">0</span>,<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>)*lim);
 }
+</code></pre>
+</div>
+</div>
+<p>给你放一份完整的，任意模数多项式乘法逆的代码，自己体会一下有多屎就行了，这里没必要再重述一遍：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+using cpx=complex&lt;double&gt;; cpx vt;
+constexpr double pi=3.141592653589793238795028841971;
+vector&lt;cpx&gt;f,g,wn,v[4]; vector&lt;int&gt;cp;
+int n,lim,l; vector&lt;int&gt;a,b,bt;
+inline int qpow(int a,int b,int p){
+	int ret=1;
+	for(;b;b&gt;&gt;=1,a=a*a%p)
+		(b&amp;1)&amp;&amp;(ret=ret*a%p);
+	return ret;
+}
+inline void fft(vector&lt;cpx&gt;&amp;v,int lim,const vector&lt;int&gt;&amp;cp,const vector&lt;cpx&gt;&amp;wn){
+	for(int i=0;i!=lim;++i)
+		if(i&lt;cp[i]) swap(v[i],v[cp[i]]);
+	for(int i=1;i!=lim;i&lt;&lt;=1)
+		for(int j=0;j!=lim;j+=i&lt;&lt;1)
+			for(int k=0;k!=i;++k)
+				vt=wn[lim/i*k]*v[j+k+i],
+				v[j+k+i]=v[j+k]-vt, v[j+k]+=vt;
+}
+inline int num(const double&amp; d) {
+	return d &lt; 0 ? (int)(d - 0.5) % 1000000007 : (int)(d + 0.5) % 1000000007;
+}
+inline void apolytime(const vector&lt;int&gt;&amp; a,vector&lt;int&gt;&amp;b,int lim,int l,int p){
+	memset(f.data(),0,sizeof(cpx)*lim*2);
+	memset(g.data(),0,sizeof(cpx)*lim*2);
+	int sp=ceil(sqrt(p)); b.resize(lim*2,0);
+	for(int i=0;i!=lim;++i)
+		f[i]=cpx(a[i]%sp,a[i]/sp),
+		g[i]=cpx(b[i]%sp,b[i]/sp);
+	for(int i=0;i!=lim*2;++i)
+		cp[i]=(cp[i&gt;&gt;1]&gt;&gt;1)|((i&amp;1)&lt;&lt;l),
+		wn[i]=cpx(cos(pi/lim/2*i),sin(pi/lim/2*i));
+	fft(f,lim*2,cp,wn); fft(g,lim*2,cp,wn);
+	v[0][0]=(f[0]+conj(f[0]))*cpx(0.5,0);
+	v[1][0]=(f[0]-conj(f[0]))*cpx(0,-0.5);
+	v[2][0]=(g[0]+conj(g[0]))*cpx(0.5,0);
+	v[3][0]=(g[0]-conj(g[0]))*cpx(0,-0.5);
+	for(int i=1;i!=lim*2;++i)
+		v[0][i]=(f[i]+conj(f[lim*2-i]))*cpx(0.5,0),
+		v[1][i]=(f[i]-conj(f[lim*2-i]))*cpx(0,-0.5),
+		v[2][i]=(g[i]+conj(g[lim*2-i]))*cpx(0.5,0),
+		v[3][i]=(g[i]-conj(g[lim*2-i]))*cpx(0,-0.5);
+	for(int i=0;i!=lim*2;++i)
+		f[i]=v[0][i]*v[2][i]+v[1][i]*v[3][i]*cpx(0,1),
+		g[i]=v[0][i]*v[3][i]+v[1][i]*v[2][i]*cpx(0,1);
+	fft(f,lim*2,cp,wn); fft(g,lim*2,cp,wn);
+	reverse(f.data()+1,f.data()+lim*2);
+	reverse(g.data()+1,g.data()+lim*2);
+	for(auto&amp;v:f) v/=lim*2; for(auto&amp;v:g) v/=lim*2;
+	for(int i=0;i!=lim*2;++i)
+		bt[i]= (((int)num(g[i].imag())+(int)num(g[i].real()))*sp+
+		(int)num(f[i].real())+(int)num(f[i].imag())*sp*sp%p)%p;
+	for(int i=0;i!=lim*2;++i) bt[i]=(p-bt[i])%p;
+	bt[0]+=2; bt[0]%=p;
+	memset(f.data(),0,sizeof(cpx)*lim*2);
+	memset(g.data(),0,sizeof(cpx)*lim*2);
+	for(int i=0;i!=lim;++i)
+		f[i]=cpx(bt[i]%sp,bt[i]/sp),
+		g[i]=cpx(b[i]%sp,b[i]/sp);
+	for(int i=0;i!=lim*2;++i)
+		cp[i]=(cp[i&gt;&gt;1]&gt;&gt;1)|((i&amp;1)&lt;&lt;l),
+		wn[i]=cpx(cos(pi/lim/2*i),sin(pi/lim/2*i));
+	fft(f,lim*2,cp,wn); fft(g,lim*2,cp,wn);
+	v[0][0]=(f[0]+conj(f[0]))*cpx(0.5,0);
+	v[1][0]=(f[0]-conj(f[0]))*cpx(0,-0.5);
+	v[2][0]=(g[0]+conj(g[0]))*cpx(0.5,0);
+	v[3][0]=(g[0]-conj(g[0]))*cpx(0,-0.5);
+	for(int i=1;i!=lim*2;++i)
+		v[0][i]=(f[i]+conj(f[lim*2-i]))*cpx(0.5,0),
+		v[1][i]=(f[i]-conj(f[lim*2-i]))*cpx(0,-0.5),
+		v[2][i]=(g[i]+conj(g[lim*2-i]))*cpx(0.5,0),
+		v[3][i]=(g[i]-conj(g[lim*2-i]))*cpx(0,-0.5);
+	for(int i=0;i!=lim*2;++i)
+		f[i]=v[0][i]*v[2][i]+v[1][i]*v[3][i]*cpx(0,1),
+		g[i]=v[0][i]*v[3][i]+v[1][i]*v[2][i]*cpx(0,1);
+	fft(f,lim*2,cp,wn); fft(g,lim*2,cp,wn);
+	reverse(f.data()+1,f.data()+lim*2);
+	reverse(g.data()+1,g.data()+lim*2);
+	for(auto&amp;v:f) v/=lim*2; for(auto&amp;v:g) v/=lim*2;
+	for(int i=0;i!=lim;++i)
+		b[i]= (((int)num(g[i].imag())+(int)num(g[i].real()))*sp+
+		(int)num(f[i].real())+(int)num(f[i].imag())*sp*sp%p)%p;
+	memset(b.data()+lim,0,sizeof(int)*lim);
+}
+inline void apolyinv(const vector&lt;int&gt;&amp;a,vector&lt;int&gt;&amp;b,int lim,int l,int p){
+	if(lim==1){
+		b.resize(2,0);
+		b[0]=qpow(a[0],p-2,p);
+		return;
+	}
+	apolyinv(a,b,lim/2,l-1,p);
+	apolytime(a,b,lim,l,p);
+}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n;
+	lim=1; while(lim&lt;n) lim&lt;&lt;=1,l++; 
+	a.resize(lim*2,0); f.resize(lim*2);
+	bt.resize(lim*2); cp.resize(lim*2);
+	g.resize(lim*2); wn.resize(lim*2);
+	for(auto&amp;ve:v) ve.resize(lim*2);
+	for(int i=0;i!=n;++i) cin&gt;&gt;a[i]; 
+	apolyinv(a,b,lim,l,1000000007); b.resize(n);
+	for(int v:b) cout&lt;&lt;v&lt;&lt;&quot; &quot;; cout&lt;&lt;endl;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+*/
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">using</span> cpx=complex&lt;<span class="hljs-type">double</span>&gt;; cpx vt;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">double</span> pi=<span class="hljs-number">3.141592653589793238795028841971</span>;
+vector&lt;cpx&gt;f,g,wn,v[<span class="hljs-number">4</span>]; vector&lt;<span class="hljs-type">int</span>&gt;cp;
+<span class="hljs-type">int</span> n,lim,l; vector&lt;<span class="hljs-type">int</span>&gt;a,b,bt;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">qpow</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b,<span class="hljs-type">int</span> p)</span></span>{
+	<span class="hljs-type">int</span> ret=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(;b;b&gt;&gt;=<span class="hljs-number">1</span>,a=a*a%p)
+		(b&amp;<span class="hljs-number">1</span>)&amp;&amp;(ret=ret*a%p);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">fft</span><span class="hljs-params">(vector&lt;cpx&gt;&amp;v,<span class="hljs-type">int</span> lim,<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp;cp,<span class="hljs-type">const</span> vector&lt;cpx&gt;&amp;wn)</span></span>{
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i)
+		<span class="hljs-keyword">if</span>(i&lt;cp[i]) <span class="hljs-built_in">swap</span>(v[i],v[cp[i]]);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=lim;i&lt;&lt;=<span class="hljs-number">1</span>)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=lim;j+=i&lt;&lt;<span class="hljs-number">1</span>)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k!=i;++k)
+				vt=wn[lim/i*k]*v[j+k+i],
+				v[j+k+i]=v[j+k]-vt, v[j+k]+=vt;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">num</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">double</span>&amp; d)</span> </span>{
+	<span class="hljs-keyword">return</span> d &lt; <span class="hljs-number">0</span> ? (<span class="hljs-type">int</span>)(d - <span class="hljs-number">0.5</span>) % <span class="hljs-number">1000000007</span> : (<span class="hljs-type">int</span>)(d + <span class="hljs-number">0.5</span>) % <span class="hljs-number">1000000007</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">apolytime</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp; a,vector&lt;<span class="hljs-type">int</span>&gt;&amp;b,<span class="hljs-type">int</span> lim,<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> p)</span></span>{
+	<span class="hljs-built_in">memset</span>(f.<span class="hljs-built_in">data</span>(),<span class="hljs-number">0</span>,<span class="hljs-built_in">sizeof</span>(cpx)*lim*<span class="hljs-number">2</span>);
+	<span class="hljs-built_in">memset</span>(g.<span class="hljs-built_in">data</span>(),<span class="hljs-number">0</span>,<span class="hljs-built_in">sizeof</span>(cpx)*lim*<span class="hljs-number">2</span>);
+	<span class="hljs-type">int</span> sp=<span class="hljs-built_in">ceil</span>(<span class="hljs-built_in">sqrt</span>(p)); b.<span class="hljs-built_in">resize</span>(lim*<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i)
+		f[i]=<span class="hljs-built_in">cpx</span>(a[i]%sp,a[i]/sp),
+		g[i]=<span class="hljs-built_in">cpx</span>(b[i]%sp,b[i]/sp);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		cp[i]=(cp[i&gt;&gt;<span class="hljs-number">1</span>]&gt;&gt;<span class="hljs-number">1</span>)|((i&amp;<span class="hljs-number">1</span>)&lt;&lt;l),
+		wn[i]=<span class="hljs-built_in">cpx</span>(<span class="hljs-built_in">cos</span>(pi/lim/<span class="hljs-number">2</span>*i),<span class="hljs-built_in">sin</span>(pi/lim/<span class="hljs-number">2</span>*i));
+	<span class="hljs-built_in">fft</span>(f,lim*<span class="hljs-number">2</span>,cp,wn); <span class="hljs-built_in">fft</span>(g,lim*<span class="hljs-number">2</span>,cp,wn);
+	v[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=(f[<span class="hljs-number">0</span>]+<span class="hljs-built_in">conj</span>(f[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>);
+	v[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>]=(f[<span class="hljs-number">0</span>]-<span class="hljs-built_in">conj</span>(f[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	v[<span class="hljs-number">2</span>][<span class="hljs-number">0</span>]=(g[<span class="hljs-number">0</span>]+<span class="hljs-built_in">conj</span>(g[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>);
+	v[<span class="hljs-number">3</span>][<span class="hljs-number">0</span>]=(g[<span class="hljs-number">0</span>]-<span class="hljs-built_in">conj</span>(g[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		v[<span class="hljs-number">0</span>][i]=(f[i]+<span class="hljs-built_in">conj</span>(f[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>),
+		v[<span class="hljs-number">1</span>][i]=(f[i]-<span class="hljs-built_in">conj</span>(f[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>),
+		v[<span class="hljs-number">2</span>][i]=(g[i]+<span class="hljs-built_in">conj</span>(g[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>),
+		v[<span class="hljs-number">3</span>][i]=(g[i]-<span class="hljs-built_in">conj</span>(g[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		f[i]=v[<span class="hljs-number">0</span>][i]*v[<span class="hljs-number">2</span>][i]+v[<span class="hljs-number">1</span>][i]*v[<span class="hljs-number">3</span>][i]*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1</span>),
+		g[i]=v[<span class="hljs-number">0</span>][i]*v[<span class="hljs-number">3</span>][i]+v[<span class="hljs-number">1</span>][i]*v[<span class="hljs-number">2</span>][i]*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	<span class="hljs-built_in">fft</span>(f,lim*<span class="hljs-number">2</span>,cp,wn); <span class="hljs-built_in">fft</span>(g,lim*<span class="hljs-number">2</span>,cp,wn);
+	<span class="hljs-built_in">reverse</span>(f.<span class="hljs-built_in">data</span>()<span class="hljs-number">+1</span>,f.<span class="hljs-built_in">data</span>()+lim*<span class="hljs-number">2</span>);
+	<span class="hljs-built_in">reverse</span>(g.<span class="hljs-built_in">data</span>()<span class="hljs-number">+1</span>,g.<span class="hljs-built_in">data</span>()+lim*<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;v:f) v/=lim*<span class="hljs-number">2</span>; <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;v:g) v/=lim*<span class="hljs-number">2</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		bt[i]= (((<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(g[i].<span class="hljs-built_in">imag</span>())+(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(g[i].<span class="hljs-built_in">real</span>()))*sp+
+		(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(f[i].<span class="hljs-built_in">real</span>())+(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(f[i].<span class="hljs-built_in">imag</span>())*sp*sp%p)%p;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i) bt[i]=(p-bt[i])%p;
+	bt[<span class="hljs-number">0</span>]+=<span class="hljs-number">2</span>; bt[<span class="hljs-number">0</span>]%=p;
+	<span class="hljs-built_in">memset</span>(f.<span class="hljs-built_in">data</span>(),<span class="hljs-number">0</span>,<span class="hljs-built_in">sizeof</span>(cpx)*lim*<span class="hljs-number">2</span>);
+	<span class="hljs-built_in">memset</span>(g.<span class="hljs-built_in">data</span>(),<span class="hljs-number">0</span>,<span class="hljs-built_in">sizeof</span>(cpx)*lim*<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i)
+		f[i]=<span class="hljs-built_in">cpx</span>(bt[i]%sp,bt[i]/sp),
+		g[i]=<span class="hljs-built_in">cpx</span>(b[i]%sp,b[i]/sp);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		cp[i]=(cp[i&gt;&gt;<span class="hljs-number">1</span>]&gt;&gt;<span class="hljs-number">1</span>)|((i&amp;<span class="hljs-number">1</span>)&lt;&lt;l),
+		wn[i]=<span class="hljs-built_in">cpx</span>(<span class="hljs-built_in">cos</span>(pi/lim/<span class="hljs-number">2</span>*i),<span class="hljs-built_in">sin</span>(pi/lim/<span class="hljs-number">2</span>*i));
+	<span class="hljs-built_in">fft</span>(f,lim*<span class="hljs-number">2</span>,cp,wn); <span class="hljs-built_in">fft</span>(g,lim*<span class="hljs-number">2</span>,cp,wn);
+	v[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=(f[<span class="hljs-number">0</span>]+<span class="hljs-built_in">conj</span>(f[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>);
+	v[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>]=(f[<span class="hljs-number">0</span>]-<span class="hljs-built_in">conj</span>(f[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	v[<span class="hljs-number">2</span>][<span class="hljs-number">0</span>]=(g[<span class="hljs-number">0</span>]+<span class="hljs-built_in">conj</span>(g[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>);
+	v[<span class="hljs-number">3</span>][<span class="hljs-number">0</span>]=(g[<span class="hljs-number">0</span>]-<span class="hljs-built_in">conj</span>(g[<span class="hljs-number">0</span>]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		v[<span class="hljs-number">0</span>][i]=(f[i]+<span class="hljs-built_in">conj</span>(f[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>),
+		v[<span class="hljs-number">1</span>][i]=(f[i]-<span class="hljs-built_in">conj</span>(f[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>),
+		v[<span class="hljs-number">2</span>][i]=(g[i]+<span class="hljs-built_in">conj</span>(g[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0.5</span>,<span class="hljs-number">0</span>),
+		v[<span class="hljs-number">3</span>][i]=(g[i]-<span class="hljs-built_in">conj</span>(g[lim*<span class="hljs-number">2</span>-i]))*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">-0.5</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim*<span class="hljs-number">2</span>;++i)
+		f[i]=v[<span class="hljs-number">0</span>][i]*v[<span class="hljs-number">2</span>][i]+v[<span class="hljs-number">1</span>][i]*v[<span class="hljs-number">3</span>][i]*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1</span>),
+		g[i]=v[<span class="hljs-number">0</span>][i]*v[<span class="hljs-number">3</span>][i]+v[<span class="hljs-number">1</span>][i]*v[<span class="hljs-number">2</span>][i]*<span class="hljs-built_in">cpx</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	<span class="hljs-built_in">fft</span>(f,lim*<span class="hljs-number">2</span>,cp,wn); <span class="hljs-built_in">fft</span>(g,lim*<span class="hljs-number">2</span>,cp,wn);
+	<span class="hljs-built_in">reverse</span>(f.<span class="hljs-built_in">data</span>()<span class="hljs-number">+1</span>,f.<span class="hljs-built_in">data</span>()+lim*<span class="hljs-number">2</span>);
+	<span class="hljs-built_in">reverse</span>(g.<span class="hljs-built_in">data</span>()<span class="hljs-number">+1</span>,g.<span class="hljs-built_in">data</span>()+lim*<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;v:f) v/=lim*<span class="hljs-number">2</span>; <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;v:g) v/=lim*<span class="hljs-number">2</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i)
+		b[i]= (((<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(g[i].<span class="hljs-built_in">imag</span>())+(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(g[i].<span class="hljs-built_in">real</span>()))*sp+
+		(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(f[i].<span class="hljs-built_in">real</span>())+(<span class="hljs-type">int</span>)<span class="hljs-built_in">num</span>(f[i].<span class="hljs-built_in">imag</span>())*sp*sp%p)%p;
+	<span class="hljs-built_in">memset</span>(b.<span class="hljs-built_in">data</span>()+lim,<span class="hljs-number">0</span>,<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>)*lim);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">apolyinv</span><span class="hljs-params">(<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp;a,vector&lt;<span class="hljs-type">int</span>&gt;&amp;b,<span class="hljs-type">int</span> lim,<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> p)</span></span>{
+	<span class="hljs-keyword">if</span>(lim==<span class="hljs-number">1</span>){
+		b.<span class="hljs-built_in">resize</span>(<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);
+		b[<span class="hljs-number">0</span>]=<span class="hljs-built_in">qpow</span>(a[<span class="hljs-number">0</span>],p<span class="hljs-number">-2</span>,p);
+		<span class="hljs-keyword">return</span>;
+	}
+	<span class="hljs-built_in">apolyinv</span>(a,b,lim/<span class="hljs-number">2</span>,l<span class="hljs-number">-1</span>,p);
+	<span class="hljs-built_in">apolytime</span>(a,b,lim,l,p);
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
+	lim=<span class="hljs-number">1</span>; <span class="hljs-keyword">while</span>(lim&lt;n) lim&lt;&lt;=<span class="hljs-number">1</span>,l++; 
+	a.<span class="hljs-built_in">resize</span>(lim*<span class="hljs-number">2</span>,<span class="hljs-number">0</span>); f.<span class="hljs-built_in">resize</span>(lim*<span class="hljs-number">2</span>);
+	bt.<span class="hljs-built_in">resize</span>(lim*<span class="hljs-number">2</span>); cp.<span class="hljs-built_in">resize</span>(lim*<span class="hljs-number">2</span>);
+	g.<span class="hljs-built_in">resize</span>(lim*<span class="hljs-number">2</span>); wn.<span class="hljs-built_in">resize</span>(lim*<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;ve:v) ve.<span class="hljs-built_in">resize</span>(lim*<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i) cin&gt;&gt;a[i]; 
+	<span class="hljs-built_in">apolyinv</span>(a,b,lim,l,<span class="hljs-number">1000000007</span>); b.<span class="hljs-built_in">resize</span>(n);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v:b) cout&lt;&lt;v&lt;&lt;<span class="hljs-string">&quot; &quot;</span>; cout&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+*/
 </code></pre>
 </div>
 </div>
@@ -11667,7 +12052,6 @@ signed main(){
 </code></pre>
 </div>
 </div>
-<h3 id="一般模数的处理">一般模数的处理</h3>
 <h3 id="简单应用">简单应用</h3>
 <p>比方说这道题：<a href="https://www.luogu.com.cn/problem/P5245">多项式快速幂</a> 和 <a href="https://www.luogu.com.cn/problem/P5273">加强版</a>。</p>
 <p>应该不会学了这么多东西还觉得直接套用快速幂的那一套是可过的吧？显然我们存在更优秀的做法：</p>
@@ -11712,6 +12096,8 @@ signed main(){
 <p>等待补充。这一部分基本上只有国赛才会用。</p>
 <h3 id="mset">MSET</h3>
 <p>等待补充。这一部分基本上只有国赛才会用。</p>
+<h2 id="分治fft">分治FFT</h2>
+<p>等待补充。</p>
 <h2 id="拉格朗日插值">拉格朗日插值</h2>
 <p>已知 $n$ 次多项式 $f$ 满足 $\forall i\in[0,n]\cap\mathbb{Z}, f(x_i)=y_i$，求 $f(x)$。</p>
 <p>考虑构造 $f_i(x):\forall j\neq i,f_i(x_j)=0,f_i(x_i)=y_i$，显然有 $f=\sum f_i$。</p>
