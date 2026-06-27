@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：AT_abc248_g [ABC248G] GCD cost on the tree</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>感觉这种对 $gcd$ 什么的容斥方法已经非常的普及了。</p>
+<p>就是这样的：我们考虑将对 $=k$ 的贡献转换成 $\mid k$ 的贡献，然后把其倍数给砍掉就是 $=k$ 的贡献了。</p>
+<p>在这道题中，我们考虑统计 $f(d)=\sum_{d|\gcd(i,j)}dis(i,j)$ 的值，然后就有答案是 $\sum_{i\ge1}d(f(d)-\sum_{j\ge2}f(jd))$。考虑 $f(d)$ 怎么计算。</p>
+<p>显然对 $f(d)$ 有贡献的路径 $(i,j)$，满足 $\forall k\in(i,j)$，$d|a_k$。</p>
+<p>于是我们将所有的因数的出现位置记出来，然后这样的路径就是若干个连通块内部的路径。接下来考虑对于一个连通块，怎么统计出所有路径的长度。</p>
+<p>显然，这些连通块仍然是树形结构，于是我们考虑我们要计算的就是一个子树中的所有路径的长度之和。</p>
+<p>不妨遍历这个树上的每一个节点，统计子树中经过这个节点的路径的长度之和，这是简单的，我们记录出每一颗子树到这个节点的路径长度和以及个数，然后就可以简单计算出来了。</p>
+<p>完了之后按照前面给的公式直接计算就行了，时间复杂度是 $n\sigma_0(n)+n\log n$，可以通过此题，参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod=998244353;
+int n,a[100005],ans[100005],c[100005],v[100005],nc[100005],ret;
+vector&lt;int&gt;son[100005],ap[100005]; bool cs[100005];
+inline void mad(int&amp; l,const int r){(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+inline void dfs(int p,int a){
+	c[p]=v[p]=1; nc[p]=cs[p]=0;
+	for(int sp:son[p]) if(cs[sp]){
+		dfs(sp,a);
+		nc[p]=(nc[p]+c[p]*v[sp]+c[sp]*v[p])%mod;
+		mad(c[p],c[sp]); v[p]=(v[p]+v[sp]+c[sp])%mod;
+	}
+	mad(ans[a],nc[p]);
+}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n;
+	for(int i=1;i&lt;=n;++i){
+		cin&gt;&gt;a[i];
+		for(int j=1;j*j&lt;=a[i];++j)
+			if(a[i]%j==0) ap[j].emplace_back(i);
+		for(int j=1;j*j&lt;a[i];++j)
+			if(a[i]%j==0) ap[a[i]/j].emplace_back(i);
+	}
+	for(int i=1,l,r;i!=n;++i)
+		cin&gt;&gt;l&gt;&gt;r,
+		son[l].emplace_back(r),
+		son[r].emplace_back(l);
+	for(int i=1e5;i&gt;=1;i--) if(ap[i].size()){
+		for(int p:ap[i]) cs[p]=1;
+		for(int p:ap[i]) if(cs[p]) dfs(p,i);
+		for(int v=i*2;v&lt;=1e5;v+=i) mad(ans[i],mod-ans[v]);
+	}
+	for(int i=1;i&lt;=1e5;++i) ret=(ret+i*ans[i])%mod;
+	cout&lt;&lt;ret&lt;&lt;endl;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>;
+<span class="hljs-type">int</span> n,a[<span class="hljs-number">100005</span>],ans[<span class="hljs-number">100005</span>],c[<span class="hljs-number">100005</span>],v[<span class="hljs-number">100005</span>],nc[<span class="hljs-number">100005</span>],ret;
+vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">100005</span>],ap[<span class="hljs-number">100005</span>]; <span class="hljs-type">bool</span> cs[<span class="hljs-number">100005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> a)</span></span>{
+	c[p]=v[p]=<span class="hljs-number">1</span>; nc[p]=cs[p]=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(cs[sp]){
+		<span class="hljs-built_in">dfs</span>(sp,a);
+		nc[p]=(nc[p]+c[p]*v[sp]+c[sp]*v[p])%mod;
+		<span class="hljs-built_in">mad</span>(c[p],c[sp]); v[p]=(v[p]+v[sp]+c[sp])%mod;
+	}
+	<span class="hljs-built_in">mad</span>(ans[a],nc[p]);
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+		cin&gt;&gt;a[i];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j*j&lt;=a[i];++j)
+			<span class="hljs-keyword">if</span>(a[i]%j==<span class="hljs-number">0</span>) ap[j].<span class="hljs-built_in">emplace_back</span>(i);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j*j&lt;a[i];++j)
+			<span class="hljs-keyword">if</span>(a[i]%j==<span class="hljs-number">0</span>) ap[a[i]/j].<span class="hljs-built_in">emplace_back</span>(i);
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i!=n;++i)
+		cin&gt;&gt;l&gt;&gt;r,
+		son[l].<span class="hljs-built_in">emplace_back</span>(r),
+		son[r].<span class="hljs-built_in">emplace_back</span>(l);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1e5</span>;i&gt;=<span class="hljs-number">1</span>;i--) <span class="hljs-keyword">if</span>(ap[i].<span class="hljs-built_in">size</span>()){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p:ap[i]) cs[p]=<span class="hljs-number">1</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p:ap[i]) <span class="hljs-keyword">if</span>(cs[p]) <span class="hljs-built_in">dfs</span>(p,i);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v=i*<span class="hljs-number">2</span>;v&lt;=<span class="hljs-number">1e5</span>;v+=i) <span class="hljs-built_in">mad</span>(ans[i],mod-ans[v]);
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-number">1e5</span>;++i) ret=(ret+i*ans[i])%mod;
+	cout&lt;&lt;ret&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+<p>注：上面时间复杂度中的 $\sigma_0$ 实际上表示的是 $1\sim n$ 中的所有数字的因数个数的最大值，在 $10^5$ 范围内只有大约 $130$，不大。</p>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

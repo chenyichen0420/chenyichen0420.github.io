@@ -425,6 +425,8 @@
 <p><a href="#%E7%AC%9B%E5%8D%A1%E5%B0%94%E6%A0%91">笛卡尔树</a></p>
 <p><a href="#%E6%A0%91%E5%A5%97%E6%A0%91">树套树</a></p>
 <p><a href="#%E7%BA%BF%E6%AE%B5%E6%A0%91%E5%88%86%E6%B2%BB">线段树分治</a></p>
+<p>线段树递归合并</p>
+<p>单调队列与按秩合并</p>
 <p><a href="#%E9%87%8D%E9%93%BE%E5%89%96%E5%88%86">重链剖分</a></p>
 <p><a href="#%E9%95%BF%E9%93%BE%E5%89%96%E5%88%86">长链剖分</a></p>
 <p><a href="#%E5%B9%B3%E8%A1%A1%E6%A0%91">平衡树</a></p>
@@ -606,6 +608,8 @@
 <p><a href="#%E5%92%8C%E7%A7%AF%E4%BA%92%E5%8C%96">和积互化</a></p>
 <p><a href="#%E5%8C%96gcd">化gcd</a></p>
 <p><a href="#%E5%8F%96min%E5%8D%B7%E7%A7%AF%E8%BD%AC%E6%99%AE%E9%80%9A%E5%8D%B7%E7%A7%AF">取min卷积转普通卷积</a></p>
+<p><a href="#%E6%8B%BC%E7%8A%B6%E6%80%81dp">拼状态dp</a></p>
+<p><a href="#%E5%8F%8D%E5%90%91dp">反向DP</a></p>
 </blockquote>
 </blockquote>
 <h3 id="注">注：</h3>
@@ -7289,6 +7293,8 @@ signed main() {
 </code></pre>
 </div>
 </div>
+<h2 id="线段树递归合并">线段树递归合并</h2>
+<p>对于部分的题目，一个区间内的答案可能依赖后面的整个区间而不只是这个区间本身。这时候，如果后面的区间的影响是不可忽略的，那么就需要线段树递归合并来尝试救场了。参见<a href="https://www.luogu.com.cn/problem/P4425">例题</a>。</p>
 <h2 id="重链剖分">重链剖分</h2>
 <p>重链剖分是树链剖分中最强大也最常用的一种。重链剖分是这样的：</p>
 <p>对于每一个节点，我们选出他的一个儿子，满足以这个儿子为根的子树大小不比别的子节点小。我们称这个儿子为重儿子。其他的我们称为轻儿子。连接重儿子和父节点的边称为重边，其余的称为轻边。这时候，一个极长的只由重边构成的链称为重链。显然一棵树会被剖分成许多的重链。</p>
@@ -16522,6 +16528,655 @@ vector&lt;<span class="hljs-type">int</span>&gt;cp[<span class="hljs-number">100
 	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=<span class="hljs-number">262144</span>;++i) <span class="hljs-keyword">if</span>(v[i]/<span class="hljs-number">2</span>&gt;v[mp]/<span class="hljs-number">2</span>) mp=i;
 	cout&lt;&lt;v[mp]/<span class="hljs-number">2</span>&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;mp&lt;&lt;endl;
 }
+</code></pre>
+</div>
+</div>
+<h2 id="拼状态dp">拼状态DP</h2>
+<p>指的是在一些 DP 题中，可能不同的状态非常的多，但是这些状态的值具有一些性质，使得我们可以通过比原来更少的值就把实际上参与转移的所有状态的值给变相的记录了出来。参见例题<a href="https://www.luogu.com.cn/problem/P4262">1</a>和<a href="https://www.luogu.com.cn/problem/CF2204G">2</a>。</p>
+<p>先看第一道题吧，读完题不难想到一个非常简单的暴力：枚举在哪一个点，直接跑轮廓线 DP，时间复杂度 $O(n^2m^22^{n+1})$，过不了。</p>
+<p>我们思考为什么这个做法不优：我们注意到每一次运行轮廓线DP的时候，除了发生更改的那个点以外，别的地方的转移实际上完全没有任何变化，也就是说我们有非常多的本质相同的转移，被反反复复做了 $nm$ 次，我们是否可以将这些砍掉呢？</p>
+<p>于是我们将尽可能多的状态给重复利用起来，每一个点可以分成这个点前面的和这个点后面的，二者互不干扰，于是我们先正反方向各进行一次轮廓线 DP，然后枚举临时障碍格的位置，显然最后的状态就是障碍格前的部分与后的部分拼起来得到的：只要两个状态的插头成功对上了。</p>
+<p>代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod=1e9+7;
+int n,m,a[17][17],ans[17][17],o;
+int dp1[17][17][1ll&lt;&lt;18],dp[2][1ll&lt;&lt;18];
+inline void mad(int&amp;l,const int r){ (l+=r)&gt;=mod&amp;&amp;(l-=mod); }
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m;
+	for(int i=0;i!=n;++i)
+		for(int j=0;j!=m;++j)
+			cin&gt;&gt;a[i][j];
+	dp[0][0]=1;
+	for(int i=0;i!=n;++i){
+		o^=1; memset(dp[o],0,sizeof dp[0]);
+		for(int j=0;j!=1ll&lt;&lt;m;++j) dp[o][j&lt;&lt;1]=dp[o^1][j];
+		for(int p=0;p!=m;++p){
+			o^=1; memset(dp[o],0,sizeof dp[0]);
+			if(a[i][p])
+				for(int j=0;j!=1ll&lt;&lt;m+1;++j){
+					int p1=j&gt;&gt;p&amp;1,p2=j&gt;&gt;p+1&amp;1;
+					if(!p1&amp;&amp;!p2) dp[o][j]=dp[o^1][j];
+				}
+			else
+				for(int j=0;j!=1ll&lt;&lt;m+1;++j){
+					int p1=j&gt;&gt;p&amp;1,p2=j&gt;&gt;p+1&amp;1;
+					if(!p1&amp;&amp;!p2){
+						mad(dp[o][j],dp[o^1][j]);
+						mad(dp[o][j^1ll&lt;&lt;p],dp[o^1][j]);
+						mad(dp[o][j^1ll&lt;&lt;p+1],dp[o^1][j]);
+					}
+					else if(p1&amp;&amp;p2);
+					else if(p1) mad(dp[o][j^1ll&lt;&lt;p],dp[o^1][j]);
+					else if(p2) mad(dp[o][j^1ll&lt;&lt;p+1],dp[o^1][j]);
+				}
+			memcpy(dp1[i][p],dp[o],sizeof dp[0]);
+		}
+	}
+	memset(dp,0,sizeof dp); dp[0][0]=1; o=0;
+	for(int i=n-1;i&gt;=0;i--){
+		o^=1; memset(dp[o],0,sizeof dp[0]);
+		for(int j=0;j!=1ll&lt;&lt;m;++j) dp[o][j]=dp[o^1][j&lt;&lt;1];
+		for(int p=m-1;p&gt;=0;--p){
+			if(!a[i][p])
+				if(p)
+					for(int j=0;j!=1ll&lt;&lt;m+1;++j){
+						if(!dp[o][j]) continue;
+						int p1=j&gt;&gt;p&amp;1,p2=j&gt;&gt;p+1&amp;1;
+						if(!p1&amp;&amp;!p2) ans[i][p]=(ans[i][p]+dp[o][j]*dp1[i][p-1][j])%mod;
+					}
+				else if(i)
+					for(int j=0;j!=1ll&lt;&lt;m+1;++j){
+						if(!dp[o][j]) continue;
+						int p1=j&gt;&gt;p&amp;1,p2=j&gt;&gt;p+1&amp;1;
+						if(!p1&amp;&amp;!p2) ans[i][p]=(ans[i][p]+dp[o][j]*dp1[i-1][m-1][j&gt;&gt;1])%mod;
+					}
+				else ans[i][p]=dp[o][0];
+			o^=1; memset(dp[o],0,sizeof dp[0]);
+			if(a[i][p])
+				for(int j=0;j!=1ll&lt;&lt;m+1;++j){
+					if(!dp[o^1][j]) continue;
+					int p1=j&gt;&gt;p&amp;1,p2=j&gt;&gt;p+1&amp;1;
+					if(!p1&amp;&amp;!p2) dp[o][j]=dp[o^1][j];
+				}
+			else
+				for(int j=0;j!=1ll&lt;&lt;m+1;++j){
+					if(!dp[o^1][j]) continue;
+					int p1=j&gt;&gt;p&amp;1,p2=j&gt;&gt;p+1&amp;1;
+					if(!p1&amp;&amp;!p2){
+						mad(dp[o][j],dp[o^1][j]);
+						mad(dp[o][j^1ll&lt;&lt;p],dp[o^1][j]);
+						mad(dp[o][j^1ll&lt;&lt;p+1],dp[o^1][j]);
+					}
+					else if(p1&amp;&amp;p2);
+					else if(p1) mad(dp[o][j^1ll&lt;&lt;p],dp[o^1][j]);
+					else if(p2) mad(dp[o][j^1ll&lt;&lt;p+1],dp[o^1][j]);
+				}
+		}
+	}
+	for(int i=0;i!=n;++i,cout&lt;&lt;endl)
+		for(int j=0;j!=m;++j)
+			cout&lt;&lt;ans[i][j]&lt;&lt;&quot; &quot;;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">1e9</span><span class="hljs-number">+7</span>;
+<span class="hljs-type">int</span> n,m,a[<span class="hljs-number">17</span>][<span class="hljs-number">17</span>],ans[<span class="hljs-number">17</span>][<span class="hljs-number">17</span>],o;
+<span class="hljs-type">int</span> dp1[<span class="hljs-number">17</span>][<span class="hljs-number">17</span>][<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">18</span>],dp[<span class="hljs-number">2</span>][<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">18</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp;l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{ (l+=r)&gt;=mod&amp;&amp;(l-=mod); }
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=m;++j)
+			cin&gt;&gt;a[i][j];
+	dp[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i){
+		o^=<span class="hljs-number">1</span>; <span class="hljs-built_in">memset</span>(dp[o],<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">1ll</span>&lt;&lt;m;++j) dp[o][j&lt;&lt;<span class="hljs-number">1</span>]=dp[o^<span class="hljs-number">1</span>][j];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p=<span class="hljs-number">0</span>;p!=m;++p){
+			o^=<span class="hljs-number">1</span>; <span class="hljs-built_in">memset</span>(dp[o],<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+			<span class="hljs-keyword">if</span>(a[i][p])
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">1ll</span>&lt;&lt;m<span class="hljs-number">+1</span>;++j){
+					<span class="hljs-type">int</span> p1=j&gt;&gt;p&amp;<span class="hljs-number">1</span>,p2=j&gt;&gt;p<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>;
+					<span class="hljs-keyword">if</span>(!p1&amp;&amp;!p2) dp[o][j]=dp[o^<span class="hljs-number">1</span>][j];
+				}
+			<span class="hljs-keyword">else</span>
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">1ll</span>&lt;&lt;m<span class="hljs-number">+1</span>;++j){
+					<span class="hljs-type">int</span> p1=j&gt;&gt;p&amp;<span class="hljs-number">1</span>,p2=j&gt;&gt;p<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>;
+					<span class="hljs-keyword">if</span>(!p1&amp;&amp;!p2){
+						<span class="hljs-built_in">mad</span>(dp[o][j],dp[o^<span class="hljs-number">1</span>][j]);
+						<span class="hljs-built_in">mad</span>(dp[o][j^<span class="hljs-number">1ll</span>&lt;&lt;p],dp[o^<span class="hljs-number">1</span>][j]);
+						<span class="hljs-built_in">mad</span>(dp[o][j^<span class="hljs-number">1ll</span>&lt;&lt;p<span class="hljs-number">+1</span>],dp[o^<span class="hljs-number">1</span>][j]);
+					}
+					<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(p1&amp;&amp;p2);
+					<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(p1) <span class="hljs-built_in">mad</span>(dp[o][j^<span class="hljs-number">1ll</span>&lt;&lt;p],dp[o^<span class="hljs-number">1</span>][j]);
+					<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(p2) <span class="hljs-built_in">mad</span>(dp[o][j^<span class="hljs-number">1ll</span>&lt;&lt;p<span class="hljs-number">+1</span>],dp[o^<span class="hljs-number">1</span>][j]);
+				}
+			<span class="hljs-built_in">memcpy</span>(dp1[i][p],dp[o],<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+		}
+	}
+	<span class="hljs-built_in">memset</span>(dp,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp); dp[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>; o=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n<span class="hljs-number">-1</span>;i&gt;=<span class="hljs-number">0</span>;i--){
+		o^=<span class="hljs-number">1</span>; <span class="hljs-built_in">memset</span>(dp[o],<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">1ll</span>&lt;&lt;m;++j) dp[o][j]=dp[o^<span class="hljs-number">1</span>][j&lt;&lt;<span class="hljs-number">1</span>];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p=m<span class="hljs-number">-1</span>;p&gt;=<span class="hljs-number">0</span>;--p){
+			<span class="hljs-keyword">if</span>(!a[i][p])
+				<span class="hljs-keyword">if</span>(p)
+					<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">1ll</span>&lt;&lt;m<span class="hljs-number">+1</span>;++j){
+						<span class="hljs-keyword">if</span>(!dp[o][j]) <span class="hljs-keyword">continue</span>;
+						<span class="hljs-type">int</span> p1=j&gt;&gt;p&amp;<span class="hljs-number">1</span>,p2=j&gt;&gt;p<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>;
+						<span class="hljs-keyword">if</span>(!p1&amp;&amp;!p2) ans[i][p]=(ans[i][p]+dp[o][j]*dp1[i][p<span class="hljs-number">-1</span>][j])%mod;
+					}
+				<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(i)
+					<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">1ll</span>&lt;&lt;m<span class="hljs-number">+1</span>;++j){
+						<span class="hljs-keyword">if</span>(!dp[o][j]) <span class="hljs-keyword">continue</span>;
+						<span class="hljs-type">int</span> p1=j&gt;&gt;p&amp;<span class="hljs-number">1</span>,p2=j&gt;&gt;p<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>;
+						<span class="hljs-keyword">if</span>(!p1&amp;&amp;!p2) ans[i][p]=(ans[i][p]+dp[o][j]*dp1[i<span class="hljs-number">-1</span>][m<span class="hljs-number">-1</span>][j&gt;&gt;<span class="hljs-number">1</span>])%mod;
+					}
+				<span class="hljs-keyword">else</span> ans[i][p]=dp[o][<span class="hljs-number">0</span>];
+			o^=<span class="hljs-number">1</span>; <span class="hljs-built_in">memset</span>(dp[o],<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+			<span class="hljs-keyword">if</span>(a[i][p])
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">1ll</span>&lt;&lt;m<span class="hljs-number">+1</span>;++j){
+					<span class="hljs-keyword">if</span>(!dp[o^<span class="hljs-number">1</span>][j]) <span class="hljs-keyword">continue</span>;
+					<span class="hljs-type">int</span> p1=j&gt;&gt;p&amp;<span class="hljs-number">1</span>,p2=j&gt;&gt;p<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>;
+					<span class="hljs-keyword">if</span>(!p1&amp;&amp;!p2) dp[o][j]=dp[o^<span class="hljs-number">1</span>][j];
+				}
+			<span class="hljs-keyword">else</span>
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">1ll</span>&lt;&lt;m<span class="hljs-number">+1</span>;++j){
+					<span class="hljs-keyword">if</span>(!dp[o^<span class="hljs-number">1</span>][j]) <span class="hljs-keyword">continue</span>;
+					<span class="hljs-type">int</span> p1=j&gt;&gt;p&amp;<span class="hljs-number">1</span>,p2=j&gt;&gt;p<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>;
+					<span class="hljs-keyword">if</span>(!p1&amp;&amp;!p2){
+						<span class="hljs-built_in">mad</span>(dp[o][j],dp[o^<span class="hljs-number">1</span>][j]);
+						<span class="hljs-built_in">mad</span>(dp[o][j^<span class="hljs-number">1ll</span>&lt;&lt;p],dp[o^<span class="hljs-number">1</span>][j]);
+						<span class="hljs-built_in">mad</span>(dp[o][j^<span class="hljs-number">1ll</span>&lt;&lt;p<span class="hljs-number">+1</span>],dp[o^<span class="hljs-number">1</span>][j]);
+					}
+					<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(p1&amp;&amp;p2);
+					<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(p1) <span class="hljs-built_in">mad</span>(dp[o][j^<span class="hljs-number">1ll</span>&lt;&lt;p],dp[o^<span class="hljs-number">1</span>][j]);
+					<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(p2) <span class="hljs-built_in">mad</span>(dp[o][j^<span class="hljs-number">1ll</span>&lt;&lt;p<span class="hljs-number">+1</span>],dp[o^<span class="hljs-number">1</span>][j]);
+				}
+		}
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i,cout&lt;&lt;endl)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=m;++j)
+			cout&lt;&lt;ans[i][j]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+<p>有了一点感觉吗？再看一下第二道题，这道题就不太能用上一道题的套路了。</p>
+<p>首先我直接给一个等价的题意：每一行都可以选一个连续的区间，但是要保证第一行的左端点是 $1$，而且相邻两行的区间有交集。</p>
+<p>考虑直接暴力模拟上述过程的话时间复杂度是 $O(nm^4)$ 的，差得多，而且看起来非常的没有前途。</p>
+<p>我们这样考虑：不满足要求的区间就是不相交的区间，我们直接找出这样的区间对，然后把他们的贡献再给减掉就行了，在这道题的数据范围下，这样的区间对数大概就是 $2\times10^6$，看起来还是没有前途。</p>
+<p>我们进一步考虑：我们能不能将右端点不超过每一个位置的区间的方案数之和，以及左端点不超过某一个位置的区间的方案数之和给维护出来？</p>
+<p>这看起来是非常有道理的，实际上我们需要干的就是统计出上一层所有区间的方案数之和，以及上面所说的那两类情况的和，然后直接暴力枚举区间进行转移就行了。</p>
+<p>因为区间可以 $O(1)$ 转移，每一类数值都可以 $O(m)\times O(m)=O(m^2)$ 的转移，因此时间复杂度降到 $O(nm^2)$，并且看起来非常的有前途。</p>
+<p>我们把总数，前后缀的数值这总共 $2m+1$ 个数字视为状态，求出转移系数，写出转移矩阵，直接转移就行了，时间复杂度 $O(m^3\log n)$，足以通过此题。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int n,m,mod,trc[301][301][301];
+struct mat{
+	int v[301][301];
+	inline mat operator*(const mat&amp;r)const{
+		static mat ret;
+		static __int128 tmp[301][301];
+		memset(tmp,0,sizeof tmp);
+		for(int i=0;i&lt;=2*m;++i)
+			for(int j=0;j&lt;=2*m;++j)
+				for(int k=0;k&lt;=2*m;++k)
+					tmp[i][k]+=v[i][j]*r.v[j][k];
+		for(int i=0;i&lt;=2*m;++i)
+			for(int j=0;j&lt;=2*m;++j)
+				ret.v[i][j]=tmp[i][j]%mod;
+		return ret;
+	}
+}ans,tmp;
+inline void mad(int&amp;l,const int r){(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m&gt;&gt;mod;
+	time_t st=clock();
+	for(int i=1;i&lt;=m;++i)
+		for(int j=i;j&lt;=m;++j){
+			trc[i][j][1]=1;
+			if(j!=m)trc[i][j][j+1]=-1;
+			if(i!=1)trc[i][j][m+i-1]=-1;
+		}
+	for(int l=m;l&gt;=1;l--){
+		if(l!=m)memcpy(tmp.v[l],tmp.v[l+1],sizeof tmp.v[0]);
+		for(int r=l;r&lt;=m;++r)
+			for(int p=0;p&lt;=m*2;++p)
+				mad(tmp.v[l][p],trc[l][r][p]);
+	}
+	memcpy(tmp.v[0],tmp.v[1],sizeof tmp.v[1]);
+	for(int r=1;r&lt;=m;++r){
+		if(r!=1) memcpy(tmp.v[r+m],tmp.v[r+m-1],sizeof tmp.v[0]);
+		for(int l=1;l&lt;=r;++l)
+			for(int p=0;p&lt;=2*m;++p)
+				mad(tmp.v[r+m][p],trc[l][r][p]);
+	}
+	tmp.v[0][0]=ans.v[0][1]=1;
+	for(int r=1;r&lt;=m;++r) ans.v[0][m+r]=1;
+	for(int i=0;i&lt;=2*m;++i)
+		for(int j=0;j!=i;++j)
+			swap(tmp.v[i][j],tmp.v[j][i]);
+	for(;n;n&gt;&gt;=1,tmp=tmp*tmp) if(n&amp;1) ans=ans*tmp;
+	cout&lt;&lt;(ans.v[0][0]+mod)%mod&lt;&lt;endl;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-type">int</span> n,m,mod,trc[<span class="hljs-number">301</span>][<span class="hljs-number">301</span>][<span class="hljs-number">301</span>];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">mat</span>{
+	<span class="hljs-type">int</span> v[<span class="hljs-number">301</span>][<span class="hljs-number">301</span>];
+	<span class="hljs-keyword">inline</span> mat <span class="hljs-keyword">operator</span>*(<span class="hljs-type">const</span> mat&amp;r)<span class="hljs-type">const</span>{
+		<span class="hljs-type">static</span> mat ret;
+		<span class="hljs-type">static</span> __int128 tmp[<span class="hljs-number">301</span>][<span class="hljs-number">301</span>];
+		<span class="hljs-built_in">memset</span>(tmp,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> tmp);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=<span class="hljs-number">2</span>*m;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=<span class="hljs-number">2</span>*m;++j)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k&lt;=<span class="hljs-number">2</span>*m;++k)
+					tmp[i][k]+=v[i][j]*r.v[j][k];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=<span class="hljs-number">2</span>*m;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=<span class="hljs-number">2</span>*m;++j)
+				ret.v[i][j]=tmp[i][j]%mod;
+		<span class="hljs-keyword">return</span> ret;
+	}
+}ans,tmp;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp;l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m&gt;&gt;mod;
+	<span class="hljs-type">time_t</span> st=<span class="hljs-built_in">clock</span>();
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=m;++i)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=i;j&lt;=m;++j){
+			trc[i][j][<span class="hljs-number">1</span>]=<span class="hljs-number">1</span>;
+			<span class="hljs-keyword">if</span>(j!=m)trc[i][j][j<span class="hljs-number">+1</span>]=<span class="hljs-number">-1</span>;
+			<span class="hljs-keyword">if</span>(i!=<span class="hljs-number">1</span>)trc[i][j][m+i<span class="hljs-number">-1</span>]=<span class="hljs-number">-1</span>;
+		}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> l=m;l&gt;=<span class="hljs-number">1</span>;l--){
+		<span class="hljs-keyword">if</span>(l!=m)<span class="hljs-built_in">memcpy</span>(tmp.v[l],tmp.v[l<span class="hljs-number">+1</span>],<span class="hljs-keyword">sizeof</span> tmp.v[<span class="hljs-number">0</span>]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> r=l;r&lt;=m;++r)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p=<span class="hljs-number">0</span>;p&lt;=m*<span class="hljs-number">2</span>;++p)
+				<span class="hljs-built_in">mad</span>(tmp.v[l][p],trc[l][r][p]);
+	}
+	<span class="hljs-built_in">memcpy</span>(tmp.v[<span class="hljs-number">0</span>],tmp.v[<span class="hljs-number">1</span>],<span class="hljs-keyword">sizeof</span> tmp.v[<span class="hljs-number">1</span>]);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> r=<span class="hljs-number">1</span>;r&lt;=m;++r){
+		<span class="hljs-keyword">if</span>(r!=<span class="hljs-number">1</span>) <span class="hljs-built_in">memcpy</span>(tmp.v[r+m],tmp.v[r+m<span class="hljs-number">-1</span>],<span class="hljs-keyword">sizeof</span> tmp.v[<span class="hljs-number">0</span>]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> l=<span class="hljs-number">1</span>;l&lt;=r;++l)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p=<span class="hljs-number">0</span>;p&lt;=<span class="hljs-number">2</span>*m;++p)
+				<span class="hljs-built_in">mad</span>(tmp.v[r+m][p],trc[l][r][p]);
+	}
+	tmp.v[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=ans.v[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> r=<span class="hljs-number">1</span>;r&lt;=m;++r) ans.v[<span class="hljs-number">0</span>][m+r]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=<span class="hljs-number">2</span>*m;++i)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=i;++j)
+			<span class="hljs-built_in">swap</span>(tmp.v[i][j],tmp.v[j][i]);
+	<span class="hljs-keyword">for</span>(;n;n&gt;&gt;=<span class="hljs-number">1</span>,tmp=tmp*tmp) <span class="hljs-keyword">if</span>(n&amp;<span class="hljs-number">1</span>) ans=ans*tmp;
+	cout&lt;&lt;(ans.v[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]+mod)%mod&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+<p>总的来说，我提供了两种拼 DP 状态的大方向，一种是对于 DP 之外的，逻辑连续的多组询问，我们可以尝试求出他们的前后缀的答案，然后将状态对应的部分拼起来得到答案；另一种是对于 DP 之内的，这些状态的值具有一些性质，使得我们可以通过比原来更少的值就把实际上参与转移的所有状态的值给变相的记录出来。</p>
+<h2 id="反向dp">反向DP</h2>
+<p>字面意思，我们正常情况下会设计出一个“正向的”DP 转移，但是我们有可能可以通过反着方向来做这个东西，削减无效信息，从而优化时间复杂度。参见例题<a href="https://www.luogu.com.cn/problem/P6383">1</a>和<a href="https://www.luogu.com.cn/problem/CF2101E">2</a>。</p>
+<p>对于第一题，我们需要观察到一个关键的性质：一个节点连接到的点不会介于他的父亲和他的父亲连接到的点之间。</p>
+<p>我们可以断言这应该是一道树形 DP 的题目。我们思考常见的树形 DP 的套路与其本质的思维模式：从底向上进行 DP，将所有的子树内的限制处理好，留给父节点一些信息。</p>
+<p>可是显然，在这道题中，更大的限制是来自父节点而非子结点的：我们的要求全部都是子结点不能跨到父节点的区间内部！</p>
+<p>那我是不是也应该转变一下思维，考虑从上到下的去考虑这件事情呢？</p>
+<p>我们思考状态 $dp_{i,j}$ 表示在 $i$ 这个节点，我的父节点给我空出来了 $j$ 个位置，此时整颗子树的方案数。注意我们现在在从上向下思考，因此我们应该乐观的假定父节点为我留了足够的位置，而我只需要筛选出子结点中确实让我满足了限制的状态最后转移到我就可以了。</p>
+<p>那么显然，对于一个状态 $dp_{i,j}$ 来说，他的满足要求的子结点就是认为给他们留了不超过 $j+1$ 个位置的点。具体转移是这样的：</p>
+<p>我们枚举当前这个节点实际上占了多少个位置，可以从 $0$ 到 $j$，假设我占了 $k$ 个位置，那么考虑到我和子结点之间其实还有一条边，那么我给子结点留的位置实际上是 $j-k+1$ 个。</p>
+<p>也就是说，最终 $dp_{i,j}=\sum_{k=0}^j\prod_{son}dp_{son,j-k+1}$。显然边界条件就是对于一个叶子节点 $i,dp_{i,j}=j$。</p>
+<p>直接暴力做就是 $O(n^3)$，优化一下，注意到 $k$ 的枚举范围随着 $j$ 的变化不大，实际上我们可以复用一下，或者稍微推一推，得到 $dp_{i,j}=dp_{i,j-1}+\prod_{son}dp_{son,j+1}$，然后时间复杂度就是 $O(n^2)$ 的了。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod=998244353;
+int n,dp[3005][3005],ans=1; vector&lt;int&gt;son[3005];
+inline void dfs(int p,int f){
+	if(son[p].size()==1&amp;&amp;f){
+		for(int i=1;i&lt;=n;++i) dp[p][i]=i;
+		return;
+	}
+	for(int sp:son[p]) if(sp!=f) dfs(sp,p);
+	for(int i=1;i&lt;=n;++i){
+		int add=1;
+		for(int sp:son[p]) if(sp!=f)
+			add=add*dp[sp][i+1]%mod;
+		dp[p][i]=(dp[p][i-1]+add)%mod;
+	}
+}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n;
+	if(n==1) return puts(&quot;1&quot;),0;
+	for(int i=1,l,r;i!=n;++i)
+		cin&gt;&gt;l&gt;&gt;r,
+		son[l].emplace_back(r),
+		son[r].emplace_back(l);
+	dfs(n,0);
+	for(int sp:son[n]) ans=ans*dp[sp][1]%mod;
+	cout&lt;&lt;ans&lt;&lt;endl;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>;
+<span class="hljs-type">int</span> n,dp[<span class="hljs-number">3005</span>][<span class="hljs-number">3005</span>],ans=<span class="hljs-number">1</span>; vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">3005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f)</span></span>{
+	<span class="hljs-keyword">if</span>(son[p].<span class="hljs-built_in">size</span>()==<span class="hljs-number">1</span>&amp;&amp;f){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) dp[p][i]=i;
+		<span class="hljs-keyword">return</span>;
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(sp!=f) <span class="hljs-built_in">dfs</span>(sp,p);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+		<span class="hljs-type">int</span> add=<span class="hljs-number">1</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(sp!=f)
+			add=add*dp[sp][i<span class="hljs-number">+1</span>]%mod;
+		dp[p][i]=(dp[p][i<span class="hljs-number">-1</span>]+add)%mod;
+	}
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
+	<span class="hljs-keyword">if</span>(n==<span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;1&quot;</span>),<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i!=n;++i)
+		cin&gt;&gt;l&gt;&gt;r,
+		son[l].<span class="hljs-built_in">emplace_back</span>(r),
+		son[r].<span class="hljs-built_in">emplace_back</span>(l);
+	<span class="hljs-built_in">dfs</span>(n,<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[n]) ans=ans*dp[sp][<span class="hljs-number">1</span>]%mod;
+	cout&lt;&lt;ans&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+<p>对于第二题，我们很容易想到一个 $dp_{i,j,k}$ 表示 $i$ 到 $j$ 的长度为 $k$ 的链的最后一条边的最小长度。但是我们明显感觉这个状态不是很优秀。</p>
+<p>为什么？我们发现对于一条合法的行动链，其“尾部”是自由的，但是他的头部是“锁死的”，然而这个锁死的头部却需要我们花费一维状态给他在那里供奉着，属实浪费。</p>
+<p>于是我们考虑优化掉这个头部。不难想到，既然尾部是自由的，那我们将整个过程倒过来，从尾巴开始，设计 $dp_{i,j}$ 表示到 $i$ 的长度为 $j$ 的链的最后一条边的最大长度，感觉是非常合理的。</p>
+<p>至少目前来说，时间复杂度已经降到了 $O(n^2)$，剩下的就和这个技巧没有太大的关系了，所以简单提一下就是了：</p>
+<p>首先不难发现总的轮数是 $O(\log n)$ 的，因为每一轮要求长度砍半，而树上的距离不超过 $n-1$。</p>
+<p>我们注意到这是一个树上路径类的转移问题，于是我们使用点分治优化这个过程，具体来说，我们对于重心 $p$，要求转移路径经过 $p$，于是之前一个 $dp_{i,j}$ 经过 $p$ 之后可以覆盖到和 $p$ 的距离不超过 $\frac{dp_{i,j}}{2}-dis(i,p)$ 的所有点 $j$，贡献是 $dis(i,p)+dis(p,j)$，不过自己子树的不行。</p>
+<p>于是我们直接使用树状数组大力优化这个过程即可，显然时间复杂度是 $\log$ 轮 $\log$ 层的树状数组 $\log$，也就是 $O(n\log^3 n)$。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+#include&lt;unistd.h&gt;
+using namespace std;
+#pragma GCC optimize(3,&quot;Ofast&quot;)
+#pragma GCC optimize(&quot;unroll-loops&quot;)
+#pragma GCC optimize(&quot;omit-frame-pointer&quot;)
+#pragma GCC optimize(&quot;no-stack-protector&quot;)
+int t,n,v[70005],ans[70005],vn[70005],lim; char c[70005];
+vector&lt;int&gt;son[70005]; bool vis[70005];
+inline __attribute__((always_inline)) void tmax(int&amp;l,const int r){(l&lt;r)&amp;&amp;(l=r);}
+struct tree_array{
+	int c[70005];
+	inline void ins(int p,int v){
+		for(p=lim-p;p&lt;=lim;p+=p&amp;-p) tmax(c[p],v);
+	}
+	inline void rst(int p){
+		for(p=lim-p;p&lt;=lim;p+=p&amp;-p) c[p]=-1e8;
+	}
+	inline int que(int p){
+		int ret=-1e8;
+		for(p=lim-p;p;p&amp;=p-1) tmax(ret,c[p]);
+		return ret;
+	} 
+}ta;
+int sz[70005],hs,pup; vector&lt;int&gt;hss;
+inline void dfs(int p,int f,int ts){
+	sz[p]=1; int ms=0;
+	for(int sp:son[p]) if(sp!=f&amp;&amp;!vis[sp])
+		dfs(sp,p,ts),sz[p]+=sz[sp],
+		(sz[sp]&gt;ms)&amp;&amp;(ms=sz[sp]);
+	tmax(ms,ts-sz[p]);
+	if(ms&lt;=ts/2) hs=p;
+	tmax(lim,v[p]/2+1);
+}
+inline void ins(int p,int f,int d){
+	if(v[p]/2&gt;=d) ta.ins(v[p]/2-d,d),tmax(pup,d);
+	for(int sp:son[p])
+		if(!vis[sp]&amp;&amp;sp!=f) ins(sp,p,d+1);
+}
+inline void que(int p,int f,int d){
+	if(d&lt;lim)tmax(vn[p],ta.que(d)+d);
+	for(int sp:son[p])
+		if(!vis[sp]&amp;&amp;sp!=f) que(sp,p,d+1);
+}
+inline void rst(int p,int f,int d){
+	if(v[p]/2&gt;=d) ta.rst(v[p]/2-d);
+	for(int sp:son[p])
+		if(!vis[sp]&amp;&amp;sp!=f) rst(sp,p,d+1);
+}
+inline void solve(int p,int ts){
+	dfs(p,0,ts); hss.emplace_back(hs);
+	vis[p=hs]=1;
+	lim=0; dfs(p,0,ts); pup=0;
+	ta.ins(v[p]/2,0);
+	for(int sp:son[p]) if(!vis[sp])
+		que(sp,0,1),ins(sp,0,1);
+	for(int sp:son[p]) if(!vis[sp])
+		rst(sp,0,1);
+	ta.rst(v[p]/2);
+	reverse(son[p].begin(),son[p].end());
+	ta.ins(v[p]/2,0);
+	for(int sp:son[p]) if(!vis[sp])
+		que(sp,0,1),ins(sp,0,1);
+	for(int sp:son[p]) if(!vis[sp])
+		rst(sp,0,1);
+	ta.rst(v[p]/2);
+	tmax(vn[p],pup);
+	reverse(son[p].begin(),son[p].end());
+	for(int sp:son[p]) if(!vis[sp])
+		solve(sp,sz[sp]);
+}
+inline void fsolve(int p,int ts,int&amp; id){
+	hs=hss[id]; vis[p=hs]=1;
+	lim=0; dfs(p,0,ts); pup=0;
+	ta.ins(v[p]/2,0);
+	for(int sp:son[p]) if(!vis[sp])
+		que(sp,0,1),ins(sp,0,1);
+	for(int sp:son[p]) if(!vis[sp])
+		rst(sp,0,1);
+	reverse(son[p].begin(),son[p].end());
+	ta.ins(v[p]/2,0);
+	for(int sp:son[p]) if(!vis[sp])
+		que(sp,0,1),ins(sp,0,1);
+	for(int sp:son[p]) if(!vis[sp])
+		rst(sp,0,1);
+	ta.rst(v[p]/2);
+	tmax(vn[p],pup);
+	reverse(son[p].begin(),son[p].end());
+	for(int sp:son[p]) if(!vis[sp])
+		++id,fsolve(sp,sz[sp],id);
+}
+signed main(){
+	ios::sync_with_stdio(0);
+	cin.tie(0); cout.tie(0);
+	for(cin&gt;&gt;t;t;t--){
+		for(int i=1;i&lt;=n;++i) son[i].clear();
+		cin&gt;&gt;n&gt;&gt;c; memmove(c+1,c,n); bool hs=0;
+		for(int i=1,l,r;i!=n;++i)
+			cin&gt;&gt;l&gt;&gt;r,
+			son[l].emplace_back(r),
+			son[r].emplace_back(l);
+		for(int i=1;i&lt;=n;++i)
+			if(c[i]^48) v[i]=2*(n-1),ans[i]=0,hs=1;
+			else ans[i]=-1,v[i]=0;
+		memset(ta.c,0xcf,sizeof ta.c); hss.clear();
+		for(int i=1;hs;++i){
+			memset(vis,0,sizeof vis);
+			memset(vn,0,sizeof vn);
+			hs=0; int cid=0;
+			if(hss.empty())solve(1,n);
+			else fsolve(1,n,cid);
+			for(int j=1;j&lt;=n;++j)
+				if(c[j]=='0') continue;
+				else if(v[j]=vn[j]) hs=1;
+				else if(!ans[j]) ans[j]=i;
+		}
+		for(int i=1;i&lt;=n;++i) cout&lt;&lt;ans[i]&lt;&lt;&quot; &quot;; cout&lt;&lt;endl;
+	}
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;unistd.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> GCC optimize(3,<span class="hljs-string">&quot;Ofast&quot;</span>)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> GCC optimize(<span class="hljs-string">&quot;unroll-loops&quot;</span>)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> GCC optimize(<span class="hljs-string">&quot;omit-frame-pointer&quot;</span>)</span>
+<span class="hljs-meta">#<span class="hljs-keyword">pragma</span> GCC optimize(<span class="hljs-string">&quot;no-stack-protector&quot;</span>)</span>
+<span class="hljs-type">int</span> t,n,v[<span class="hljs-number">70005</span>],ans[<span class="hljs-number">70005</span>],vn[<span class="hljs-number">70005</span>],lim; <span class="hljs-type">char</span> c[<span class="hljs-number">70005</span>];
+vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">70005</span>]; <span class="hljs-type">bool</span> vis[<span class="hljs-number">70005</span>];
+<span class="hljs-keyword">inline</span> __attribute__((always_inline)) <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">tmax</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp;l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l&lt;r)&amp;&amp;(l=r);}
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">tree_array</span>{
+	<span class="hljs-type">int</span> c[<span class="hljs-number">70005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> v)</span></span>{
+		<span class="hljs-keyword">for</span>(p=lim-p;p&lt;=lim;p+=p&amp;-p) <span class="hljs-built_in">tmax</span>(c[p],v);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">rst</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">for</span>(p=lim-p;p&lt;=lim;p+=p&amp;-p) c[p]=<span class="hljs-number">-1e8</span>;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-type">int</span> ret=<span class="hljs-number">-1e8</span>;
+		<span class="hljs-keyword">for</span>(p=lim-p;p;p&amp;=p<span class="hljs-number">-1</span>) <span class="hljs-built_in">tmax</span>(ret,c[p]);
+		<span class="hljs-keyword">return</span> ret;
+	} 
+}ta;
+<span class="hljs-type">int</span> sz[<span class="hljs-number">70005</span>],hs,pup; vector&lt;<span class="hljs-type">int</span>&gt;hss;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f,<span class="hljs-type">int</span> ts)</span></span>{
+	sz[p]=<span class="hljs-number">1</span>; <span class="hljs-type">int</span> ms=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(sp!=f&amp;&amp;!vis[sp])
+		<span class="hljs-built_in">dfs</span>(sp,p,ts),sz[p]+=sz[sp],
+		(sz[sp]&gt;ms)&amp;&amp;(ms=sz[sp]);
+	<span class="hljs-built_in">tmax</span>(ms,ts-sz[p]);
+	<span class="hljs-keyword">if</span>(ms&lt;=ts/<span class="hljs-number">2</span>) hs=p;
+	<span class="hljs-built_in">tmax</span>(lim,v[p]/<span class="hljs-number">2</span><span class="hljs-number">+1</span>);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f,<span class="hljs-type">int</span> d)</span></span>{
+	<span class="hljs-keyword">if</span>(v[p]/<span class="hljs-number">2</span>&gt;=d) ta.<span class="hljs-built_in">ins</span>(v[p]/<span class="hljs-number">2</span>-d,d),<span class="hljs-built_in">tmax</span>(pup,d);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p])
+		<span class="hljs-keyword">if</span>(!vis[sp]&amp;&amp;sp!=f) <span class="hljs-built_in">ins</span>(sp,p,d<span class="hljs-number">+1</span>);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f,<span class="hljs-type">int</span> d)</span></span>{
+	<span class="hljs-keyword">if</span>(d&lt;lim)<span class="hljs-built_in">tmax</span>(vn[p],ta.<span class="hljs-built_in">que</span>(d)+d);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p])
+		<span class="hljs-keyword">if</span>(!vis[sp]&amp;&amp;sp!=f) <span class="hljs-built_in">que</span>(sp,p,d<span class="hljs-number">+1</span>);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">rst</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f,<span class="hljs-type">int</span> d)</span></span>{
+	<span class="hljs-keyword">if</span>(v[p]/<span class="hljs-number">2</span>&gt;=d) ta.<span class="hljs-built_in">rst</span>(v[p]/<span class="hljs-number">2</span>-d);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p])
+		<span class="hljs-keyword">if</span>(!vis[sp]&amp;&amp;sp!=f) <span class="hljs-built_in">rst</span>(sp,p,d<span class="hljs-number">+1</span>);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">solve</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> ts)</span></span>{
+	<span class="hljs-built_in">dfs</span>(p,<span class="hljs-number">0</span>,ts); hss.<span class="hljs-built_in">emplace_back</span>(hs);
+	vis[p=hs]=<span class="hljs-number">1</span>;
+	lim=<span class="hljs-number">0</span>; <span class="hljs-built_in">dfs</span>(p,<span class="hljs-number">0</span>,ts); pup=<span class="hljs-number">0</span>;
+	ta.<span class="hljs-built_in">ins</span>(v[p]/<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">que</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>),<span class="hljs-built_in">ins</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">rst</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	ta.<span class="hljs-built_in">rst</span>(v[p]/<span class="hljs-number">2</span>);
+	<span class="hljs-built_in">reverse</span>(son[p].<span class="hljs-built_in">begin</span>(),son[p].<span class="hljs-built_in">end</span>());
+	ta.<span class="hljs-built_in">ins</span>(v[p]/<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">que</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>),<span class="hljs-built_in">ins</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">rst</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	ta.<span class="hljs-built_in">rst</span>(v[p]/<span class="hljs-number">2</span>);
+	<span class="hljs-built_in">tmax</span>(vn[p],pup);
+	<span class="hljs-built_in">reverse</span>(son[p].<span class="hljs-built_in">begin</span>(),son[p].<span class="hljs-built_in">end</span>());
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">solve</span>(sp,sz[sp]);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">fsolve</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> ts,<span class="hljs-type">int</span>&amp; id)</span></span>{
+	hs=hss[id]; vis[p=hs]=<span class="hljs-number">1</span>;
+	lim=<span class="hljs-number">0</span>; <span class="hljs-built_in">dfs</span>(p,<span class="hljs-number">0</span>,ts); pup=<span class="hljs-number">0</span>;
+	ta.<span class="hljs-built_in">ins</span>(v[p]/<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">que</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>),<span class="hljs-built_in">ins</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">rst</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	<span class="hljs-built_in">reverse</span>(son[p].<span class="hljs-built_in">begin</span>(),son[p].<span class="hljs-built_in">end</span>());
+	ta.<span class="hljs-built_in">ins</span>(v[p]/<span class="hljs-number">2</span>,<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">que</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>),<span class="hljs-built_in">ins</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		<span class="hljs-built_in">rst</span>(sp,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>);
+	ta.<span class="hljs-built_in">rst</span>(v[p]/<span class="hljs-number">2</span>);
+	<span class="hljs-built_in">tmax</span>(vn[p],pup);
+	<span class="hljs-built_in">reverse</span>(son[p].<span class="hljs-built_in">begin</span>(),son[p].<span class="hljs-built_in">end</span>());
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(!vis[sp])
+		++id,<span class="hljs-built_in">fsolve</span>(sp,sz[sp],id);
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin.<span class="hljs-built_in">tie</span>(<span class="hljs-number">0</span>); cout.<span class="hljs-built_in">tie</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(cin&gt;&gt;t;t;t--){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) son[i].<span class="hljs-built_in">clear</span>();
+		cin&gt;&gt;n&gt;&gt;c; <span class="hljs-built_in">memmove</span>(c<span class="hljs-number">+1</span>,c,n); <span class="hljs-type">bool</span> hs=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i!=n;++i)
+			cin&gt;&gt;l&gt;&gt;r,
+			son[l].<span class="hljs-built_in">emplace_back</span>(r),
+			son[r].<span class="hljs-built_in">emplace_back</span>(l);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+			<span class="hljs-keyword">if</span>(c[i]^<span class="hljs-number">48</span>) v[i]=<span class="hljs-number">2</span>*(n<span class="hljs-number">-1</span>),ans[i]=<span class="hljs-number">0</span>,hs=<span class="hljs-number">1</span>;
+			<span class="hljs-keyword">else</span> ans[i]=<span class="hljs-number">-1</span>,v[i]=<span class="hljs-number">0</span>;
+		<span class="hljs-built_in">memset</span>(ta.c,<span class="hljs-number">0xcf</span>,<span class="hljs-keyword">sizeof</span> ta.c); hss.<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;hs;++i){
+			<span class="hljs-built_in">memset</span>(vis,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> vis);
+			<span class="hljs-built_in">memset</span>(vn,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> vn);
+			hs=<span class="hljs-number">0</span>; <span class="hljs-type">int</span> cid=<span class="hljs-number">0</span>;
+			<span class="hljs-keyword">if</span>(hss.<span class="hljs-built_in">empty</span>())<span class="hljs-built_in">solve</span>(<span class="hljs-number">1</span>,n);
+			<span class="hljs-keyword">else</span> <span class="hljs-built_in">fsolve</span>(<span class="hljs-number">1</span>,n,cid);
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j)
+				<span class="hljs-keyword">if</span>(c[j]==<span class="hljs-string">&#x27;0&#x27;</span>) <span class="hljs-keyword">continue</span>;
+				<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(v[j]=vn[j]) hs=<span class="hljs-number">1</span>;
+				<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(!ans[j]) ans[j]=i;
+		}
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cout&lt;&lt;ans[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>; cout&lt;&lt;endl;
+	}
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
 </code></pre>
 </div>
 </div>

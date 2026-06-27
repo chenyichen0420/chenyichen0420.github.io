@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：CF1988F Heartbeat</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>每一步都不难，拼到一起就让我卡住了。</p>
+<p>首先，我们注意到一个性质：第一个后缀最大值和最后一个前缀最大值都是 $n$。</p>
+<p>于是我们可以将最终的序列从 $n$ 的位置分开，统计前缀部分的贡献和后缀部分的贡献，然后拼起来得到最终的答案。</p>
+<p>考虑怎么去拼这个东西，显然上升点并不是一个前后独立的状态，而前后部分的长度也是对答案有影响的，剩下的东西都是独立的，于是我们考虑让 $f_{i,j}$ 表示一个长度为 $i$ 的区间中有 $j$ 个上升点的所有排列的 $a$ 的和的值，$b_{i,j}$ 表示的是一个长度为 $i$ 的区间中有 $j$ 个上升点的所有排列的 $b$ 的和的值。</p>
+<p>特别注意，因为前后缀的段实际上少统计了 $n$ 那个位置的贡献，因此实际计算 $f,b$ 的时候，如果有 $x$ 个最大值，那么实际用的应该是 $a_{x+1}$ 或 $b_{x+1}$。同时，我们还钦定 $f_{0,0}=b_{0,0}=1$。</p>
+<p>显然，如果我知道了上面的两个数值，那么最终的答案就是 $f(i)=\sum_{j=1}^i\sum_{k1=0}^{j-1}\sum_{k2=0}^{i-j}f_{j-1,k1}b_{i-j,k2}c_{k1+k2+[j\neq1]}\binom{i-1}{j-1}$。</p>
+<p>我们先考虑 $b,f$ 怎么计算，等会儿回过头来尝试优化这个 $O(n^4)$ 的答案计算。显然 $b,f$ 是类似的，于是我们只讲一个 $f$ 的计算方式，$b$ 留给读者自己推一下。</p>
+<p>考虑 $f_{i,j}$ 显然信息并没有维护够：$a$ 并不是一个好递推的东西，于是我们再设一个辅助数组 $dp_{i,j,k}$ 表示长度为 $i$ 的，有 $j$ 个前缀最大值的，$k$ 个上升点的序列的数量。</p>
+<p>可是，你仔细一想：这样的状态设计中没有存最终有多少个数，也难以维护一个值到底是不是最大值，于是我们考虑重新钦定一下转移顺序。</p>
+<p>常见的转移顺序有两种：记录尾项排名的顺序递推和指定数值从大到小（或者从小到大）的递推。显然在这道题中如果使用第一种那么状态会额外多一维，大小为 $n$，无法接受，于是我们考虑第二种。</p>
+<p>现在思考到底是从小到大还是从大到小。显然这道题中需要维护的是前缀最大值，如果从小到大处理那么会存在难以转移的问题，而从大到小则不存在这个问题，因此从大到小进行枚举。</p>
+<p>考虑转移：只有将当前最小值放到第一个才能使得前缀最大值数量增加 $1$，同时原先的第一个位置成为了上升点，因此 $dp_{i,j,k}\to dp_{i+1,j+1,k+1}$。</p>
+<p>如果将当前最小值放到一个上升点前，因为这个值比上升点的值小，所以上升点还是上升点，但是这个值也比之前上升点前的那个数值小，因此这个点本身没有成为上升点，因此 $dp_{i,j,k}\times k\to dp_{i+1,j,k}$。</p>
+<p>其他的情况下，这个点应该能让他后面的点变成上升点，除非后面没有点，因此 $dp_{i,j,k}\to dp_{i+1,j,k}$，$dp_{i,j,k}\times(i-k-1)\to dp_{i+1,j,k}$。</p>
+<p>显然状态数是 $O(n^3)$ 的，只有小常数种转移，因此这部分的时间复杂度是 $O(n^3)$ 的，对于这道题的时间限制来说问题不大。</p>
+<p>$b$ 是类似的，在此跳过，我们考虑怎么去优化那个 $O(n^4)$ 的转移：</p>
+<p>分析一下每一个因子的依赖项：四个不同的因子中分别使用到了 $(i,j),(j,k1),(i,j,k2),(j,k1,k2)$ 四组不同的变量。</p>
+<p>显然最后我们是一定要枚举 $i$ 这个变量的，于是把 $i$ 视作常量，那么这几组变量就是 $([i],j),(j,k1),([i],j,k2),(j,k1,k2)$。注意到 $k1$ 和 $i$ 独立，于是我们考虑能不能通过枚举 $j,k1,k2$，将其中的 $k1$ 消掉，然后再枚举 $i,j,k2$ 计算答案。</p>
+<p>我们发现确实可以，我们只需要预先计算出 $f^\prime_{j,k2}=\sum_{k1}\sum_{k2}f_{j,k1}c_{k1+k2+[j\neq1]}$，然后拿着 $f^\prime$ 和 $b$ 再进行转移就可以了，时间复杂度是 $O(n^3)$。</p>
+<p>此题可解，代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod=998244353;
+int n,a[1005],b[1005],c[1005],dp[2][1005][1005],cf[1005][1005],cb[1005][1005],ans,cvl[1005][1005],nf[1005][1005];
+inline void mad(int&amp; l,const int r){(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+signed main() {
+	ios::sync_with_stdio(0); cin&gt;&gt;n;
+	for(int i=1;i&lt;=n;++i) cin&gt;&gt;a[i];
+	for(int i=1;i&lt;=n;++i) cin&gt;&gt;b[i];
+	for(int i=0;i!=n;++i) cin&gt;&gt;c[i];
+	for(int i=0;i&lt;=n;++i)
+		for(int j=cvl[i][0]=1;j&lt;=i;++j)
+			cvl[i][j]=(cvl[i-1][j]+cvl[i-1][j-1])%mod;
+	dp[1][1][0]=1;
+	for(int i=1;i!=n;++i){
+		for(int j=1;j&lt;=i;++j)
+			for(int k=0;k!=i;++k)
+				if(dp[i&amp;1][j][k])
+					//插入到最前面
+					mad(dp[i+1&amp;1][j+1][k+1],dp[i&amp;1][j][k]),
+					//插入到上升点前面或者最后，导致上升个数不变
+					dp[i+1&amp;1][j][k]=(dp[i+1&amp;1][j][k]+dp[i&amp;1][j][k]*(k+1))%mod,
+					//其他情况
+					dp[i+1&amp;1][j][k+1]=(dp[i+1&amp;1][j][k+1]+dp[i&amp;1][j][k]*(i-k-1))%mod;
+		for(int j=1;j&lt;=i;++j)
+			for(int k=0;k!=i;++k)
+				cf[i][k]=(cf[i][k]+dp[i&amp;1][j][k]*a[j+1])%mod;
+		memset(dp[i&amp;1],0,sizeof dp[0]);
+	}
+	memset(dp,0,sizeof dp);
+	dp[1][1][0]=1;
+	for(int i=1;i!=n;++i){
+		for(int j=1;j&lt;=i;++j)
+			for(int k=0;k!=i;++k)
+				if(dp[i&amp;1][j][k])
+					//插入到最后面
+					mad(dp[i+1&amp;1][j+1][k],dp[i&amp;1][j][k]),
+					//插入到上升点前面，导致上升个数不变
+					dp[i+1&amp;1][j][k]=(dp[i+1&amp;1][j][k]+dp[i&amp;1][j][k]*k)%mod,
+					//其他情况
+					dp[i+1&amp;1][j][k+1]=(dp[i+1&amp;1][j][k+1]+dp[i&amp;1][j][k]*(i-k))%mod;
+		for(int j=1;j&lt;=i;++j)
+			for(int k=0;k!=i;++k)
+				cb[i][k]=(cb[i][k]+dp[i&amp;1][j][k]*b[j+1])%mod;
+		memset(dp[i&amp;1],0,sizeof dp[0]);
+	}
+	cf[0][0]=a[1]; cb[0][0]=b[1];
+	for(int j=1;j&lt;=n;++j)
+		for(int k1=0;k1&lt;=j-1;++k1)
+			for(int k2=0;k2&lt;=n-j;++k2)
+				nf[j-1][k2]=(nf[j-1][k2]+cf[j-1][k1]*c[k1+k2+(j!=1)])%mod;
+	for(int i=1;i&lt;=n;++i){
+		for(int j=1;j&lt;=n;++j)
+			for(int k2=0;k2&lt;=i-j;++k2)
+				ans=(ans+nf[j-1][k2]*cb[i-j][k2]%mod*cvl[i-1][j-1])%mod;
+		cout&lt;&lt;ans&lt;&lt;' '; ans=0;
+	}
+	cout&lt;&lt;endl;
+}
+//私は猫です!
+/*
+Written by cbc on nyarch linux.
+normal compile:
+g++ -std=c++14 -O2 -lm -o $1 $1.cpp
+ultra favt:
+g++ -O3 -march=native -mtune=native -flto=8 -ffast-math -funroll-loops -finline-functions -fomit-frame-pointer -fno-rtti -std=c++14 -o $1 $1.cpp
+*/
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>;
+<span class="hljs-type">int</span> n,a[<span class="hljs-number">1005</span>],b[<span class="hljs-number">1005</span>],c[<span class="hljs-number">1005</span>],dp[<span class="hljs-number">2</span>][<span class="hljs-number">1005</span>][<span class="hljs-number">1005</span>],cf[<span class="hljs-number">1005</span>][<span class="hljs-number">1005</span>],cb[<span class="hljs-number">1005</span>][<span class="hljs-number">1005</span>],ans,cvl[<span class="hljs-number">1005</span>][<span class="hljs-number">1005</span>],nf[<span class="hljs-number">1005</span>][<span class="hljs-number">1005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;a[i];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;b[i];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i) cin&gt;&gt;c[i];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=n;++i)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=cvl[i][<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;j&lt;=i;++j)
+			cvl[i][j]=(cvl[i<span class="hljs-number">-1</span>][j]+cvl[i<span class="hljs-number">-1</span>][j<span class="hljs-number">-1</span>])%mod;
+	dp[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>][<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=n;++i){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=i;++j)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k!=i;++k)
+				<span class="hljs-keyword">if</span>(dp[i&amp;<span class="hljs-number">1</span>][j][k])
+					<span class="hljs-comment">//插入到最前面</span>
+					<span class="hljs-built_in">mad</span>(dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j<span class="hljs-number">+1</span>][k<span class="hljs-number">+1</span>],dp[i&amp;<span class="hljs-number">1</span>][j][k]),
+					<span class="hljs-comment">//插入到上升点前面或者最后，导致上升个数不变</span>
+					dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j][k]=(dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j][k]+dp[i&amp;<span class="hljs-number">1</span>][j][k]*(k<span class="hljs-number">+1</span>))%mod,
+					<span class="hljs-comment">//其他情况</span>
+					dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j][k<span class="hljs-number">+1</span>]=(dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j][k<span class="hljs-number">+1</span>]+dp[i&amp;<span class="hljs-number">1</span>][j][k]*(i-k<span class="hljs-number">-1</span>))%mod;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=i;++j)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k!=i;++k)
+				cf[i][k]=(cf[i][k]+dp[i&amp;<span class="hljs-number">1</span>][j][k]*a[j<span class="hljs-number">+1</span>])%mod;
+		<span class="hljs-built_in">memset</span>(dp[i&amp;<span class="hljs-number">1</span>],<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+	}
+	<span class="hljs-built_in">memset</span>(dp,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp);
+	dp[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>][<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=n;++i){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=i;++j)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k!=i;++k)
+				<span class="hljs-keyword">if</span>(dp[i&amp;<span class="hljs-number">1</span>][j][k])
+					<span class="hljs-comment">//插入到最后面</span>
+					<span class="hljs-built_in">mad</span>(dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j<span class="hljs-number">+1</span>][k],dp[i&amp;<span class="hljs-number">1</span>][j][k]),
+					<span class="hljs-comment">//插入到上升点前面，导致上升个数不变</span>
+					dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j][k]=(dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j][k]+dp[i&amp;<span class="hljs-number">1</span>][j][k]*k)%mod,
+					<span class="hljs-comment">//其他情况</span>
+					dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j][k<span class="hljs-number">+1</span>]=(dp[i<span class="hljs-number">+1</span>&amp;<span class="hljs-number">1</span>][j][k<span class="hljs-number">+1</span>]+dp[i&amp;<span class="hljs-number">1</span>][j][k]*(i-k))%mod;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=i;++j)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k!=i;++k)
+				cb[i][k]=(cb[i][k]+dp[i&amp;<span class="hljs-number">1</span>][j][k]*b[j<span class="hljs-number">+1</span>])%mod;
+		<span class="hljs-built_in">memset</span>(dp[i&amp;<span class="hljs-number">1</span>],<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+	}
+	cf[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=a[<span class="hljs-number">1</span>]; cb[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=b[<span class="hljs-number">1</span>];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k1=<span class="hljs-number">0</span>;k1&lt;=j<span class="hljs-number">-1</span>;++k1)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k2=<span class="hljs-number">0</span>;k2&lt;=n-j;++k2)
+				nf[j<span class="hljs-number">-1</span>][k2]=(nf[j<span class="hljs-number">-1</span>][k2]+cf[j<span class="hljs-number">-1</span>][k1]*c[k1+k2+(j!=<span class="hljs-number">1</span>)])%mod;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k2=<span class="hljs-number">0</span>;k2&lt;=i-j;++k2)
+				ans=(ans+nf[j<span class="hljs-number">-1</span>][k2]*cb[i-j][k2]%mod*cvl[i<span class="hljs-number">-1</span>][j<span class="hljs-number">-1</span>])%mod;
+		cout&lt;&lt;ans&lt;&lt;<span class="hljs-string">&#x27; &#x27;</span>; ans=<span class="hljs-number">0</span>;
+	}
+	cout&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">/*
+Written by cbc on nyarch linux.
+normal compile:
+g++ -std=c++14 -O2 -lm -o $1 $1.cpp
+ultra favt:
+g++ -O3 -march=native -mtune=native -flto=8 -ffast-math -funroll-loops -finline-functions -fomit-frame-pointer -fno-rtti -std=c++14 -o $1 $1.cpp
+*/</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
