@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：CF755G PolandBall and Many Other Balls</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>不动脑子（其实就是不会推通项）的解法。</p>
+<p>考虑 $dp_{i,j}$ 表示到了 $i$，共计产生 $j$ 组的方案数。显然有转移方程 $dp_{i,j}=dp_{i-1,j}+dp_{i-1,j-1}+dp_{i-2,j-1}$。</p>
+<p>于是我们把这个东西写成普通生成函数的形式：$f_i=(1+x)f_{i+1}+xf_{i-2}$。</p>
+<p>显然一项只和前两项相关。于是我们直接把矩阵乘法搬上来，尝试使用矩阵快速幂解决这个问题。</p>
+<p>具体来说，直接把转移系数填到 $2\times2$ 的多项式矩形里面，然后进行多项式矩阵的快速幂即可。</p>
+<p>显然时间复杂度是 $O(k\log k\log n)$ 带有非常大的常数的，但是不进行任何卡常就能过。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod=998244353,g=3;
+int n,m,cp[1ll&lt;&lt;17],a[1ll&lt;&lt;17],b[1ll&lt;&lt;17];
+inline int qpow(int a,int b){
+	int ret=1;
+	for(;b;b&gt;&gt;=1,a=a*a%mod)
+		(b&amp;1)&amp;&amp;(ret=ret*a%mod);
+	return ret;
+}
+inline void fft(int*v,int lim,int l){
+	for(int i=1;i!=lim;++i)
+		cp[i]=(cp[i&gt;&gt;1]&gt;&gt;1)|((i&amp;1)&lt;&lt;(l-1));
+	for(int i=0;i!=lim;++i)
+		if(cp[i]&gt;i) swap(v[i],v[cp[i]]);
+	for(int i=1;i!=lim;i&lt;&lt;=1){
+		int tv=qpow(g,(mod-1)/i/2);
+		for(int j=0;j!=lim;j+=i&lt;&lt;1){
+			int vt=1,t;
+			for(int k=0;k!=i;++k)
+				t=v[j+k+i]*vt%mod,
+				v[j+k+i]=(v[j+k]-t+mod)%mod,
+				v[j+k]=(v[j+k]+t)%mod,
+				vt=vt*tv%mod;
+		}
+	}
+}
+using poly=vector&lt;int&gt;;
+inline void add(poly&amp;l,const poly&amp;r){
+	l.resize(max(l.size(),r.size()));
+	for(int i=0;i!=l.size();++i)
+		(l[i]+=r[i])&gt;=mod&amp;&amp;(l[i]-=mod);
+}
+inline poly time(const poly&amp;l,const poly&amp;r){
+	int lim=1,ln=0,s=l.size()+r.size();
+	while(lim&lt;s) lim&lt;&lt;=1,ln++;
+	int ny=qpow(lim,mod-2);
+	memset(a,0,lim*sizeof(int));
+	memset(b,0,lim*sizeof(int));
+	memcpy(a,l.data(),l.size()*sizeof(int));
+	memcpy(b,r.data(),r.size()*sizeof(int));
+	fft(a,lim,ln); fft(b,lim,ln);
+	for(int i=0;i!=lim;++i) a[i]=a[i]*b[i]%mod;
+	fft(a,lim,ln); reverse(a+1,a+lim); 
+	for(int i=0;i!=lim;++i) a[i]=a[i]*ny%mod;
+	static poly ret; ret.resize(s-1);
+	memcpy(ret.data(),a,sizeof(int)*(s-1));
+	if(ret.size()&gt;m+1) ret.resize(m+1);
+	return ret;
+}
+struct mat{
+	poly v[2][2];
+	inline mat operator*(const mat&amp;r)const{
+		mat ret;
+		for(int i=0;i!=2;++i)
+			for(int j=0;j!=2;++j)
+				for(int k=0;k!=2;++k)
+					add(ret.v[i][k],time(v[i][j],r.v[j][k]));
+					//可以优化，这里的乘法有大量重复，可以不用 NTT 这么多次
+					//暂时先放着，我相信这个常数应该还好
+		return ret;
+	}
+}ans,tmp;
+signed main() {
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m;
+	/*
+	我们考虑 dp_{i,j} 表示到了 i，共计产生了 j 组的方案数
+	于是有转移方程：
+	dp_{i,j}=dp_{i-1,j}+dp_{i-1,j-1}+dp_{i-2,j-1}
+	组合意义是显然的
+	我们考虑把这个东西写成生成函数的形式：
+	f_i=(1+x)f_{i-1}+xf_{i-2}
+	于是考虑把这个东西写成矩阵乘法的形式：
+	[f_{i-2},f_{i-1}] *	[0,x  ]	= [f_{i-1},f_i]
+						[1,x+1]
+	初始状态：f_0=1, f_1=1+x
+	或者更加简单的，f_{-1}=0,f_0=1
+	我们要求的直接变成了[0,x  ]的n次方
+						[1,x+1]
+	*/
+	ans.v[0][0]=ans.v[1][1]={1};
+	ans.v[0][1]=ans.v[1][0]={0};
+	tmp.v[0][0]={0}; tmp.v[1][0]={1};
+	tmp.v[0][1]={0,1}; tmp.v[1][1]={1,1};
+	for(;n;n&gt;&gt;=1,tmp=tmp*tmp)
+		if(n&amp;1) ans=ans*tmp;
+	for(int i=1;i!=ans.v[1][1].size();++i)
+		cout&lt;&lt;ans.v[1][1][i]&lt;&lt;&quot; &quot;;
+	for(int i=ans.v[1][1].size();i&lt;=m;++i)
+		cout&lt;&lt;&quot;0 &quot;;
+	cout&lt;&lt;endl;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>,g=<span class="hljs-number">3</span>;
+<span class="hljs-type">int</span> n,m,cp[<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">17</span>],a[<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">17</span>],b[<span class="hljs-number">1ll</span>&lt;&lt;<span class="hljs-number">17</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">qpow</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b)</span></span>{
+	<span class="hljs-type">int</span> ret=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(;b;b&gt;&gt;=<span class="hljs-number">1</span>,a=a*a%mod)
+		(b&amp;<span class="hljs-number">1</span>)&amp;&amp;(ret=ret*a%mod);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">fft</span><span class="hljs-params">(<span class="hljs-type">int</span>*v,<span class="hljs-type">int</span> lim,<span class="hljs-type">int</span> l)</span></span>{
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=lim;++i)
+		cp[i]=(cp[i&gt;&gt;<span class="hljs-number">1</span>]&gt;&gt;<span class="hljs-number">1</span>)|((i&amp;<span class="hljs-number">1</span>)&lt;&lt;(l<span class="hljs-number">-1</span>));
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i)
+		<span class="hljs-keyword">if</span>(cp[i]&gt;i) <span class="hljs-built_in">swap</span>(v[i],v[cp[i]]);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=lim;i&lt;&lt;=<span class="hljs-number">1</span>){
+		<span class="hljs-type">int</span> tv=<span class="hljs-built_in">qpow</span>(g,(mod<span class="hljs-number">-1</span>)/i/<span class="hljs-number">2</span>);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=lim;j+=i&lt;&lt;<span class="hljs-number">1</span>){
+			<span class="hljs-type">int</span> vt=<span class="hljs-number">1</span>,t;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k!=i;++k)
+				t=v[j+k+i]*vt%mod,
+				v[j+k+i]=(v[j+k]-t+mod)%mod,
+				v[j+k]=(v[j+k]+t)%mod,
+				vt=vt*tv%mod;
+		}
+	}
+}
+<span class="hljs-keyword">using</span> poly=vector&lt;<span class="hljs-type">int</span>&gt;;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">add</span><span class="hljs-params">(poly&amp;l,<span class="hljs-type">const</span> poly&amp;r)</span></span>{
+	l.<span class="hljs-built_in">resize</span>(<span class="hljs-built_in">max</span>(l.<span class="hljs-built_in">size</span>(),r.<span class="hljs-built_in">size</span>()));
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=l.<span class="hljs-built_in">size</span>();++i)
+		(l[i]+=r[i])&gt;=mod&amp;&amp;(l[i]-=mod);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> poly <span class="hljs-title">time</span><span class="hljs-params">(<span class="hljs-type">const</span> poly&amp;l,<span class="hljs-type">const</span> poly&amp;r)</span></span>{
+	<span class="hljs-type">int</span> lim=<span class="hljs-number">1</span>,ln=<span class="hljs-number">0</span>,s=l.<span class="hljs-built_in">size</span>()+r.<span class="hljs-built_in">size</span>();
+	<span class="hljs-keyword">while</span>(lim&lt;s) lim&lt;&lt;=<span class="hljs-number">1</span>,ln++;
+	<span class="hljs-type">int</span> ny=<span class="hljs-built_in">qpow</span>(lim,mod<span class="hljs-number">-2</span>);
+	<span class="hljs-built_in">memset</span>(a,<span class="hljs-number">0</span>,lim*<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+	<span class="hljs-built_in">memset</span>(b,<span class="hljs-number">0</span>,lim*<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+	<span class="hljs-built_in">memcpy</span>(a,l.<span class="hljs-built_in">data</span>(),l.<span class="hljs-built_in">size</span>()*<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+	<span class="hljs-built_in">memcpy</span>(b,r.<span class="hljs-built_in">data</span>(),r.<span class="hljs-built_in">size</span>()*<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+	<span class="hljs-built_in">fft</span>(a,lim,ln); <span class="hljs-built_in">fft</span>(b,lim,ln);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i) a[i]=a[i]*b[i]%mod;
+	<span class="hljs-built_in">fft</span>(a,lim,ln); <span class="hljs-built_in">reverse</span>(a<span class="hljs-number">+1</span>,a+lim); 
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=lim;++i) a[i]=a[i]*ny%mod;
+	<span class="hljs-type">static</span> poly ret; ret.<span class="hljs-built_in">resize</span>(s<span class="hljs-number">-1</span>);
+	<span class="hljs-built_in">memcpy</span>(ret.<span class="hljs-built_in">data</span>(),a,<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>)*(s<span class="hljs-number">-1</span>));
+	<span class="hljs-keyword">if</span>(ret.<span class="hljs-built_in">size</span>()&gt;m<span class="hljs-number">+1</span>) ret.<span class="hljs-built_in">resize</span>(m<span class="hljs-number">+1</span>);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">mat</span>{
+	poly v[<span class="hljs-number">2</span>][<span class="hljs-number">2</span>];
+	<span class="hljs-keyword">inline</span> mat <span class="hljs-keyword">operator</span>*(<span class="hljs-type">const</span> mat&amp;r)<span class="hljs-type">const</span>{
+		mat ret;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">2</span>;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">2</span>;++j)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k!=<span class="hljs-number">2</span>;++k)
+					<span class="hljs-built_in">add</span>(ret.v[i][k],<span class="hljs-built_in">time</span>(v[i][j],r.v[j][k]));
+					<span class="hljs-comment">//可以优化，这里的乘法有大量重复，可以不用 NTT 这么多次</span>
+					<span class="hljs-comment">//暂时先放着，我相信这个常数应该还好</span>
+		<span class="hljs-keyword">return</span> ret;
+	}
+}ans,tmp;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m;
+	<span class="hljs-comment">/*
+	我们考虑 dp_{i,j} 表示到了 i，共计产生了 j 组的方案数
+	于是有转移方程：
+	dp_{i,j}=dp_{i-1,j}+dp_{i-1,j-1}+dp_{i-2,j-1}
+	组合意义是显然的
+	我们考虑把这个东西写成生成函数的形式：
+	f_i=(1+x)f_{i-1}+xf_{i-2}
+	于是考虑把这个东西写成矩阵乘法的形式：
+	[f_{i-2},f_{i-1}] *	[0,x  ]	= [f_{i-1},f_i]
+						[1,x+1]
+	初始状态：f_0=1, f_1=1+x
+	或者更加简单的，f_{-1}=0,f_0=1
+	我们要求的直接变成了[0,x  ]的n次方
+						[1,x+1]
+	*/</span>
+	ans.v[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=ans.v[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>]={<span class="hljs-number">1</span>};
+	ans.v[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>]=ans.v[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>]={<span class="hljs-number">0</span>};
+	tmp.v[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]={<span class="hljs-number">0</span>}; tmp.v[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>]={<span class="hljs-number">1</span>};
+	tmp.v[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>]={<span class="hljs-number">0</span>,<span class="hljs-number">1</span>}; tmp.v[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>]={<span class="hljs-number">1</span>,<span class="hljs-number">1</span>};
+	<span class="hljs-keyword">for</span>(;n;n&gt;&gt;=<span class="hljs-number">1</span>,tmp=tmp*tmp)
+		<span class="hljs-keyword">if</span>(n&amp;<span class="hljs-number">1</span>) ans=ans*tmp;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=ans.v[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>].<span class="hljs-built_in">size</span>();++i)
+		cout&lt;&lt;ans.v[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>][i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=ans.v[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>].<span class="hljs-built_in">size</span>();i&lt;=m;++i)
+		cout&lt;&lt;<span class="hljs-string">&quot;0 &quot;</span>;
+	cout&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

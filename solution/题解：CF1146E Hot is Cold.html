@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：CF1146E Hot is Cold</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>竟然都在写线段树，不写一点脑子都没有的平衡树，没爱了（雾）。</p>
+<p>我们维护 FHQ Treap，每一个节点中的信息是数值，原下标。每一次的操作实质上就是将要取相反数的部分分裂出来，打上标记，然后重新合并。</p>
+<p>因为现在值域是有交的，所以我们直接进行 FHQ 的有交分裂即可。具体来说，我们枚举到一个节点时，钦定 $l$ 的随机值不小于 $r$，然后将 $r$ 按照 $l$ 节点的 $v$ 分裂开，$l$ 的左子树和 $r$ 的左部分合并，$l$ 的右子树和 $r$ 的右部分合并。</p>
+<p>这样操作的时间复杂度被证明是 $O(\log^2)$ 的，具体怎么证我其实不太会，不过这应该是一个比较普及的基础科技了，所以我就不严谨证明了。</p>
+<p>大方向就是对于有序序列来说定义势能是相邻两项的差的对数，然后区间取相反数只会给势能增加 $O(\log)$，合并间隔数为 $k$ 所消耗的势能是 $k$ 的，带上本身的 $\log$ 就是 $\log^2$ 了。</p>
+<p>参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+mt19937 mt(chrono::high_resolution_clock::now().time_since_epoch().count());
+int n,m,a[100005],rt,tp[4]; char op;
+struct fhq_treap{
+	struct node{
+		int v,id,ls,rs,f,mn,mx,rd;
+		inline void flip(){
+			swap(mn,mx); mn=-mn; mx=-mx;
+			v=-v,f^=1,swap(ls,rs);
+		}
+	}re[100005];
+	inline void pud(int p){
+		if(re[p].f)
+			re[re[p].ls].flip(),
+			re[re[p].rs].flip(),
+			re[p].f=0;
+	}
+	inline void pup(int p){
+		re[p].mx=max({re[re[p].ls].mx,re[re[p].rs].mx,re[p].v});
+		re[p].mn=min({re[re[p].ls].mn,re[re[p].rs].mn,re[p].v});
+	}
+	inline void split(int p,int v,int &amp;l,int &amp;r){
+		if(!p) return void(l=r=0); pud(p);
+		if(re[p].v&gt;v) split(re[p].ls,v,l,re[r=p].ls),pup(r);
+		else split(re[p].rs,v,re[l=p].rs,r),pup(l);
+	}
+	inline int merge(int l,int r){
+		if(!l||!r)return l|r;
+		pud(l); pud(r);
+		if(re[l].rd&gt;re[r].rd){
+			re[l].rs=merge(re[l].rs,r);
+			pup(l); return l;
+		}
+		else{
+			re[r].ls=merge(l,re[r].ls);
+			pup(r); return r;
+		}
+	}
+	inline int intmerge(int l,int r){
+		if(!l||!r) return l|r;
+		if(re[l].rd&lt;re[r].rd) swap(l,r);
+		int rpl,rpr; pud(l);
+		split(r,re[l].v,rpl,rpr);
+		re[l].ls=intmerge(re[l].ls,rpl);
+		re[l].rs=intmerge(re[l].rs,rpr);
+		pup(l); return l;
+	}
+	inline void ins(int v,int p){
+		split(rt,v,tp[1],tp[2]);
+		re[p]={v,p,0,0,0,v,v,(int)mt()};
+		rt=merge(merge(tp[1],p),tp[2]);
+	}
+	inline void flpbg(int v){
+		split(rt,v,tp[1],tp[2]);
+		re[tp[2]].flip();
+		rt=intmerge(tp[1],tp[2]);
+	}
+	inline void flpsm(int v){
+		split(rt,v-1,tp[1],tp[2]);
+		re[tp[1]].flip();
+		rt=intmerge(tp[1],tp[2]);
+	}
+	inline void dfs(int p){
+		a[re[p].id]=re[p].v; pud(p);
+		if(re[p].ls) dfs(re[p].ls);
+		if(re[p].rs) dfs(re[p].rs);
+	}
+}fhq;
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m;
+	fhq.re[0].mx=1e9; fhq.re[0].mn=-1e9;
+	for(int i=1,a;i&lt;=n;++i) cin&gt;&gt;a,fhq.ins(a,i);
+	for(int i=1,p;i&lt;=m;++i)
+		if(cin&gt;&gt;op&gt;&gt;p,op=='&lt;') fhq.flpsm(p);
+		else fhq.flpbg(p);
+	fhq.dfs(rt);
+	for(int i=1;i&lt;=n;++i) cout&lt;&lt;a[i]&lt;&lt;&quot; &quot;; cout&lt;&lt;endl;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-function">mt19937 <span class="hljs-title">mt</span><span class="hljs-params">(chrono::high_resolution_clock::now().time_since_epoch().count())</span></span>;
+<span class="hljs-type">int</span> n,m,a[<span class="hljs-number">100005</span>],rt,tp[<span class="hljs-number">4</span>]; <span class="hljs-type">char</span> op;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">fhq_treap</span>{
+	<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>{
+		<span class="hljs-type">int</span> v,id,ls,rs,f,mn,mx,rd;
+		<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">flip</span><span class="hljs-params">()</span></span>{
+			<span class="hljs-built_in">swap</span>(mn,mx); mn=-mn; mx=-mx;
+			v=-v,f^=<span class="hljs-number">1</span>,<span class="hljs-built_in">swap</span>(ls,rs);
+		}
+	}re[<span class="hljs-number">100005</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">pud</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(re[p].f)
+			re[re[p].ls].<span class="hljs-built_in">flip</span>(),
+			re[re[p].rs].<span class="hljs-built_in">flip</span>(),
+			re[p].f=<span class="hljs-number">0</span>;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">pup</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{
+		re[p].mx=<span class="hljs-built_in">max</span>({re[re[p].ls].mx,re[re[p].rs].mx,re[p].v});
+		re[p].mn=<span class="hljs-built_in">min</span>({re[re[p].ls].mn,re[re[p].rs].mn,re[p].v});
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">split</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> v,<span class="hljs-type">int</span> &amp;l,<span class="hljs-type">int</span> &amp;r)</span></span>{
+		<span class="hljs-keyword">if</span>(!p) <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(l=r=<span class="hljs-number">0</span>); <span class="hljs-built_in">pud</span>(p);
+		<span class="hljs-keyword">if</span>(re[p].v&gt;v) <span class="hljs-built_in">split</span>(re[p].ls,v,l,re[r=p].ls),<span class="hljs-built_in">pup</span>(r);
+		<span class="hljs-keyword">else</span> <span class="hljs-built_in">split</span>(re[p].rs,v,re[l=p].rs,r),<span class="hljs-built_in">pup</span>(l);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r)</span></span>{
+		<span class="hljs-keyword">if</span>(!l||!r)<span class="hljs-keyword">return</span> l|r;
+		<span class="hljs-built_in">pud</span>(l); <span class="hljs-built_in">pud</span>(r);
+		<span class="hljs-keyword">if</span>(re[l].rd&gt;re[r].rd){
+			re[l].rs=<span class="hljs-built_in">merge</span>(re[l].rs,r);
+			<span class="hljs-built_in">pup</span>(l); <span class="hljs-keyword">return</span> l;
+		}
+		<span class="hljs-keyword">else</span>{
+			re[r].ls=<span class="hljs-built_in">merge</span>(l,re[r].ls);
+			<span class="hljs-built_in">pup</span>(r); <span class="hljs-keyword">return</span> r;
+		}
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">intmerge</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r)</span></span>{
+		<span class="hljs-keyword">if</span>(!l||!r) <span class="hljs-keyword">return</span> l|r;
+		<span class="hljs-keyword">if</span>(re[l].rd&lt;re[r].rd) <span class="hljs-built_in">swap</span>(l,r);
+		<span class="hljs-type">int</span> rpl,rpr; <span class="hljs-built_in">pud</span>(l);
+		<span class="hljs-built_in">split</span>(r,re[l].v,rpl,rpr);
+		re[l].ls=<span class="hljs-built_in">intmerge</span>(re[l].ls,rpl);
+		re[l].rs=<span class="hljs-built_in">intmerge</span>(re[l].rs,rpr);
+		<span class="hljs-built_in">pup</span>(l); <span class="hljs-keyword">return</span> l;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> v,<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-built_in">split</span>(rt,v,tp[<span class="hljs-number">1</span>],tp[<span class="hljs-number">2</span>]);
+		re[p]={v,p,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,v,v,(<span class="hljs-type">int</span>)<span class="hljs-built_in">mt</span>()};
+		rt=<span class="hljs-built_in">merge</span>(<span class="hljs-built_in">merge</span>(tp[<span class="hljs-number">1</span>],p),tp[<span class="hljs-number">2</span>]);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">flpbg</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span></span>{
+		<span class="hljs-built_in">split</span>(rt,v,tp[<span class="hljs-number">1</span>],tp[<span class="hljs-number">2</span>]);
+		re[tp[<span class="hljs-number">2</span>]].<span class="hljs-built_in">flip</span>();
+		rt=<span class="hljs-built_in">intmerge</span>(tp[<span class="hljs-number">1</span>],tp[<span class="hljs-number">2</span>]);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">flpsm</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span></span>{
+		<span class="hljs-built_in">split</span>(rt,v<span class="hljs-number">-1</span>,tp[<span class="hljs-number">1</span>],tp[<span class="hljs-number">2</span>]);
+		re[tp[<span class="hljs-number">1</span>]].<span class="hljs-built_in">flip</span>();
+		rt=<span class="hljs-built_in">intmerge</span>(tp[<span class="hljs-number">1</span>],tp[<span class="hljs-number">2</span>]);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{
+		a[re[p].id]=re[p].v; <span class="hljs-built_in">pud</span>(p);
+		<span class="hljs-keyword">if</span>(re[p].ls) <span class="hljs-built_in">dfs</span>(re[p].ls);
+		<span class="hljs-keyword">if</span>(re[p].rs) <span class="hljs-built_in">dfs</span>(re[p].rs);
+	}
+}fhq;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m;
+	fhq.re[<span class="hljs-number">0</span>].mx=<span class="hljs-number">1e9</span>; fhq.re[<span class="hljs-number">0</span>].mn=<span class="hljs-number">-1e9</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,a;i&lt;=n;++i) cin&gt;&gt;a,fhq.<span class="hljs-built_in">ins</span>(a,i);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,p;i&lt;=m;++i)
+		<span class="hljs-keyword">if</span>(cin&gt;&gt;op&gt;&gt;p,op==<span class="hljs-string">&#x27;&lt;&#x27;</span>) fhq.<span class="hljs-built_in">flpsm</span>(p);
+		<span class="hljs-keyword">else</span> fhq.<span class="hljs-built_in">flpbg</span>(p);
+	fhq.<span class="hljs-built_in">dfs</span>(rt);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cout&lt;&lt;a[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>; cout&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
