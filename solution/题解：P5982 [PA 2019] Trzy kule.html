@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P5982 [PA 2019] Trzy kule</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>三个条件或起来，那肯定就是正难则反，求不满足要求的字符串数量了。</p>
+<p>对于三个字符串的不满足要求的位置，考虑单个位置有几种可能的贡献：显然是 $8$ 种。这 $8$ 种按照是否贡献到 $1$ 上面分成两类，并将两类中互补对象配对形成 $4$ 对。</p>
+<p>这四对的出现次数是确定的，比如分别是 $a,b,c,d$，并假设这四种当中，对 $1$ 有贡献的那一个的出现次数依次是 $x,y,z,w$。</p>
+<p>那么最后的约束可以写成：</p>
+<ol>
+<li>$x,y,z,w$ 分别不大于 $a,b,c,d$。</li>
+<li>$x+y+z+w>r1$。</li>
+<li>$x+y-z-w>r2-c-d$。</li>
+<li>$x-y+z-w>r3-b-d$。</li>
+</ol>
+<p>我们要计算的是 $x,y,z,w$ 的总方案数。</p>
+<p>从中，我们显然注意到 $x$ 的贡献系数是完全一致的，所以我们将 $x$ 单独枚举，但是后面的 $y,z,w$ 怎么办？</p>
+<p>或者说详细一点，我们枚举 $x$，那么需要求解的就是 $y+z+w>r1-x\land y-z-w>r2-c-d-x\land z-y-w>r3-b-d-x$ 的方案数之和。</p>
+<p>进一步扩展这个思路：我们求解 $y+z>const1,y-z>const2,z-y>const3$ 的方案数，然后计算答案的时候枚举 $x,w$ 的数值。</p>
+<p>注意到前面的 $y-z$ 和 $z-y$ 正好是相反数，因此可以少记录一维。这样是一个 $O(n^2)$ 预处理，$O(n^2)$ 查询的做法。</p>
+<p>$const$ 的数值可以自己手推一下，不懂得就看下面的参考代码，相应位置有注释：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+// bool membeg;
+constexpr bool online=1;
+constexpr int mod=1e9+7;
+int n,lim[4],r1,r2,r3,c[10005][10005];
+long long ans,jc[10005],ny[10005];
+char c1[10005],c2[10005],c3[10005];
+inline void mad(int&amp;l,const int r){(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+inline long long qpow(long long a,int b){
+	long long ret=1;
+	for(;b;b&gt;&gt;=1,a=a*a%mod)
+		(b&amp;1)&amp;&amp;(ret=ret*a%mod);
+	return ret;
+}
+inline long long cvl(int n,int m){
+	// cerr&lt;&lt;n&lt;&lt;&quot; &quot;&lt;&lt;m&lt;&lt;&quot; &quot;&lt;&lt;jc[n]*ny[m]%mod*ny[n-m]%mod&lt;&lt;endl;
+	return jc[n]*ny[m]%mod*ny[n-m]%mod;
+}
+// bool memend;
+signed main(){
+	if(online)
+		freopen(&quot;kul.in&quot;,&quot;r&quot;,stdin),
+		freopen(&quot;kul.out&quot;,&quot;w&quot;,stdout);
+	// memset(c,0,sizeof c);
+	// cerr&lt;&lt;abs((long long)(&amp;membeg)-(long long)(&amp;memend))&lt;&lt;endl;
+	ios::sync_with_stdio(0); cin&gt;&gt;n;
+	for(int i=jc[0]=1;i&lt;=n;++i) jc[i]=jc[i-1]*i%mod;
+	ny[n]=qpow(jc[n],mod-2);
+	for(int i=n;i&gt;=1;i--) ny[i-1]=ny[i]*i%mod;
+	/*
+	那肯定就是求不满足要求的字符串数量了
+	我有一些大胆的想法：能不能搞一个三元多项式？
+	没有前途，每一元的次数都是 n 的，实际上没什么优化空间
+
+	1～8 是简单的，直接 dp_{p,i,j,k} 就行了
+	9~10 的特殊性质是 r&lt;=500
+	那时间复杂度肯定就是 O(r^3) 或者 O(nr^2) 的了
+	感觉后者更有可能一些，思考一下：
+
+	虽然我可能误解了最后那个神秘特殊性质的意思
+	但是它确实给了我一点点启发：    
+	我们可不可以把三个字符串都一样的位置直接删除掉，最后再合并进来？
+	这为什么有道理：剩下的位置一定是 1/2 的选择，
+
+	等一下，为什么我一定只剥离三个都一样的情况？
+	考虑有几种可能的贡献：显然是 8 种
+	这八种按照是否贡献到 1 上面分成两类
+	我们将两类中互补对象配对形成四对
+	这四对的出现次数是确定的，比如分别是 a,b,c,d
+	假设这四种当中，对 1 有贡献的出现次数依次是 x,y,z,w
+	那么最后的约束可以写成 x,y,z,w 分别不大于 a,b,c,d
+	并且 x+y+z+w &gt; r1
+	并且 x+y-z-w &gt; r2-c-d
+	并且 x-y+z-w &gt; r3-b-d
+	的方案数计数
+
+	从中显然注意到 x 的贡献系数是完全一致的
+	所以前面我才会提出来独立 x 但是后面的 y,z,w 怎么办？
+	本质上就是在求解：
+	y+z+w &gt; a
+	y-z-w &gt; b
+	z-y-w &gt; c
+	并且 y,z,w 有一个不到 n 的上界的方案数
+	直接枚举 y,z,w 就可以知道 =a,=b,=c 的方案数
+	所以说再做一个前缀和不就 &gt;a,&gt;b,&gt;c 了？
+	显然时间复杂度就是 O(n^3) 了
+
+	进一步扩展这个思路：我们求解
+	y+z &gt; a, y-z &gt; b, z-y &gt; c 的方案数
+	然后计算答案的时候枚举 x,w 的数值
+	注意到前面的 y-z 和 z-y 正好是相反数，因此可以少记录一维
+	这样是不是一个 O(n^2) 预处理，O(n^2) 查询的做法？
+	好像是对的！！！
+	*/
+	cin&gt;&gt;r1&gt;&gt;c1&gt;&gt;r2&gt;&gt;c2&gt;&gt;r3&gt;&gt;c3;
+	for(int i=0;i!=n;++i){
+		if(c1[i]==c2[i]&amp;&amp;c1[i]==c3[i]) lim[0]++;
+		if(c1[i]==c2[i]&amp;&amp;c1[i]!=c3[i]) lim[1]++;
+		if(c1[i]!=c2[i]&amp;&amp;c1[i]==c3[i]) lim[2]++;
+		if(c1[i]!=c2[i]&amp;&amp;c1[i]!=c3[i]) lim[3]++;
+	}
+	// cerr&lt;&lt;lim[0]&lt;&lt;&quot; &quot;&lt;&lt;lim[1]&lt;&lt;&quot; &quot;&lt;&lt;lim[2]&lt;&lt;&quot; &quot;&lt;&lt;lim[3]&lt;&lt;endl;
+	for(int y=0;y&lt;=lim[1];++y)
+		for(int z=0;z&lt;=lim[2];++z)
+			c[y+z][y-z+lim[2]]=cvl(lim[1],y)*cvl(lim[2],z)%mod;
+			// cerr&lt;&lt;y+z&lt;&lt;&quot; &quot;&lt;&lt;y-z+lim[2]&lt;&lt;&quot; &quot;&lt;&lt;c[y+z][y-z+lim[2]]&lt;&lt;endl;
+	// cerr&lt;&lt;endl;
+	for(int i=lim[1]+lim[2];i&gt;=0;i--)
+		for(int j=lim[1]+lim[2];j&gt;=0;j--)
+			mad(c[i][j],c[i][j+1]),
+			mad(c[i][j],c[i+1][j]),
+			mad(c[i][j],mod-c[i+1][j+1]);
+			// cerr&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;j&lt;&lt;&quot; &quot;&lt;&lt;c[i][j]&lt;&lt;endl;
+	// cerr&lt;&lt;endl;
+	for(int x=0;x&lt;=lim[0];++x)
+		for(int w=0;w&lt;=lim[3];++w){
+			/*
+			CRITICAL STEP，VERIFY CKP，重新推导一下贡献：
+			对于 s1，不满足的位置有 x+y+z+w 个
+			对于 s2，不满足的位置有 x+y+(lim2-z)+(lim3-w) 个
+			对于 s3，不满足的位只有 x+(lim1-y)+z+(lim3-w) 个
+			于是：
+			x,y,z,w 已经通过枚举范围，满足了上界的要求
+			x+y+z+w &gt; r1，因此要求 y+z &gt; r1-x-w
+			x+y+(lim2-z)+(lim3-w) &gt; r2，因此要求 y-z &gt; r2-lim2-lim3+w-x
+			x+(lim1-y)+z+(lim3-w) &gt; r3，因此要求 z-y &gt; r3-lim1-lim3+w-x
+			也就是 -(r3-lim1-lim3+w-x) &gt; y-z &gt; r2-lim2-lim3+w-x
+			*/
+			int lb1=max(r1-x-w+1,0ll);
+			int lb2=max(r2-lim[2]-lim[3]+w-x+1,-lim[2]);
+			int rb2=-(r3-lim[1]-lim[3]+w-x);
+			// cerr&lt;&lt;x&lt;&lt;&quot; &quot;&lt;&lt;w&lt;&lt;&quot; &quot;&lt;&lt;lb1&lt;&lt;&quot; &quot;&lt;&lt;lb2&lt;&lt;&quot; &quot;&lt;&lt;rb2&lt;&lt;endl;
+			if(rb2&lt;=lb2) continue;
+			int add=(c[lb1][lb2+lim[2]]-c[lb1][rb2+lim[2]]+mod);
+			// cerr&lt;&lt;c[lb1][lb2+lim[2]]&lt;&lt;&quot; &quot;&lt;&lt;c[lb1][rb2+lim[2]]&lt;&lt;endl;
+			add=add*cvl(lim[0],x)%mod*cvl(lim[3],w)%mod;
+			ans=(ans+add)%mod;
+		}
+	cout&lt;&lt;(qpow(2,n)-ans+mod)%mod&lt;&lt;endl;
+}
+//1134 passdc all big samples.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-comment">// bool membeg;</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> online=<span class="hljs-number">1</span>;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">1e9</span><span class="hljs-number">+7</span>;
+<span class="hljs-type">int</span> n,lim[<span class="hljs-number">4</span>],r1,r2,r3,c[<span class="hljs-number">10005</span>][<span class="hljs-number">10005</span>];
+<span class="hljs-type">long</span> <span class="hljs-type">long</span> ans,jc[<span class="hljs-number">10005</span>],ny[<span class="hljs-number">10005</span>];
+<span class="hljs-type">char</span> c1[<span class="hljs-number">10005</span>],c2[<span class="hljs-number">10005</span>],c3[<span class="hljs-number">10005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp;l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-title">qpow</span><span class="hljs-params">(<span class="hljs-type">long</span> <span class="hljs-type">long</span> a,<span class="hljs-type">int</span> b)</span></span>{
+	<span class="hljs-type">long</span> <span class="hljs-type">long</span> ret=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(;b;b&gt;&gt;=<span class="hljs-number">1</span>,a=a*a%mod)
+		(b&amp;<span class="hljs-number">1</span>)&amp;&amp;(ret=ret*a%mod);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-title">cvl</span><span class="hljs-params">(<span class="hljs-type">int</span> n,<span class="hljs-type">int</span> m)</span></span>{
+	<span class="hljs-comment">// cerr&lt;&lt;n&lt;&lt;&quot; &quot;&lt;&lt;m&lt;&lt;&quot; &quot;&lt;&lt;jc[n]*ny[m]%mod*ny[n-m]%mod&lt;&lt;endl;</span>
+	<span class="hljs-keyword">return</span> jc[n]*ny[m]%mod*ny[n-m]%mod;
+}
+<span class="hljs-comment">// bool memend;</span>
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">if</span>(online)
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;kul.in&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>,stdin),
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;kul.out&quot;</span>,<span class="hljs-string">&quot;w&quot;</span>,stdout);
+	<span class="hljs-comment">// memset(c,0,sizeof c);</span>
+	<span class="hljs-comment">// cerr&lt;&lt;abs((long long)(&amp;membeg)-(long long)(&amp;memend))&lt;&lt;endl;</span>
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=jc[<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;i&lt;=n;++i) jc[i]=jc[i<span class="hljs-number">-1</span>]*i%mod;
+	ny[n]=<span class="hljs-built_in">qpow</span>(jc[n],mod<span class="hljs-number">-2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n;i&gt;=<span class="hljs-number">1</span>;i--) ny[i<span class="hljs-number">-1</span>]=ny[i]*i%mod;
+	<span class="hljs-comment">/*
+	那肯定就是求不满足要求的字符串数量了
+	我有一些大胆的想法：能不能搞一个三元多项式？
+	没有前途，每一元的次数都是 n 的，实际上没什么优化空间
+
+	1～8 是简单的，直接 dp_{p,i,j,k} 就行了
+	9~10 的特殊性质是 r&lt;=500
+	那时间复杂度肯定就是 O(r^3) 或者 O(nr^2) 的了
+	感觉后者更有可能一些，思考一下：
+
+	虽然我可能误解了最后那个神秘特殊性质的意思
+	但是它确实给了我一点点启发：    
+	我们可不可以把三个字符串都一样的位置直接删除掉，最后再合并进来？
+	这为什么有道理：剩下的位置一定是 1/2 的选择，
+
+	等一下，为什么我一定只剥离三个都一样的情况？
+	考虑有几种可能的贡献：显然是 8 种
+	这八种按照是否贡献到 1 上面分成两类
+	我们将两类中互补对象配对形成四对
+	这四对的出现次数是确定的，比如分别是 a,b,c,d
+	假设这四种当中，对 1 有贡献的出现次数依次是 x,y,z,w
+	那么最后的约束可以写成 x,y,z,w 分别不大于 a,b,c,d
+	并且 x+y+z+w &gt; r1
+	并且 x+y-z-w &gt; r2-c-d
+	并且 x-y+z-w &gt; r3-b-d
+	的方案数计数
+
+	从中显然注意到 x 的贡献系数是完全一致的
+	所以前面我才会提出来独立 x 但是后面的 y,z,w 怎么办？
+	本质上就是在求解：
+	y+z+w &gt; a
+	y-z-w &gt; b
+	z-y-w &gt; c
+	并且 y,z,w 有一个不到 n 的上界的方案数
+	直接枚举 y,z,w 就可以知道 =a,=b,=c 的方案数
+	所以说再做一个前缀和不就 &gt;a,&gt;b,&gt;c 了？
+	显然时间复杂度就是 O(n^3) 了
+
+	进一步扩展这个思路：我们求解
+	y+z &gt; a, y-z &gt; b, z-y &gt; c 的方案数
+	然后计算答案的时候枚举 x,w 的数值
+	注意到前面的 y-z 和 z-y 正好是相反数，因此可以少记录一维
+	这样是不是一个 O(n^2) 预处理，O(n^2) 查询的做法？
+	好像是对的！！！
+	*/</span>
+	cin&gt;&gt;r1&gt;&gt;c1&gt;&gt;r2&gt;&gt;c2&gt;&gt;r3&gt;&gt;c3;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i){
+		<span class="hljs-keyword">if</span>(c1[i]==c2[i]&amp;&amp;c1[i]==c3[i]) lim[<span class="hljs-number">0</span>]++;
+		<span class="hljs-keyword">if</span>(c1[i]==c2[i]&amp;&amp;c1[i]!=c3[i]) lim[<span class="hljs-number">1</span>]++;
+		<span class="hljs-keyword">if</span>(c1[i]!=c2[i]&amp;&amp;c1[i]==c3[i]) lim[<span class="hljs-number">2</span>]++;
+		<span class="hljs-keyword">if</span>(c1[i]!=c2[i]&amp;&amp;c1[i]!=c3[i]) lim[<span class="hljs-number">3</span>]++;
+	}
+	<span class="hljs-comment">// cerr&lt;&lt;lim[0]&lt;&lt;&quot; &quot;&lt;&lt;lim[1]&lt;&lt;&quot; &quot;&lt;&lt;lim[2]&lt;&lt;&quot; &quot;&lt;&lt;lim[3]&lt;&lt;endl;</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> y=<span class="hljs-number">0</span>;y&lt;=lim[<span class="hljs-number">1</span>];++y)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> z=<span class="hljs-number">0</span>;z&lt;=lim[<span class="hljs-number">2</span>];++z)
+			c[y+z][y-z+lim[<span class="hljs-number">2</span>]]=<span class="hljs-built_in">cvl</span>(lim[<span class="hljs-number">1</span>],y)*<span class="hljs-built_in">cvl</span>(lim[<span class="hljs-number">2</span>],z)%mod;
+			<span class="hljs-comment">// cerr&lt;&lt;y+z&lt;&lt;&quot; &quot;&lt;&lt;y-z+lim[2]&lt;&lt;&quot; &quot;&lt;&lt;c[y+z][y-z+lim[2]]&lt;&lt;endl;</span>
+	<span class="hljs-comment">// cerr&lt;&lt;endl;</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=lim[<span class="hljs-number">1</span>]+lim[<span class="hljs-number">2</span>];i&gt;=<span class="hljs-number">0</span>;i--)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=lim[<span class="hljs-number">1</span>]+lim[<span class="hljs-number">2</span>];j&gt;=<span class="hljs-number">0</span>;j--)
+			<span class="hljs-built_in">mad</span>(c[i][j],c[i][j<span class="hljs-number">+1</span>]),
+			<span class="hljs-built_in">mad</span>(c[i][j],c[i<span class="hljs-number">+1</span>][j]),
+			<span class="hljs-built_in">mad</span>(c[i][j],mod-c[i<span class="hljs-number">+1</span>][j<span class="hljs-number">+1</span>]);
+			<span class="hljs-comment">// cerr&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;j&lt;&lt;&quot; &quot;&lt;&lt;c[i][j]&lt;&lt;endl;</span>
+	<span class="hljs-comment">// cerr&lt;&lt;endl;</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> x=<span class="hljs-number">0</span>;x&lt;=lim[<span class="hljs-number">0</span>];++x)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> w=<span class="hljs-number">0</span>;w&lt;=lim[<span class="hljs-number">3</span>];++w){
+			<span class="hljs-comment">/*
+			CRITICAL STEP，VERIFY CKP，重新推导一下贡献：
+			对于 s1，不满足的位置有 x+y+z+w 个
+			对于 s2，不满足的位置有 x+y+(lim2-z)+(lim3-w) 个
+			对于 s3，不满足的位只有 x+(lim1-y)+z+(lim3-w) 个
+			于是：
+			x,y,z,w 已经通过枚举范围，满足了上界的要求
+			x+y+z+w &gt; r1，因此要求 y+z &gt; r1-x-w
+			x+y+(lim2-z)+(lim3-w) &gt; r2，因此要求 y-z &gt; r2-lim2-lim3+w-x
+			x+(lim1-y)+z+(lim3-w) &gt; r3，因此要求 z-y &gt; r3-lim1-lim3+w-x
+			也就是 -(r3-lim1-lim3+w-x) &gt; y-z &gt; r2-lim2-lim3+w-x
+			*/</span>
+			<span class="hljs-type">int</span> lb1=<span class="hljs-built_in">max</span>(r1-x-w<span class="hljs-number">+1</span>,<span class="hljs-number">0ll</span>);
+			<span class="hljs-type">int</span> lb2=<span class="hljs-built_in">max</span>(r2-lim[<span class="hljs-number">2</span>]-lim[<span class="hljs-number">3</span>]+w-x<span class="hljs-number">+1</span>,-lim[<span class="hljs-number">2</span>]);
+			<span class="hljs-type">int</span> rb2=-(r3-lim[<span class="hljs-number">1</span>]-lim[<span class="hljs-number">3</span>]+w-x);
+			<span class="hljs-comment">// cerr&lt;&lt;x&lt;&lt;&quot; &quot;&lt;&lt;w&lt;&lt;&quot; &quot;&lt;&lt;lb1&lt;&lt;&quot; &quot;&lt;&lt;lb2&lt;&lt;&quot; &quot;&lt;&lt;rb2&lt;&lt;endl;</span>
+			<span class="hljs-keyword">if</span>(rb2&lt;=lb2) <span class="hljs-keyword">continue</span>;
+			<span class="hljs-type">int</span> add=(c[lb1][lb2+lim[<span class="hljs-number">2</span>]]-c[lb1][rb2+lim[<span class="hljs-number">2</span>]]+mod);
+			<span class="hljs-comment">// cerr&lt;&lt;c[lb1][lb2+lim[2]]&lt;&lt;&quot; &quot;&lt;&lt;c[lb1][rb2+lim[2]]&lt;&lt;endl;</span>
+			add=add*<span class="hljs-built_in">cvl</span>(lim[<span class="hljs-number">0</span>],x)%mod*<span class="hljs-built_in">cvl</span>(lim[<span class="hljs-number">3</span>],w)%mod;
+			ans=(ans+add)%mod;
+		}
+	cout&lt;&lt;(<span class="hljs-built_in">qpow</span>(<span class="hljs-number">2</span>,n)-ans+mod)%mod&lt;&lt;endl;
+}
+<span class="hljs-comment">//1134 passdc all big samples.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

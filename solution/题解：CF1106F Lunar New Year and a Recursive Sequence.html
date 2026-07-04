@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：CF1106F Lunar New Year and a Recursive Sequence</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>一眼就是原根什么的，题面的提示性一定程度上给这道题降低了难度。</p>
+<p>最大的提示就是那个幂的乘积，这确实太过于显眼了。我们考虑将整个式子重写成这样：</p>
+<p>$g_i=\sum_{j=1}^kb_jg_{i-j}$，显然 $g_i=\log f_i$。</p>
+<p>我们知道 $\log 1=0$，再求出来 $\log m$ 就可以列方程解 $g_k$ 了。具体来说，我们将所有的数值用 $g_k$ 的几倍来表示，比如 $g_1=0\times g_k$，$g_k=1\times g_k$。</p>
+<p>随后我们直接使用矩阵快速幂就可以列出等式 $v\times g_k=\log m$。现在我们想办法让整个式子有意义。</p>
+<p>显然 $998244353$ 有一个原根是 $3$，于是我们让上面的所有 $\log$ 都以 $3$ 为底进行计算即可。</p>
+<p>于是，唯一一步可能出现无解的地方就是 $v\times g_k=\log m$ 无解，这部分当中 $g_k$ 显然可以通过 EXGCD 直接算即可。</p>
+<p>最后 $f_k=3^{g_k}$ 还原回去就好了。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include &lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod=998244353,g=3;
+int k,n,m,b[105],lgm;
+unordered_map&lt;int,int&gt;mp;
+inline int calg(int v){
+	mp.clear();
+	int ret=-1;
+	int cv=1,sv=sqrt(mod);
+	for(int i=0;i!=sv;++i)
+		mp[cv*v%mod]=i,cv=cv*g%mod;
+	if(m==1) ret=0;
+	else{
+		int cur=1;
+		for(int i=1;i&lt;=sv+2;++i){
+			cur=cur*cv%mod;
+			if(mp.count(cur)){
+				ret=i*sv-mp[cur];
+				break;
+			}
+		}
+	}
+	if(ret==-1) exit(puts(&quot;-1&quot;)&amp;0);
+	return ret;
+}
+struct mat{
+	int v[101][101];
+	inline mat operator*(const mat&amp;r)const{
+		static mat ret;
+		memset(ret.v,0,sizeof ret.v);
+		for(int i=0;i!=k;++i)
+			for(int j=0;j!=k;++j)
+				for(int l=0;l!=k;++l)
+					ret.v[i][l]=(ret.v[i][l]+v[i][j]*r.v[j][l])%(mod-1);
+		return ret;
+	}
+}ans,tmp;
+inline void qpow(int k){
+	for(;k;k&gt;&gt;=1,tmp=tmp*tmp)
+		if(k&amp;1) ans=ans*tmp;
+}
+inline int qpow(int a,int b){
+	int ret=1;
+	for(;b;b&gt;&gt;=1,a=a*a%mod)	
+		(b&amp;1)&amp;&amp;(ret=ret*a%mod);
+	return ret;
+}
+inline void exgcd(int a,int b,int &amp;x,int &amp;y){
+	if(b==0) return x=1,void(y=0);
+	exgcd(b,a%b,y,x); y-=a/b*x;
+}
+signed main() {
+	ios::sync_with_stdio(0); cin&gt;&gt;k;
+	/*
+	g_i=log f_i 那么显然有:
+	g_i=\sum_{j=1}^k b_j f_{i-j}
+	有 g_{1}^{k-1}=0
+	这里的 log 我们可以定义为 log3，因为 3 是 998244353 的原根
+	此题可解！
+	*/
+	for(int i=1;i&lt;=k;++i) cin&gt;&gt;b[i];
+	cin&gt;&gt;n&gt;&gt;m; lgm=calg(m);
+	if(lgm==0) exit(puts(&quot;1&quot;)&amp;0);
+	ans.v[0][k-1]=1;
+	for(int i=0;i!=k-1;++i)
+		tmp.v[i+1][i]=1;
+	for(int i=0;i!=k;++i)
+		tmp.v[i][k-1]=b[k-i];
+	qpow(n-k);
+	int a=ans.v[0][k-1];
+	int b=lgm;
+	int gc=__gcd(a,b);
+	a/=gc; b/=gc;
+	if(__gcd(a,mod-1)!=1) exit(puts(&quot;-1&quot;)&amp;0);
+	cerr&lt;&lt;&quot;3^(&quot;&lt;&lt;b&lt;&lt;&quot;/&quot;&lt;&lt;a&lt;&lt;&quot;)\n&quot;;
+	int inv,tmp;
+	exgcd(a,mod-1,inv,tmp);
+	inv=(inv%(mod-1)+mod-1)%(mod-1);
+	b=b*inv%(mod-1);
+	cout&lt;&lt;qpow(g,b)&lt;&lt;endl;
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>,g=<span class="hljs-number">3</span>;
+<span class="hljs-type">int</span> k,n,m,b[<span class="hljs-number">105</span>],lgm;
+unordered_map&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;mp;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">calg</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span></span>{
+	mp.<span class="hljs-built_in">clear</span>();
+	<span class="hljs-type">int</span> ret=<span class="hljs-number">-1</span>;
+	<span class="hljs-type">int</span> cv=<span class="hljs-number">1</span>,sv=<span class="hljs-built_in">sqrt</span>(mod);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=sv;++i)
+		mp[cv*v%mod]=i,cv=cv*g%mod;
+	<span class="hljs-keyword">if</span>(m==<span class="hljs-number">1</span>) ret=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">else</span>{
+		<span class="hljs-type">int</span> cur=<span class="hljs-number">1</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=sv<span class="hljs-number">+2</span>;++i){
+			cur=cur*cv%mod;
+			<span class="hljs-keyword">if</span>(mp.<span class="hljs-built_in">count</span>(cur)){
+				ret=i*sv-mp[cur];
+				<span class="hljs-keyword">break</span>;
+			}
+		}
+	}
+	<span class="hljs-keyword">if</span>(ret==<span class="hljs-number">-1</span>) <span class="hljs-built_in">exit</span>(<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;-1&quot;</span>)&amp;<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">mat</span>{
+	<span class="hljs-type">int</span> v[<span class="hljs-number">101</span>][<span class="hljs-number">101</span>];
+	<span class="hljs-keyword">inline</span> mat <span class="hljs-keyword">operator</span>*(<span class="hljs-type">const</span> mat&amp;r)<span class="hljs-type">const</span>{
+		<span class="hljs-type">static</span> mat ret;
+		<span class="hljs-built_in">memset</span>(ret.v,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> ret.v);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=k;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=k;++j)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> l=<span class="hljs-number">0</span>;l!=k;++l)
+					ret.v[i][l]=(ret.v[i][l]+v[i][j]*r.v[j][l])%(mod<span class="hljs-number">-1</span>);
+		<span class="hljs-keyword">return</span> ret;
+	}
+}ans,tmp;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">qpow</span><span class="hljs-params">(<span class="hljs-type">int</span> k)</span></span>{
+	<span class="hljs-keyword">for</span>(;k;k&gt;&gt;=<span class="hljs-number">1</span>,tmp=tmp*tmp)
+		<span class="hljs-keyword">if</span>(k&amp;<span class="hljs-number">1</span>) ans=ans*tmp;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">qpow</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b)</span></span>{
+	<span class="hljs-type">int</span> ret=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(;b;b&gt;&gt;=<span class="hljs-number">1</span>,a=a*a%mod)	
+		(b&amp;<span class="hljs-number">1</span>)&amp;&amp;(ret=ret*a%mod);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">exgcd</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b,<span class="hljs-type">int</span> &amp;x,<span class="hljs-type">int</span> &amp;y)</span></span>{
+	<span class="hljs-keyword">if</span>(b==<span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> x=<span class="hljs-number">1</span>,<span class="hljs-built_in">void</span>(y=<span class="hljs-number">0</span>);
+	<span class="hljs-built_in">exgcd</span>(b,a%b,y,x); y-=a/b*x;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;k;
+	<span class="hljs-comment">/*
+	g_i=log f_i 那么显然有:
+	g_i=\sum_{j=1}^k b_j f_{i-j}
+	有 g_{1}^{k-1}=0
+	这里的 log 我们可以定义为 log3，因为 3 是 998244353 的原根
+	此题可解！
+	*/</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=k;++i) cin&gt;&gt;b[i];
+	cin&gt;&gt;n&gt;&gt;m; lgm=<span class="hljs-built_in">calg</span>(m);
+	<span class="hljs-keyword">if</span>(lgm==<span class="hljs-number">0</span>) <span class="hljs-built_in">exit</span>(<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;1&quot;</span>)&amp;<span class="hljs-number">0</span>);
+	ans.v[<span class="hljs-number">0</span>][k<span class="hljs-number">-1</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=k<span class="hljs-number">-1</span>;++i)
+		tmp.v[i<span class="hljs-number">+1</span>][i]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=k;++i)
+		tmp.v[i][k<span class="hljs-number">-1</span>]=b[k-i];
+	<span class="hljs-built_in">qpow</span>(n-k);
+	<span class="hljs-type">int</span> a=ans.v[<span class="hljs-number">0</span>][k<span class="hljs-number">-1</span>];
+	<span class="hljs-type">int</span> b=lgm;
+	<span class="hljs-type">int</span> gc=__gcd(a,b);
+	a/=gc; b/=gc;
+	<span class="hljs-keyword">if</span>(__gcd(a,mod<span class="hljs-number">-1</span>)!=<span class="hljs-number">1</span>) <span class="hljs-built_in">exit</span>(<span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;-1&quot;</span>)&amp;<span class="hljs-number">0</span>);
+	cerr&lt;&lt;<span class="hljs-string">&quot;3^(&quot;</span>&lt;&lt;b&lt;&lt;<span class="hljs-string">&quot;/&quot;</span>&lt;&lt;a&lt;&lt;<span class="hljs-string">&quot;)\n&quot;</span>;
+	<span class="hljs-type">int</span> inv,tmp;
+	<span class="hljs-built_in">exgcd</span>(a,mod<span class="hljs-number">-1</span>,inv,tmp);
+	inv=(inv%(mod<span class="hljs-number">-1</span>)+mod<span class="hljs-number">-1</span>)%(mod<span class="hljs-number">-1</span>);
+	b=b*inv%(mod<span class="hljs-number">-1</span>);
+	cout&lt;&lt;<span class="hljs-built_in">qpow</span>(g,b)&lt;&lt;endl;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
