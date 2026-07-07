@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：AT_abc213_f [ABC213F] Common Prefixes</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>看到这种多串 LCP 的题目，优先想一下 SA 可不可做。</p>
+<p>SA 的 height 数组有一个非常美妙的性质：$\operatorname{LCP}(i,j)=\min_{k=i+1}^{j}height_k$，这里的 LCP 定义为 rank 为 $i$ 的字符串和 rank 为 $j$ 的字符串的最长公共前缀的长度。</p>
+<p>于是，$\sum_{i=1}^n\operatorname{LCP}(i,k)=\sum_{i=1}^{k-1}\min_{j=i+1}^kheight_j+\sum_{i=k+1}^n\min_{j=k+1}^iheight_j+(n-sa_k+1)$。最后一项是 $\operatorname{LCP}(k,k)$ 的贡献。</p>
+<p>于是此题确实可解，具体来说，我们将 SA，rank，height 数组求出来，然后按照上面的式子使用单调栈将前两项的贡献算出来，最后输出的时候查询 $rank_i$ 的数据即可，时间复杂度 $n\log n$，瓶颈在于求解 SA。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int n,nsa[1000005],cnt[1000005]; char c[1000005];
+int sa[1000005],rk[2000005],nrk[1000005],h[1000005];
+int ansl[1000005],ansr[1000005],ant; stack&lt;pair&lt;int,int&gt;&gt;s;
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;c;
+	memmove(c+1,c,n*sizeof(char));
+	for(int i=1;i&lt;=n;++i) rk[i]=c[i]-'a'+1;
+	for(int i=1;i&lt;n;i&lt;&lt;=1){
+		for(int j=1;j&lt;=n;++j) cnt[rk[j+i]]++;
+		for(int j=1;j&lt;=max(n,26ll);++j) cnt[j]+=cnt[j-1];
+		for(int j=max(n,26ll);j&gt;=1;j--) cnt[j]=cnt[j-1];
+		cnt[0]=0;
+		for(int j=1;j&lt;=n;++j) nsa[++cnt[rk[j+i]]]=j;
+		for(int j=0;j&lt;=max(n,26ll);++j) cnt[j]=0;
+		for(int j=1;j&lt;=n;++j) cnt[rk[j]]++;
+		for(int j=1;j&lt;=max(n,26ll);++j) cnt[j]+=cnt[j-1];
+		for(int j=max(n,26ll);j&gt;=1;j--) cnt[j]=cnt[j-1];
+		cnt[0]=0;
+		for(int j=1;j&lt;=n;++j) sa[++cnt[rk[nsa[j]]]]=nsa[j];
+		for(int j=0;j&lt;=max(n,26ll);++j) cnt[j]=0;
+		for(int j=1,k=0;j&lt;=n;++j)
+			nrk[sa[j]]=(k+=(rk[sa[j]]!=rk[sa[j-1]]||rk[sa[j]+i]!=rk[sa[j-1]+i]));
+		memcpy(rk+1,nrk+1,n*sizeof(int));
+	}
+	for(int i=1,j=0;i&lt;=n;++i){
+		if(j)j--;if(rk[i]==1)continue;
+		while(c[i+j]==c[sa[rk[i]-1]+j])j++;
+		h[rk[i]]=j;
+	}
+	s.emplace(1,0);
+	for(int i=2;i&lt;=n;++i){
+		int cp=i;
+		while(s.top().second&gt;h[i])
+			ant-=(s.top().second)*(cp-s.top().first),
+			cp=s.top().first,s.pop();
+		s.emplace(cp,h[i]), ant+=(i-cp+1)*h[i];
+		ansl[i]=ant;
+		// cerr&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;h[i]&lt;&lt;&quot; &quot;&lt;&lt;ansl[i]&lt;&lt;endl;
+	}
+	while(s.size()) s.pop();
+	s.emplace(n,0); ant=0; //cerr&lt;&lt;endl;
+	for(int i=n-1;i&gt;=1;i--){
+		int cp=i;
+		while(s.top().second&gt;h[i+1])
+			ant-=(s.top().second)*(s.top().first-cp),
+			cp=s.top().first,s.pop();
+		s.emplace(cp,h[i+1]), ant+=(cp-i+1)*h[i+1];
+		ansr[i]=ant;
+		// cerr&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;h[i+1]&lt;&lt;&quot; &quot;&lt;&lt;ansr[i]&lt;&lt;endl;
+	}
+	for(int i=1;i&lt;=n;++i)
+		cout&lt;&lt;ansl[rk[i]]+ansr[rk[i]]+(n-i+1)&lt;&lt;'\n';
+}
+//私は猫です!
+//Written by cbc on nyarch linux.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-type">int</span> n,nsa[<span class="hljs-number">1000005</span>],cnt[<span class="hljs-number">1000005</span>]; <span class="hljs-type">char</span> c[<span class="hljs-number">1000005</span>];
+<span class="hljs-type">int</span> sa[<span class="hljs-number">1000005</span>],rk[<span class="hljs-number">2000005</span>],nrk[<span class="hljs-number">1000005</span>],h[<span class="hljs-number">1000005</span>];
+<span class="hljs-type">int</span> ansl[<span class="hljs-number">1000005</span>],ansr[<span class="hljs-number">1000005</span>],ant; stack&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&gt;s;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;c;
+	<span class="hljs-built_in">memmove</span>(c<span class="hljs-number">+1</span>,c,n*<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">char</span>));
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) rk[i]=c[i]-<span class="hljs-string">&#x27;a&#x27;</span><span class="hljs-number">+1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;n;i&lt;&lt;=<span class="hljs-number">1</span>){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j) cnt[rk[j+i]]++;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=<span class="hljs-built_in">max</span>(n,<span class="hljs-number">26ll</span>);++j) cnt[j]+=cnt[j<span class="hljs-number">-1</span>];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-built_in">max</span>(n,<span class="hljs-number">26ll</span>);j&gt;=<span class="hljs-number">1</span>;j--) cnt[j]=cnt[j<span class="hljs-number">-1</span>];
+		cnt[<span class="hljs-number">0</span>]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j) nsa[++cnt[rk[j+i]]]=j;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=<span class="hljs-built_in">max</span>(n,<span class="hljs-number">26ll</span>);++j) cnt[j]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j) cnt[rk[j]]++;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=<span class="hljs-built_in">max</span>(n,<span class="hljs-number">26ll</span>);++j) cnt[j]+=cnt[j<span class="hljs-number">-1</span>];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-built_in">max</span>(n,<span class="hljs-number">26ll</span>);j&gt;=<span class="hljs-number">1</span>;j--) cnt[j]=cnt[j<span class="hljs-number">-1</span>];
+		cnt[<span class="hljs-number">0</span>]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j) sa[++cnt[rk[nsa[j]]]]=nsa[j];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=<span class="hljs-built_in">max</span>(n,<span class="hljs-number">26ll</span>);++j) cnt[j]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>,k=<span class="hljs-number">0</span>;j&lt;=n;++j)
+			nrk[sa[j]]=(k+=(rk[sa[j]]!=rk[sa[j<span class="hljs-number">-1</span>]]||rk[sa[j]+i]!=rk[sa[j<span class="hljs-number">-1</span>]+i]));
+		<span class="hljs-built_in">memcpy</span>(rk<span class="hljs-number">+1</span>,nrk<span class="hljs-number">+1</span>,n*<span class="hljs-built_in">sizeof</span>(<span class="hljs-type">int</span>));
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,j=<span class="hljs-number">0</span>;i&lt;=n;++i){
+		<span class="hljs-keyword">if</span>(j)j--;<span class="hljs-keyword">if</span>(rk[i]==<span class="hljs-number">1</span>)<span class="hljs-keyword">continue</span>;
+		<span class="hljs-keyword">while</span>(c[i+j]==c[sa[rk[i]<span class="hljs-number">-1</span>]+j])j++;
+		h[rk[i]]=j;
+	}
+	s.<span class="hljs-built_in">emplace</span>(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">2</span>;i&lt;=n;++i){
+		<span class="hljs-type">int</span> cp=i;
+		<span class="hljs-keyword">while</span>(s.<span class="hljs-built_in">top</span>().second&gt;h[i])
+			ant-=(s.<span class="hljs-built_in">top</span>().second)*(cp-s.<span class="hljs-built_in">top</span>().first),
+			cp=s.<span class="hljs-built_in">top</span>().first,s.<span class="hljs-built_in">pop</span>();
+		s.<span class="hljs-built_in">emplace</span>(cp,h[i]), ant+=(i-cp<span class="hljs-number">+1</span>)*h[i];
+		ansl[i]=ant;
+		<span class="hljs-comment">// cerr&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;h[i]&lt;&lt;&quot; &quot;&lt;&lt;ansl[i]&lt;&lt;endl;</span>
+	}
+	<span class="hljs-keyword">while</span>(s.<span class="hljs-built_in">size</span>()) s.<span class="hljs-built_in">pop</span>();
+	s.<span class="hljs-built_in">emplace</span>(n,<span class="hljs-number">0</span>); ant=<span class="hljs-number">0</span>; <span class="hljs-comment">//cerr&lt;&lt;endl;</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n<span class="hljs-number">-1</span>;i&gt;=<span class="hljs-number">1</span>;i--){
+		<span class="hljs-type">int</span> cp=i;
+		<span class="hljs-keyword">while</span>(s.<span class="hljs-built_in">top</span>().second&gt;h[i<span class="hljs-number">+1</span>])
+			ant-=(s.<span class="hljs-built_in">top</span>().second)*(s.<span class="hljs-built_in">top</span>().first-cp),
+			cp=s.<span class="hljs-built_in">top</span>().first,s.<span class="hljs-built_in">pop</span>();
+		s.<span class="hljs-built_in">emplace</span>(cp,h[i<span class="hljs-number">+1</span>]), ant+=(cp-i<span class="hljs-number">+1</span>)*h[i<span class="hljs-number">+1</span>];
+		ansr[i]=ant;
+		<span class="hljs-comment">// cerr&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;h[i+1]&lt;&lt;&quot; &quot;&lt;&lt;ansr[i]&lt;&lt;endl;</span>
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+		cout&lt;&lt;ansl[rk[i]]+ansr[rk[i]]+(n-i<span class="hljs-number">+1</span>)&lt;&lt;<span class="hljs-string">&#x27;\n&#x27;</span>;
+}
+<span class="hljs-comment">//私は猫です!</span>
+<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
