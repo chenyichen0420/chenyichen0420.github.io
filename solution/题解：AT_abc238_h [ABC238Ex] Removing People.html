@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="color-scheme" content="light dark">
-    <title>题解：AT_abc248_g [ABC248G] GCD cost on the tree</title>
+    <title>题解：AT_abc238_h [ABC238Ex] Removing People</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -220,14 +220,22 @@
     <div class="search-results" id="searchResults"></div>
 </div>
         <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
-<p>感觉这种对 $gcd$ 什么的容斥方法已经非常的普及了。</p>
-<p>就是这样的：我们考虑将对 $=k$ 的贡献转换成 $\mid k$ 的贡献，然后把其倍数给砍掉就是 $=k$ 的贡献了。</p>
-<p>在这道题中，我们考虑统计 $f(d)=\sum_{d\mid \gcd(i,j)}dis(i,j)$ 的值，然后就有答案是 $\sum_{i\ge1}d(f(d)-\sum_{j\ge2}f(jd))$。考虑 $f(d)$ 怎么计算。</p>
-<p>显然对 $f(d)$ 有贡献的路径 $(i,j)$，满足 $\forall k\in(i,j)$，$d\mid a_k$。</p>
-<p>于是我们将所有的因数的出现位置记出来，然后这样的路径就是若干个连通块内部的路径。接下来考虑对于一个连通块，怎么统计出所有路径的长度。</p>
-<p>显然，这些连通块仍然是树形结构，于是我们考虑我们要计算的就是一个子树中的所有路径的长度之和。</p>
-<p>不妨遍历这个树上的每一个节点，统计子树中经过这个节点的路径的长度之和，这是简单的，我们记录出每一颗子树到这个节点的路径长度和以及个数，然后就可以简单计算出来了。</p>
-<p>完了之后按照前面给的公式直接计算就行了，时间复杂度是 $n\sigma_0(n)+n\log n$，可以通过此题，参考代码如下：</p>
+<p>看数据范围，大致猜一个三次方，不过具体怎么做？</p>
+<p>直觉上应该会是一个 DP 题，但是不太确定具体怎么 DP，于是我们考虑区尝试刻画一个合适的 DP 状态。</p>
+<p>我们发现如果直接按照原始的流程去做的话，每一步都依赖于前面的所有步，你总是需要把所有的人的生死状态记录下来，非常不优秀。</p>
+<p>我们考虑正难则反，倒着考虑整个过程。</p>
+<p>容易注意到我们此时的操作就是最后任意保留下来一个人，然后每一次沿着某一个活着的人的方向复活一个人，代价就是二者的距离。</p>
+<p>于是我们注意到一个非常美妙的性质：因为我和我复活的人中间是不能有别的人的，所以说我新复活的人会将我的方向上的这个区间砍成两个独立的部分。</p>
+<p>于是我们对这个东西进行区间 DP 即可。</p>
+<p>具体来说，我们先断环为链，随后考虑令 $dp_{i,j}$ 表示保留了 $i,j$ 这两个点的情况下，内部的人全部复活的所有情况的代价之和。考虑转移。</p>
+<p>注意到我们求的是所有的情况的代价之和，所以经过推导，我们还需要一个辅助的数值 $c_{i,j}$，表示保留了 $i,j$ 这两个点的情况下，内部的人全部复活的情况数。</p>
+<p>详细描述一下 $dp$ 的转移。我们假设我们现在想要求出 $dp_{i,j}$ 的数值。此时我们钦定了我们 已经保留了 $i,j$ 两个点。</p>
+<p>那么如果 $s_i=R$，我们就可以让 $i$ 来复活人。假设我们复活的人是 $k$，那么对 $dp_{i,j}$ 的贡献有三部分：$dp_{i,k}\times c_{k,j}\times\binom{(j-k-1)}{(k-i-1)+(j-k-1)}$，$c_{i,k}\times dp_{k,j}\times\binom{(j-k-1)}{(k-i-1)+(j-k-1)}$，和 $(k-i)\times c_{i,k}\times c_{k,j}\times\binom{(j-k-1)}{(k-i-1)+(j-k-1)}$。</p>
+<p>前两部分是将左右子区间的贡献传上来。以左子区间为例，首先左子区间的每一种决策都能和右子区间的所有决策组合，所以首先乘上一个 $c_{k,j}$。再考虑到两个区间内部的顺序其实是任意的，所以我们还需要在两边的大小之和个位置中选出左区间的大小个位置留给左边，也就是 $\binom{(j-k-1)}{(k-i-1)+(j-k-1)}$。</p>
+<p>最后一部分是 $i$ 复活 $k$ 的贡献，意思是我复活产生的 $(k-i)$ 会贡献剩下两个区间的总决策数量次。类似前面我们可以推得这个决策数量就是内部决策数量之积再乘上二者的相对顺序的系数。</p>
+<p>如果 $s_j=L$，那么会产生一组非常相似的贡献，留给读者自行推导。</p>
+<p>最后转移一下 $c$，显然 $c_{i,j}$ 就是所有的 $(i,k),(k,j)$ 的总贡献的转移，形式上就是只保留前面 $dp$ 转移的第三项中的转移系数，不再赘述。</p>
+<p>边界条件：$dp_{i,i+1}=0,c_{i,i+1}=1$。至此，此题可解，时间复杂度 $O(n^3)$，参考代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
     <span class="code-lang">CPP</span>
@@ -235,41 +243,44 @@
 using namespace std;
 #define int long long
 constexpr int mod=998244353;
-int n,a[100005],ans[100005],c[100005],v[100005],nc[100005],ret;
-vector&lt;int&gt;son[100005],ap[100005]; bool cs[100005];
-inline void mad(int&amp; l,const int r){(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
-inline void dfs(int p,int a){
-	c[p]=v[p]=1; nc[p]=cs[p]=0;
-	for(int sp:son[p]) if(cs[sp]){
-		dfs(sp,a);
-		nc[p]=(nc[p]+c[p]*v[sp]+c[sp]*v[p])%mod;
-		mad(c[p],c[sp]); v[p]=(v[p]+v[sp]+c[sp])%mod;
-	}
-	mad(ans[a],nc[p]);
+int n,dp[605][605],ans,c[605][605];
+char s[605]; int jc[605],ny[605];
+inline int qpow(int a,int b){
+	int ret=1;
+	for(;b;b&gt;&gt;=1,a=a*a%mod)
+		(b&amp;1)&amp;&amp;(ret=ret*a%mod);
+	return ret;
+}
+inline int cvc(int n,int m){
+	return jc[n+m]*ny[n]%mod*ny[m]%mod;
 }
 signed main(){
 	ios::sync_with_stdio(0); cin&gt;&gt;n;
-	for(int i=1;i&lt;=n;++i){
-		cin&gt;&gt;a[i];
-		for(int j=1;j*j&lt;=a[i];++j)
-			if(a[i]%j==0) ap[j].emplace_back(i);
-		for(int j=1;j*j&lt;a[i];++j)
-			if(a[i]%j==0) ap[a[i]/j].emplace_back(i);
-	}
-	for(int i=1,l,r;i!=n;++i)
-		cin&gt;&gt;l&gt;&gt;r,
-		son[l].emplace_back(r),
-		son[r].emplace_back(l);
-	for(int i=1e5;i&gt;=1;i--) if(ap[i].size()){
-		for(int p:ap[i]) cs[p]=1;
-		for(int p:ap[i]) if(cs[p]) dfs(p,i);
-		for(int v=i*2;v&lt;=1e5;v+=i) mad(ans[i],mod-ans[v]);
-	}
-	for(int i=1;i&lt;=1e5;++i) ret=(ret+i*ans[i])%mod;
-	cout&lt;&lt;ret&lt;&lt;endl;
+	for(int i=1;i&lt;=n;++i) cin&gt;&gt;s[i],s[i+n]=s[i];
+	for(int i=1;i!=n*2;++i) c[i][i+1]=1;
+	for(int i=jc[0]=1;i&lt;=n*2;++i) jc[i]=jc[i-1]*i%mod;
+	ny[n*2]=qpow(jc[n*2],mod-2);
+	for(int i=n*2;i&gt;=1;i--) ny[i-1]=ny[i]*i%mod;
+	for(int l=2;l&lt;=n;++l)
+#define j (i+l)
+		for(int i=1;j&lt;=n*2;++i){
+			if(s[i]=='R')
+				for(int k=i+1;k!=j;++k)
+					c[i][j]=(c[i][j]+c[i][k]*c[k][j]%mod*cvc(k-i-1,j-k-1))%mod,
+					dp[i][j]=(dp[i][j]+c[i][k]*dp[k][j]%mod*cvc(k-i-1,j-k-1))%mod,
+					dp[i][j]=(dp[i][j]+dp[i][k]*c[k][j]%mod*cvc(k-i-1,j-k-1))%mod,
+					dp[i][j]=(dp[i][j]+(k-i)*c[i][k]%mod*c[k][j]%mod*cvc(k-i-1,j-k-1))%mod;
+			if(s[j]=='L')
+				for(int k=i+1;k!=j;++k)
+					c[i][j]=(c[i][j]+c[i][k]*c[k][j]%mod*cvc(k-i-1,j-k-1))%mod,
+					dp[i][j]=(dp[i][j]+c[i][k]*dp[k][j]%mod*cvc(k-i-1,j-k-1))%mod,
+					dp[i][j]=(dp[i][j]+dp[i][k]*c[k][j]%mod*cvc(k-i-1,j-k-1))%mod,
+					dp[i][j]=(dp[i][j]+(j-k)*c[i][k]%mod*c[k][j]%mod*cvc(k-i-1,j-k-1))%mod;
+		}
+	for(int i=1;i&lt;=n;++i) ans=(ans+dp[i][i+n])%mod,cerr&lt;&lt;dp[i][i+n]&lt;&lt;&quot; &quot;;
+	cerr&lt;&lt;ans&lt;&lt;endl; cout&lt;&lt;ans*ny[n]%mod&lt;&lt;endl;
 }
-//私は猫です!
-//Written by cbc on nyarch linux.
+//written by cbc on nyarch linux.
 ">复制</button>
 </div>
 <div class="code-content">
@@ -277,45 +288,47 @@ signed main(){
 <span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
 <span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
 <span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>;
-<span class="hljs-type">int</span> n,a[<span class="hljs-number">100005</span>],ans[<span class="hljs-number">100005</span>],c[<span class="hljs-number">100005</span>],v[<span class="hljs-number">100005</span>],nc[<span class="hljs-number">100005</span>],ret;
-vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">100005</span>],ap[<span class="hljs-number">100005</span>]; <span class="hljs-type">bool</span> cs[<span class="hljs-number">100005</span>];
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> a)</span></span>{
-	c[p]=v[p]=<span class="hljs-number">1</span>; nc[p]=cs[p]=<span class="hljs-number">0</span>;
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(cs[sp]){
-		<span class="hljs-built_in">dfs</span>(sp,a);
-		nc[p]=(nc[p]+c[p]*v[sp]+c[sp]*v[p])%mod;
-		<span class="hljs-built_in">mad</span>(c[p],c[sp]); v[p]=(v[p]+v[sp]+c[sp])%mod;
-	}
-	<span class="hljs-built_in">mad</span>(ans[a],nc[p]);
+<span class="hljs-type">int</span> n,dp[<span class="hljs-number">605</span>][<span class="hljs-number">605</span>],ans,c[<span class="hljs-number">605</span>][<span class="hljs-number">605</span>];
+<span class="hljs-type">char</span> s[<span class="hljs-number">605</span>]; <span class="hljs-type">int</span> jc[<span class="hljs-number">605</span>],ny[<span class="hljs-number">605</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">qpow</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b)</span></span>{
+	<span class="hljs-type">int</span> ret=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(;b;b&gt;&gt;=<span class="hljs-number">1</span>,a=a*a%mod)
+		(b&amp;<span class="hljs-number">1</span>)&amp;&amp;(ret=ret*a%mod);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">cvc</span><span class="hljs-params">(<span class="hljs-type">int</span> n,<span class="hljs-type">int</span> m)</span></span>{
+	<span class="hljs-keyword">return</span> jc[n+m]*ny[n]%mod*ny[m]%mod;
 }
 <span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
 	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
-		cin&gt;&gt;a[i];
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j*j&lt;=a[i];++j)
-			<span class="hljs-keyword">if</span>(a[i]%j==<span class="hljs-number">0</span>) ap[j].<span class="hljs-built_in">emplace_back</span>(i);
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j*j&lt;a[i];++j)
-			<span class="hljs-keyword">if</span>(a[i]%j==<span class="hljs-number">0</span>) ap[a[i]/j].<span class="hljs-built_in">emplace_back</span>(i);
-	}
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i!=n;++i)
-		cin&gt;&gt;l&gt;&gt;r,
-		son[l].<span class="hljs-built_in">emplace_back</span>(r),
-		son[r].<span class="hljs-built_in">emplace_back</span>(l);
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1e5</span>;i&gt;=<span class="hljs-number">1</span>;i--) <span class="hljs-keyword">if</span>(ap[i].<span class="hljs-built_in">size</span>()){
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p:ap[i]) cs[p]=<span class="hljs-number">1</span>;
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p:ap[i]) <span class="hljs-keyword">if</span>(cs[p]) <span class="hljs-built_in">dfs</span>(p,i);
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v=i*<span class="hljs-number">2</span>;v&lt;=<span class="hljs-number">1e5</span>;v+=i) <span class="hljs-built_in">mad</span>(ans[i],mod-ans[v]);
-	}
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-number">1e5</span>;++i) ret=(ret+i*ans[i])%mod;
-	cout&lt;&lt;ret&lt;&lt;endl;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;s[i],s[i+n]=s[i];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=n*<span class="hljs-number">2</span>;++i) c[i][i<span class="hljs-number">+1</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=jc[<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;i&lt;=n*<span class="hljs-number">2</span>;++i) jc[i]=jc[i<span class="hljs-number">-1</span>]*i%mod;
+	ny[n*<span class="hljs-number">2</span>]=<span class="hljs-built_in">qpow</span>(jc[n*<span class="hljs-number">2</span>],mod<span class="hljs-number">-2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n*<span class="hljs-number">2</span>;i&gt;=<span class="hljs-number">1</span>;i--) ny[i<span class="hljs-number">-1</span>]=ny[i]*i%mod;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> l=<span class="hljs-number">2</span>;l&lt;=n;++l)
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> j (i+l)</span>
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;j&lt;=n*<span class="hljs-number">2</span>;++i){
+			<span class="hljs-keyword">if</span>(s[i]==<span class="hljs-string">&#x27;R&#x27;</span>)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=i<span class="hljs-number">+1</span>;k!=j;++k)
+					c[i][j]=(c[i][j]+c[i][k]*c[k][j]%mod*<span class="hljs-built_in">cvc</span>(k-i<span class="hljs-number">-1</span>,j-k<span class="hljs-number">-1</span>))%mod,
+					dp[i][j]=(dp[i][j]+c[i][k]*dp[k][j]%mod*<span class="hljs-built_in">cvc</span>(k-i<span class="hljs-number">-1</span>,j-k<span class="hljs-number">-1</span>))%mod,
+					dp[i][j]=(dp[i][j]+dp[i][k]*c[k][j]%mod*<span class="hljs-built_in">cvc</span>(k-i<span class="hljs-number">-1</span>,j-k<span class="hljs-number">-1</span>))%mod,
+					dp[i][j]=(dp[i][j]+(k-i)*c[i][k]%mod*c[k][j]%mod*<span class="hljs-built_in">cvc</span>(k-i<span class="hljs-number">-1</span>,j-k<span class="hljs-number">-1</span>))%mod;
+			<span class="hljs-keyword">if</span>(s[j]==<span class="hljs-string">&#x27;L&#x27;</span>)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=i<span class="hljs-number">+1</span>;k!=j;++k)
+					c[i][j]=(c[i][j]+c[i][k]*c[k][j]%mod*<span class="hljs-built_in">cvc</span>(k-i<span class="hljs-number">-1</span>,j-k<span class="hljs-number">-1</span>))%mod,
+					dp[i][j]=(dp[i][j]+c[i][k]*dp[k][j]%mod*<span class="hljs-built_in">cvc</span>(k-i<span class="hljs-number">-1</span>,j-k<span class="hljs-number">-1</span>))%mod,
+					dp[i][j]=(dp[i][j]+dp[i][k]*c[k][j]%mod*<span class="hljs-built_in">cvc</span>(k-i<span class="hljs-number">-1</span>,j-k<span class="hljs-number">-1</span>))%mod,
+					dp[i][j]=(dp[i][j]+(j-k)*c[i][k]%mod*c[k][j]%mod*<span class="hljs-built_in">cvc</span>(k-i<span class="hljs-number">-1</span>,j-k<span class="hljs-number">-1</span>))%mod;
+		}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) ans=(ans+dp[i][i+n])%mod,cerr&lt;&lt;dp[i][i+n]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>;
+	cerr&lt;&lt;ans&lt;&lt;endl; cout&lt;&lt;ans*ny[n]%mod&lt;&lt;endl;
 }
-<span class="hljs-comment">//私は猫です!</span>
-<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+<span class="hljs-comment">//written by cbc on nyarch linux.</span>
 </code></pre>
 </div>
 </div>
-<p>注：上面时间复杂度中的 $\sigma_0$ 实际上表示的是 $1\sim n$ 中的所有数字的因数个数的最大值，在 $10^5$ 范围内只有大约 $130$，不大。</p>
 </div>
         <div class="footer">
             <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="color-scheme" content="light dark">
-    <title>题解：AT_abc248_g [ABC248G] GCD cost on the tree</title>
+    <title>题解：CF1764G1 Doremy's Perfect DS Class (Easy Version)</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -220,102 +220,156 @@
     <div class="search-results" id="searchResults"></div>
 </div>
         <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
-<p>感觉这种对 $gcd$ 什么的容斥方法已经非常的普及了。</p>
-<p>就是这样的：我们考虑将对 $=k$ 的贡献转换成 $\mid k$ 的贡献，然后把其倍数给砍掉就是 $=k$ 的贡献了。</p>
-<p>在这道题中，我们考虑统计 $f(d)=\sum_{d\mid \gcd(i,j)}dis(i,j)$ 的值，然后就有答案是 $\sum_{i\ge1}d(f(d)-\sum_{j\ge2}f(jd))$。考虑 $f(d)$ 怎么计算。</p>
-<p>显然对 $f(d)$ 有贡献的路径 $(i,j)$，满足 $\forall k\in(i,j)$，$d\mid a_k$。</p>
-<p>于是我们将所有的因数的出现位置记出来，然后这样的路径就是若干个连通块内部的路径。接下来考虑对于一个连通块，怎么统计出所有路径的长度。</p>
-<p>显然，这些连通块仍然是树形结构，于是我们考虑我们要计算的就是一个子树中的所有路径的长度之和。</p>
-<p>不妨遍历这个树上的每一个节点，统计子树中经过这个节点的路径的长度之和，这是简单的，我们记录出每一颗子树到这个节点的路径长度和以及个数，然后就可以简单计算出来了。</p>
-<p>完了之后按照前面给的公式直接计算就行了，时间复杂度是 $n\sigma_0(n)+n\log n$，可以通过此题，参考代码如下：</p>
+<p>看了一眼数据范围，非常像是 $3\times\log_2n$，于是我们思考一下怎么进行分治。</p>
+<p>我们想要找的数字是 $1$，$1$ 有什么性质是别的数不具有的？对于任何的 $k$（显然我们可以忽略毫无用处的 $k=1$），$\lfloor\frac{1}{k}\rfloor=0$。</p>
+<p>这样的性质在 $k=2$ 的时候是最为明显的，因为此时对于任何 $v\neq 1,\lfloor\frac{v}{k}\rfloor\neq0$。</p>
+<p>于是我们考虑，如果使用 $k=2$ 的询问，我们可以得到什么样的信息。</p>
+<p>一个自然的观察是那些结果一样的数字形如 $2v,2v+1$，也就可以理解为这样的数字两两配对。</p>
+<p>如果我们选择一个分割点 $p$，我们询问 $[1,p],k=2$ 和 $[p+1,n],k=2$，我们就可以知道两边有多少个不同的数字，进而可以知道两边有多少个数字是没有配对的。</p>
+<p>对于大多数情况，如果左边有一个没有配对的数字，那么原本和他配对的数字就会出现在右边。也就是说，两边的没有配对的数字的数量应该是近似相等的。</p>
+<p>什么数字导致了两边不相等呢？$1$ 是一个，他是一定没有配对的。还有，如果 $n$ 是偶数的话，他也一定是没有配对的。</p>
+<p>于是我们可以考虑利用这一点进行二分。较为简单的，我们可以先考虑 $n$ 是奇数的情况。如果当前答案区间是 $[l,r]$ 的话，那么询问 $[1,mid],k=2$ 和 $[mid+1,n],k=2$ 并计算<strong>未配对的数</strong>的个数。</p>
+<p>如果左边的更多（应该恰好多一），那么 $1$ 在左边，$r=mid$，反之 $1$ 在右边，$l=mid+1$。</p>
+<p>现在考虑偶数的情况。上面的过程显然需要消耗 $2\times\log_2n$ 的操作次数。于是我们考虑 $n$ 又有什么特殊性质？</p>
+<p>显然，只有 $n$ 满足 $\lfloor\frac{n}{n}\rfloor=1$，别的 $v\neq n$ 都有 $\lfloor\frac{v}{n}\rfloor=0$。</p>
+<p>于是显然我们可以使用一个 $\log$ 把 $n$ 的位置二分出来。具体来说，当答案区间是 $[l,r]$ 的时候，我们可以询问 $[1,mid],k=n$，如果是 $2$ 则说明 $n$ 在 $[l,mid]$，否则说明答案在 $[mid+1,r]$。</p>
+<p>于是显然这就是 $3\times\log_2n$ 的做法。</p>
+<p>还能更优秀一点吗？</p>
+<p>我们考虑在 $n$ 是奇数的情况下的那个做法什么时候会爆炸：显然就是 $1$ 和 $n$ 相对于 $mid$ 一左一右的时候。</p>
+<p>那么，我们考虑是不是可以等用到的时候再确认一下到底是在哪一边呢？</p>
+<p>确实可以，确认的方式和前面是一样的，不再赘述，注意我们只需要确认一次，因为区间是缩小的。确认之后记录一下 $n$ 是在区间的左边还是右边就行了。</p>
+<p>于是总的操作次数为 $2\times\log_2n+1$，可以通过 $1$ 和 $2$。参考代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
     <span class="code-lang">CPP</span>
     <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
-#define int long long
-constexpr int mod=998244353;
-int n,a[100005],ans[100005],c[100005],v[100005],nc[100005],ret;
-vector&lt;int&gt;son[100005],ap[100005]; bool cs[100005];
-inline void mad(int&amp; l,const int r){(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
-inline void dfs(int p,int a){
-	c[p]=v[p]=1; nc[p]=cs[p]=0;
-	for(int sp:son[p]) if(cs[sp]){
-		dfs(sp,a);
-		nc[p]=(nc[p]+c[p]*v[sp]+c[sp]*v[p])%mod;
-		mad(c[p],c[sp]); v[p]=(v[p]+v[sp]+c[sp])%mod;
-	}
-	mad(ans[a],nc[p]);
+// #define DBG
+#ifdef DBG
+	string input=&quot;113 1 111 63 101 51 68 81 11 105 28 36 7 67 4 14 65 3 22 71 39 99 104 78 40 98 45 66 10 92 64 46 69 30 112 42 27 49 19 32 34 43 93 85 55 74 41 72 8 79 109 100 88 23 107 62 53 5 89 87 9 18 17 31 50 33 95 37 57 48 76 24 26 82 103 35 77 47 60 61 75 86 110 94 70 16 13 58 84 80 59 52 56 114 44 90 102 83 91 25 12 29 108 20 73 2 21 106 15 38 6 97 54 96&quot;;
+	int a[115];
+#endif
+int n,l,r,mid,vl,vr,sd;
+inline int query(int l,int r,int k){
+	cout&lt;&lt;&quot;? &quot;&lt;&lt;l&lt;&lt;&quot; &quot;&lt;&lt;r&lt;&lt;&quot; &quot;&lt;&lt;k&lt;&lt;endl;
+#ifdef DBG
+	set&lt;int&gt;s;
+	for(int i=l;i&lt;=r;++i)
+		s.emplace(a[i]/k);
+	cout&lt;&lt;s.size()&lt;&lt;endl;
+	return s.size();
+#endif
+	int ret; cin&gt;&gt;ret; return ret;
 }
 signed main(){
-	ios::sync_with_stdio(0); cin&gt;&gt;n;
-	for(int i=1;i&lt;=n;++i){
-		cin&gt;&gt;a[i];
-		for(int j=1;j*j&lt;=a[i];++j)
-			if(a[i]%j==0) ap[j].emplace_back(i);
-		for(int j=1;j*j&lt;a[i];++j)
-			if(a[i]%j==0) ap[a[i]/j].emplace_back(i);
+	ios::sync_with_stdio(0); 
+#ifdef DBG
+	vector&lt;int&gt;vv; int vt;
+	istringstream iss(input);
+	while(iss&gt;&gt;vt) vv.emplace_back(vt);
+	l=1, n=r=vv.size();
+	for(int i=1;i&lt;=n;++i) a[i]=vv[i-1];
+#else
+	cin&gt;&gt;n; l=1,r=n;
+#endif
+	while(l!=r){
+		mid=l+r&gt;&gt;1;
+		vl=query(1,mid,2);
+		vr=query(mid+1,n,2);
+		vl=vl*2-mid;
+		vr=vr*2-(n-mid);
+		if(sd)
+			if(sd==1) vl--;
+			else vr--;
+		if(vl&gt;vr) r=mid;
+		else if(vl&lt;vr) l=mid+1;
+		else{
+			if(mid!=1){
+				if(query(1,mid,n)==1) r=mid,sd=2;
+				else l=mid+1,sd=1;
+			}
+			else{
+				if(query(mid+1,n,n)==1) l=mid+1,sd=1;
+				else r=mid,sd=2;
+			}
+		}
+		cerr&lt;&lt;l&lt;&lt;&quot; &quot;&lt;&lt;r&lt;&lt;endl;
 	}
-	for(int i=1,l,r;i!=n;++i)
-		cin&gt;&gt;l&gt;&gt;r,
-		son[l].emplace_back(r),
-		son[r].emplace_back(l);
-	for(int i=1e5;i&gt;=1;i--) if(ap[i].size()){
-		for(int p:ap[i]) cs[p]=1;
-		for(int p:ap[i]) if(cs[p]) dfs(p,i);
-		for(int v=i*2;v&lt;=1e5;v+=i) mad(ans[i],mod-ans[v]);
-	}
-	for(int i=1;i&lt;=1e5;++i) ret=(ret+i*ans[i])%mod;
-	cout&lt;&lt;ret&lt;&lt;endl;
+	cout&lt;&lt;&quot;! &quot;&lt;&lt;l&lt;&lt;endl;
+#ifdef DBG
+	if(a[l]!=1) cout&lt;&lt;&quot;Incorrect!\n&quot;;
+	else cout&lt;&lt;&quot;Correct!\n&quot;;
+#endif
+	return 0;
 }
-//私は猫です!
-//Written by cbc on nyarch linux.
+//written by cbc on nyarch linux.
 ">复制</button>
 </div>
 <div class="code-content">
     <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
 <span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
-<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
-<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>;
-<span class="hljs-type">int</span> n,a[<span class="hljs-number">100005</span>],ans[<span class="hljs-number">100005</span>],c[<span class="hljs-number">100005</span>],v[<span class="hljs-number">100005</span>],nc[<span class="hljs-number">100005</span>],ret;
-vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">100005</span>],ap[<span class="hljs-number">100005</span>]; <span class="hljs-type">bool</span> cs[<span class="hljs-number">100005</span>];
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> a)</span></span>{
-	c[p]=v[p]=<span class="hljs-number">1</span>; nc[p]=cs[p]=<span class="hljs-number">0</span>;
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(cs[sp]){
-		<span class="hljs-built_in">dfs</span>(sp,a);
-		nc[p]=(nc[p]+c[p]*v[sp]+c[sp]*v[p])%mod;
-		<span class="hljs-built_in">mad</span>(c[p],c[sp]); v[p]=(v[p]+v[sp]+c[sp])%mod;
-	}
-	<span class="hljs-built_in">mad</span>(ans[a],nc[p]);
+<span class="hljs-comment">// #define DBG</span>
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> DBG</span>
+	string input=<span class="hljs-string">&quot;113 1 111 63 101 51 68 81 11 105 28 36 7 67 4 14 65 3 22 71 39 99 104 78 40 98 45 66 10 92 64 46 69 30 112 42 27 49 19 32 34 43 93 85 55 74 41 72 8 79 109 100 88 23 107 62 53 5 89 87 9 18 17 31 50 33 95 37 57 48 76 24 26 82 103 35 77 47 60 61 75 86 110 94 70 16 13 58 84 80 59 52 56 114 44 90 102 83 91 25 12 29 108 20 73 2 21 106 15 38 6 97 54 96&quot;</span>;
+	<span class="hljs-type">int</span> a[<span class="hljs-number">115</span>];
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+<span class="hljs-type">int</span> n,l,r,mid,vl,vr,sd;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">query</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> k)</span></span>{
+	cout&lt;&lt;<span class="hljs-string">&quot;? &quot;</span>&lt;&lt;l&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;r&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;k&lt;&lt;endl;
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> DBG</span>
+	set&lt;<span class="hljs-type">int</span>&gt;s;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=l;i&lt;=r;++i)
+		s.<span class="hljs-built_in">emplace</span>(a[i]/k);
+	cout&lt;&lt;s.<span class="hljs-built_in">size</span>()&lt;&lt;endl;
+	<span class="hljs-keyword">return</span> s.<span class="hljs-built_in">size</span>();
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+	<span class="hljs-type">int</span> ret; cin&gt;&gt;ret; <span class="hljs-keyword">return</span> ret;
 }
 <span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
-	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
-		cin&gt;&gt;a[i];
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j*j&lt;=a[i];++j)
-			<span class="hljs-keyword">if</span>(a[i]%j==<span class="hljs-number">0</span>) ap[j].<span class="hljs-built_in">emplace_back</span>(i);
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j*j&lt;a[i];++j)
-			<span class="hljs-keyword">if</span>(a[i]%j==<span class="hljs-number">0</span>) ap[a[i]/j].<span class="hljs-built_in">emplace_back</span>(i);
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); 
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> DBG</span>
+	vector&lt;<span class="hljs-type">int</span>&gt;vv; <span class="hljs-type">int</span> vt;
+	<span class="hljs-function">istringstream <span class="hljs-title">iss</span><span class="hljs-params">(input)</span></span>;
+	<span class="hljs-keyword">while</span>(iss&gt;&gt;vt) vv.<span class="hljs-built_in">emplace_back</span>(vt);
+	l=<span class="hljs-number">1</span>, n=r=vv.<span class="hljs-built_in">size</span>();
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) a[i]=vv[i<span class="hljs-number">-1</span>];
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+	cin&gt;&gt;n; l=<span class="hljs-number">1</span>,r=n;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+	<span class="hljs-keyword">while</span>(l!=r){
+		mid=l+r&gt;&gt;<span class="hljs-number">1</span>;
+		vl=<span class="hljs-built_in">query</span>(<span class="hljs-number">1</span>,mid,<span class="hljs-number">2</span>);
+		vr=<span class="hljs-built_in">query</span>(mid<span class="hljs-number">+1</span>,n,<span class="hljs-number">2</span>);
+		vl=vl*<span class="hljs-number">2</span>-mid;
+		vr=vr*<span class="hljs-number">2</span>-(n-mid);
+		<span class="hljs-keyword">if</span>(sd)
+			<span class="hljs-keyword">if</span>(sd==<span class="hljs-number">1</span>) vl--;
+			<span class="hljs-keyword">else</span> vr--;
+		<span class="hljs-keyword">if</span>(vl&gt;vr) r=mid;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(vl&lt;vr) l=mid<span class="hljs-number">+1</span>;
+		<span class="hljs-keyword">else</span>{
+			<span class="hljs-keyword">if</span>(mid!=<span class="hljs-number">1</span>){
+				<span class="hljs-keyword">if</span>(<span class="hljs-built_in">query</span>(<span class="hljs-number">1</span>,mid,n)==<span class="hljs-number">1</span>) r=mid,sd=<span class="hljs-number">2</span>;
+				<span class="hljs-keyword">else</span> l=mid<span class="hljs-number">+1</span>,sd=<span class="hljs-number">1</span>;
+			}
+			<span class="hljs-keyword">else</span>{
+				<span class="hljs-keyword">if</span>(<span class="hljs-built_in">query</span>(mid<span class="hljs-number">+1</span>,n,n)==<span class="hljs-number">1</span>) l=mid<span class="hljs-number">+1</span>,sd=<span class="hljs-number">1</span>;
+				<span class="hljs-keyword">else</span> r=mid,sd=<span class="hljs-number">2</span>;
+			}
+		}
+		cerr&lt;&lt;l&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;r&lt;&lt;endl;
 	}
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i!=n;++i)
-		cin&gt;&gt;l&gt;&gt;r,
-		son[l].<span class="hljs-built_in">emplace_back</span>(r),
-		son[r].<span class="hljs-built_in">emplace_back</span>(l);
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1e5</span>;i&gt;=<span class="hljs-number">1</span>;i--) <span class="hljs-keyword">if</span>(ap[i].<span class="hljs-built_in">size</span>()){
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p:ap[i]) cs[p]=<span class="hljs-number">1</span>;
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p:ap[i]) <span class="hljs-keyword">if</span>(cs[p]) <span class="hljs-built_in">dfs</span>(p,i);
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v=i*<span class="hljs-number">2</span>;v&lt;=<span class="hljs-number">1e5</span>;v+=i) <span class="hljs-built_in">mad</span>(ans[i],mod-ans[v]);
-	}
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-number">1e5</span>;++i) ret=(ret+i*ans[i])%mod;
-	cout&lt;&lt;ret&lt;&lt;endl;
+	cout&lt;&lt;<span class="hljs-string">&quot;! &quot;</span>&lt;&lt;l&lt;&lt;endl;
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> DBG</span>
+	<span class="hljs-keyword">if</span>(a[l]!=<span class="hljs-number">1</span>) cout&lt;&lt;<span class="hljs-string">&quot;Incorrect!\n&quot;</span>;
+	<span class="hljs-keyword">else</span> cout&lt;&lt;<span class="hljs-string">&quot;Correct!\n&quot;</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 }
-<span class="hljs-comment">//私は猫です!</span>
-<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
+<span class="hljs-comment">//written by cbc on nyarch linux.</span>
 </code></pre>
 </div>
 </div>
-<p>注：上面时间复杂度中的 $\sigma_0$ 实际上表示的是 $1\sim n$ 中的所有数字的因数个数的最大值，在 $10^5$ 范围内只有大约 $130$，不大。</p>
 </div>
         <div class="footer">
             <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
