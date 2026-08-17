@@ -620,6 +620,7 @@
 <p><a href="#%E5%8F%96min%E5%8D%B7%E7%A7%AF%E8%BD%AC%E6%99%AE%E9%80%9A%E5%8D%B7%E7%A7%AF">取min卷积转普通卷积</a></p>
 <p><a href="#%E6%8B%BC%E7%8A%B6%E6%80%81dp">拼状态dp</a></p>
 <p><a href="#%E5%8F%8D%E5%90%91dp">反向DP</a></p>
+<p>树上top序计数</p>
 </blockquote>
 </blockquote>
 <h3 id="注">注：</h3>
@@ -11144,7 +11145,7 @@ cpx a[<span class="hljs-number">1048576</span>],b[<span class="hljs-number">1048
 <p>好吧，我们不妨再计算一个实部为 $A_1$，虚部为 $-A_2$，那么传出来的就是新函数的点值。</p>
 <p>总的来说，我们现在知道了 $(A_1+iA_2)(x)$ 和 $(A_1-iA_2)(x)$ 的点值，分别为 $F_1,F_2$，那么 $A_1$ 显然就是 $\frac{F_1+F_2}{2}$，$A_2$ 就是 $\frac{F_1-F_2}{2}$。</p>
 <p>可是我们仔细一看，欸，好像，还使用了两个 FFT。但是还有一定的希望：被求值的函数每一个位置都是共轭的。</p>
-<p>我们推导一下：$\operatorname{FFT}(\overline{x})[k]=\sum_{n=0}^{N-1}\overline{x[n]}\omage_N^{kn}=\sum_{n=0}^{N-1}\overline{x[n]\omega_n^{-kn}}=\overline{\operatorname{FFT}(\overline{x})[-k]}$。</p>
+<p>我们推导一下：$\operatorname{FFT}(\overline{x})[k]=\sum_{n=0}^{N-1}\overline{x[n]}\omega_N^{kn}=\sum_{n=0}^{N-1}\overline{x[n]\omega_n^{-kn}}=\overline{\operatorname{FFT}(\overline{x})[-k]}$。</p>
 <p>好耶！我们不用专门再做一次 FFT 来得到 $A_1-iA_2$ 的点值，而是可以直接用 $A_1+iA_2$ 的点值得到！</p>
 <p>不过值得一提的是这里的 IFFT 就不完全一样了。当我们进行完 FFT 和 reverse 之后，就不需要再作额外的操作了。因为本身传入 IFFT 的数据就是频域数据组合，所以传出来的就是解耦后的两组不相干的时域数据，直接拿出来就行。参考代码如下：</p>
 <div class="code-wrapper">
@@ -14994,7 +14995,91 @@ string s; <span class="hljs-type">int</span> n, sa[<span class="hljs-number">100
 </code></pre>
 </div>
 </div>
-<p>height 数组有什么作用呢？他有一个非常美妙的性质：$\operatorname{LCP}(i,j)=\min_{k=i+1}^{j}height_k$，这里的 $\operatorname{LCP}$ 定义为 $rk$ 为 $i$ 的字符串和 $rk$ 为 $j$ 的字符串的最长公共前缀的长度。</p>
+<p>height 数组有什么作用呢？他有一个非常美妙的性质：$\operatorname{LCP}(i,j)=\min_{k=rk_i+1}^{rk_j}height_k$，或者说 $\operatorname{LCP}(sa_i,sa_j)=\min_{k=i+1}^{j}height_k$。这也是 SA 最常考的一点。</p>
+<p>一个简单的例题是 $O(n\log n)$ 求解两个字符串的最长公共子串。思路如下：</p>
+<p>我们考虑两个字符串的最长公共子串一定是他们各自的一个后缀的最长公共前缀。</p>
+<p>于是我们将两个字符串拼起来，求一遍后缀数组，然后枚举后缀，$O(1)$ 或者 $O(\log)$ 的求出他们的 $\operatorname{LCP}$，即可得到一个 $O(n^2)$ 或者 $O(n^2\log)$ 的算法，甚至跑不过暴力。</p>
+<p>我们观察性质进行优化。注意到两个后缀 $i,j$ 的 $\operatorname{LCP}$ 是 $\min_{k=rk_i+1}^{rk_j}height_k$，于是我们直接枚举所有的 $rk_j=rk_i+1$ 的位置，找满足 $i$ 和 $j$ 属于不同的原串时 $height_{rk_j}$ 的最大值即为答案。由于 $\min$ 的存在，其他的组合一定是不优的。这样时间复杂度是 $O(n\log n+n)$，其中前面的 $\log$ 是求后缀数组的时间。</p>
+<p>参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,m,h[1000005],c[1000005]; char a[500005],b[500005];
+int rk[1000005],sa[1000005],tp[1000005],nrk[1000005],ans;
+inline bool check(int p){ return (sa[p-1]&lt;=n)^(sa[p]&lt;=n); }
+signed main(){
+	ios::sync_with_stdio(0);
+	cin&gt;&gt;a&gt;&gt;b; n=strlen(a); m=strlen(b);
+	memmove(a+1,a,n); memmove(a+n+1,b,m); m+=n;
+	for(int i=1;i&lt;=m;++i) rk[i]=a[i]-'a'+1;
+	for(int i=1;i&lt;m;i&lt;&lt;=1){
+		for(int j=1;j&lt;=m;++j) c[rk[j+i]]++;
+		for(int j=1;j&lt;=max(m,26);++j) c[j]+=c[j-1];
+		for(int j=max(m,26);j&gt;=1;j--) c[j]=c[j-1]; c[0]=0;
+		for(int j=1;j&lt;=m;++j) tp[++c[rk[j+i]]]=j;
+		for(int j=0;j&lt;=max(m,26);++j) c[j]=0;
+		for(int j=1;j&lt;=m;++j) c[rk[j]]++;
+		for(int j=1;j&lt;=max(m,26);++j) c[j]+=c[j-1];
+		for(int j=max(m,26);j&gt;=1;j--) c[j]=c[j-1]; c[0]=0;
+		for(int j=1;j&lt;=m;++j) sa[++c[rk[tp[j]]]]=tp[j];
+		for(int j=0;j&lt;=max(m,26);++j) c[j]=0;
+		for(int j=1;j&lt;=m;++j)
+			if(rk[sa[j]]!=rk[sa[j-1]]) nrk[sa[j]]=nrk[sa[j-1]]+1;
+			else if(rk[sa[j]+i]!=rk[sa[j-1]+i]) nrk[sa[j]]=nrk[sa[j-1]]+1;
+			else nrk[sa[j]]=nrk[sa[j-1]];
+		swap(rk,nrk);
+	}
+	for(int i=1,j=0;i&lt;=m;++i){
+		if(rk[i]==1) continue; if(j) j--;
+		while(a[i+j]==a[sa[rk[i]-1]+j]) j++;
+		h[rk[i]]=j;
+	}
+	for(int i=2;i&lt;=m;++i) if(check(i)) ans=max(ans,h[i]);
+	cout&lt;&lt;min(ans,n)&lt;&lt;endl; //注意思考这里为什么要取min，和我没有在两个串之间添加分隔符有关系
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-type">int</span> n,m,h[<span class="hljs-number">1000005</span>],c[<span class="hljs-number">1000005</span>]; <span class="hljs-type">char</span> a[<span class="hljs-number">500005</span>],b[<span class="hljs-number">500005</span>];
+<span class="hljs-type">int</span> rk[<span class="hljs-number">1000005</span>],sa[<span class="hljs-number">1000005</span>],tp[<span class="hljs-number">1000005</span>],nrk[<span class="hljs-number">1000005</span>],ans;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">check</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{ <span class="hljs-keyword">return</span> (sa[p<span class="hljs-number">-1</span>]&lt;=n)^(sa[p]&lt;=n); }
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	cin&gt;&gt;a&gt;&gt;b; n=<span class="hljs-built_in">strlen</span>(a); m=<span class="hljs-built_in">strlen</span>(b);
+	<span class="hljs-built_in">memmove</span>(a<span class="hljs-number">+1</span>,a,n); <span class="hljs-built_in">memmove</span>(a+n<span class="hljs-number">+1</span>,b,m); m+=n;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=m;++i) rk[i]=a[i]-<span class="hljs-string">&#x27;a&#x27;</span><span class="hljs-number">+1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;m;i&lt;&lt;=<span class="hljs-number">1</span>){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=m;++j) c[rk[j+i]]++;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=<span class="hljs-built_in">max</span>(m,<span class="hljs-number">26</span>);++j) c[j]+=c[j<span class="hljs-number">-1</span>];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-built_in">max</span>(m,<span class="hljs-number">26</span>);j&gt;=<span class="hljs-number">1</span>;j--) c[j]=c[j<span class="hljs-number">-1</span>]; c[<span class="hljs-number">0</span>]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=m;++j) tp[++c[rk[j+i]]]=j;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=<span class="hljs-built_in">max</span>(m,<span class="hljs-number">26</span>);++j) c[j]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=m;++j) c[rk[j]]++;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=<span class="hljs-built_in">max</span>(m,<span class="hljs-number">26</span>);++j) c[j]+=c[j<span class="hljs-number">-1</span>];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-built_in">max</span>(m,<span class="hljs-number">26</span>);j&gt;=<span class="hljs-number">1</span>;j--) c[j]=c[j<span class="hljs-number">-1</span>]; c[<span class="hljs-number">0</span>]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=m;++j) sa[++c[rk[tp[j]]]]=tp[j];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=<span class="hljs-built_in">max</span>(m,<span class="hljs-number">26</span>);++j) c[j]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=m;++j)
+			<span class="hljs-keyword">if</span>(rk[sa[j]]!=rk[sa[j<span class="hljs-number">-1</span>]]) nrk[sa[j]]=nrk[sa[j<span class="hljs-number">-1</span>]]<span class="hljs-number">+1</span>;
+			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(rk[sa[j]+i]!=rk[sa[j<span class="hljs-number">-1</span>]+i]) nrk[sa[j]]=nrk[sa[j<span class="hljs-number">-1</span>]]<span class="hljs-number">+1</span>;
+			<span class="hljs-keyword">else</span> nrk[sa[j]]=nrk[sa[j<span class="hljs-number">-1</span>]];
+		<span class="hljs-built_in">swap</span>(rk,nrk);
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,j=<span class="hljs-number">0</span>;i&lt;=m;++i){
+		<span class="hljs-keyword">if</span>(rk[i]==<span class="hljs-number">1</span>) <span class="hljs-keyword">continue</span>; <span class="hljs-keyword">if</span>(j) j--;
+		<span class="hljs-keyword">while</span>(a[i+j]==a[sa[rk[i]<span class="hljs-number">-1</span>]+j]) j++;
+		h[rk[i]]=j;
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">2</span>;i&lt;=m;++i) <span class="hljs-keyword">if</span>(<span class="hljs-built_in">check</span>(i)) ans=<span class="hljs-built_in">max</span>(ans,h[i]);
+	cout&lt;&lt;<span class="hljs-built_in">min</span>(ans,n)&lt;&lt;endl; <span class="hljs-comment">//注意思考这里为什么要取min，和我没有在两个串之间添加分隔符有关系</span>
+}
+</code></pre>
+</div>
+</div>
 <p>还有什么呢？另一个性质是这样的：一个字符串的本质不同的子串个数为 $\sum_{i=1}^n(n-sa_i+1-height_i)$。这是因为后缀数组中每一个后缀贡献了 $n-sa_i+1$ 个前缀，但是与前一个后缀有重复，且数量恰好为 $height_i$。</p>
 <h1 id="计算几何">计算几何</h1>
 <h2 id="计几基础概念">计几基础概念</h2>
@@ -17548,8 +17633,8 @@ signed main(){
 </div>
 <h2 id="取min卷积转普通卷积">取min卷积转普通卷积</h2>
 <p>本质上就是一种拆贡献的思想，也就是把 $f(i,j)$ 解耦成 $g(i)g(j)$，方便我们进一步优化。</p>
-<p>考虑这一道题：不难看出我们需要求的本质上就是对于所有 $k$ 的 $\sum_{i+j=k}\min(c_i,c_j)$，其中 $c_i$ 表示长度为 $i$ 的木棍的个数。</p>
-<p>这可真是卷积不了一点，于是我们考虑进行变形。$\min(c_i,c_j)=\max d: d\le c_i\landd\le c_j=\sum_{d\ge1}[d\le c_i][d\le c_j]$！能做了？</p>
+<p>考虑<a href="https://www.luogu.com.cn/problem/P6300">这一道题</a>：不难看出我们需要求的本质上就是对于所有 $k$ 的 $\sum_{i+j=k}\min(c_i,c_j)$，其中 $c_i$ 表示长度为 $i$ 的木棍的个数。</p>
+<p>这可真是卷积不了一点，于是我们考虑进行变形。$\min(c_i,c_j)=\max d: d\le c_i\land\le c_j=\sum_{d\ge1}[d\le c_i][d\le c_j]$！能做了？</p>
 <p>我们枚举 $d$，$[x^i]f(x)=[a_i\ge d]$，随后进行普通卷积就行了！时间复杂度 $O(n^2\log n)$，劣于暴力，恭喜！</p>
 <p>我们利用前面的常见隐含上下界，注意到不同的 $d$ 只有 $O(\sqrt n)$ 个，于是时间复杂度降为 $n\sqrt n\log n$，此题可解，代码如下：</p>
 <div class="code-wrapper">
@@ -18314,6 +18399,132 @@ vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">70
 </code></pre>
 </div>
 </div>
+<h2 id="树上top序计数">树上top序计数</h2>
+<p>有一个经典的结论：对于一颗有根树，其 top 序的数量是 $\frac{n!}{\prod_{sz_i}}$，其中 $n$ 是总结点数量，$sz_i$ 是以 $i$ 为根的子树大小。</p>
+<p>如何理解这个东西：对于一颗以 $p$ 为根的子树，$p$ 在 top 序上一定比他的所有子结点都更靠前。于是我们考虑从序列中提取出这个子树的所有节点的顺序。$sz_p!$ 种当中我们要求 $p$ 在最前面，但是剩下的顺序任意，也就是只有 $(sz_p-1)!$ 种，相当于除掉了一个 $sz_p$。</p>
+<p>我们按照任意一个 top 序对整棵树进行约束，即可得到原式。</p>
+<p>然而，有一些题目会让我们对树形图进行一些 top 序相关的计数，例如<a href="https://www.luogu.com.cn/problem/P10013">这道题</a>。</p>
+<p>我们考虑怎么去做这个东西。因为每一个排名都是有特定的权值的，所以一个想法是我把每一个数的每一个排名的方案数给求出来。</p>
+<p>怎么去求呢？我们考虑，只有从根到他自己的点才是强制处在他的前面的，所以一个自然的想法是我能不能从这个点出发进行一些 DP，到根的时候把答案计算出来呢？</p>
+<p>设计状态 $dp_{i,j}$ 表示在以 $i$ 为根的子树当中，有 $j$ 个在我们的目标节点 $p$ 前面的节点的方案数。最终的答案显然就是 $\sum_{i=0}^{n-1}dp_{1,i}\times b_{i+1}$，初始状态是 $dp_{p,0}$ 为以 $p$ 为根的子树内部的 top 序数量。</p>
+<p>考虑转移：这一类问题的转移的核心思想是以 $p$ 自己作为分割线，钦定内外的序列后，前半部分混合，后半部分混合，注意乘上钦定带来的系数即可。</p>
+<p>在这里，我们考虑 $dp_{i,j}$ 向 $dp_{fa_i,j+k}$ 的转移，也就是在子树 $fa_i$ 的除了子树 $i$ 以外的部分有 $k$ 个节点排在 $p$ 之前的转移系数。</p>
+<p>第一步：钦定两部分的序列。子树 $i$ 内的顺序已经完全记录到状态中了，所以系数是 $1$，但是子树 $fa_i$ 中除了子树 $i$ 以外的部分的序列并不固定，显然个数就是子树 $fa_i$ 除去子树 $i$ 之后剩余部分的 top 序个数。这是一个可以简单计算出来的东西，不再赘述。然后就是两部分的混合。</p>
+<p>对于 $p$ 之后的部分，在 $i$ 中有 $sz_i-j-1$ 个（因为要抛开 $p$ 本身），在 $fa_i$ 中（注意包含子树 $i$）有 $sz_{fa_i}-j-k-1$ 个（注意 $fa_i$ 一定在 $p$ 之前）。也就是说后半部分混合的方案数是 $\binom{sz_{fa_i}-j-k-1}{sz_i-j-1}$，本质上就是那么多个空位，$i$ 子树内的节点任意选择。注意 $i$ 子树内的节点的相对顺序是已经被固定了的，所以不需要乘上多余的系数。</p>
+<p>对于 $p$ 之前的部分，在 $i$ 中有 $j$ 个，在 $fa_i$ 中有 $k$ 个，但是注意我们是 top 序，$fa_i$ 必须是第一个，因此实际上可以随意安排的只有 $k-1$ 个。也就是说前半部分混合的方案数是 $\binom{j+k-1}{j}$。</p>
+<p>至此，我们获得了一个 $O(n^3)$ 的做法，参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod=1e9+7;
+vector&lt;int&gt;son[5005]; int ans[5005],pd[5005];
+int n,f[5005],dp[5005][5005],v[5005],a[5005],sz[5005],jc[5005],ny[5005];
+inline int qpow(int a,int b){
+	int ret=1;
+	for(;b;b&gt;&gt;=1,a=a*a%mod)
+		(b&amp;1)&amp;&amp;(ret=ret*a%mod);
+	return ret;
+}
+inline void dfs(int p){
+	sz[p]=1; v[p]=1;
+	for(int sp:son[p])
+		dfs(sp),sz[p]+=sz[sp],
+		v[p]=v[p]*v[sp]%mod;
+	pd[p]=v[p]=v[p]*sz[p]%mod;
+}
+inline int cvl(int n,int m){
+	if(n&lt;m) return 0;
+	return jc[n]*ny[m]%mod*ny[n-m]%mod;
+}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n; jc[0]=1;
+	for(int i=1;i&lt;=n;++i) jc[i]=jc[i-1]*i%mod;
+	ny[n]=qpow(jc[n],mod-2);
+	for(int i=n;i&gt;=1;i--) ny[i-1]=ny[i]*i%mod;
+	for(int i=2;i&lt;=n;++i)
+		cin&gt;&gt;f[i],son[f[i]].emplace_back(i);
+	for(int i=1;i&lt;=n;++i) cin&gt;&gt;a[i];
+	dfs(1);
+	for(int i=n;i&gt;=2;--i)
+		v[i]=jc[sz[f[i]]-sz[i]]*qpow(v[f[i]],mod-2)%mod*v[i]%mod*sz[f[i]]%mod*qpow(sz[f[i]]-sz[i],mod-2)%mod;
+	for(int i=1;i&lt;=n;++i){
+		for(int j=1;j&lt;=n;++j)
+			for(int k=0;k&lt;=n;++k)
+				dp[j][k]=0;
+		dp[i][0]=jc[sz[i]]*qpow(pd[i],mod-2)%mod; int cp=i;
+		while(cp!=1){
+			for(int j=0;j!=sz[cp];++j)
+				for(int k=1;k&lt;=sz[f[cp]]-sz[cp];++k)
+					dp[f[cp]][j+k]=(dp[f[cp]][j+k]+dp[cp][j]*cvl(j+k-1,j)%mod
+					*cvl(sz[f[cp]]-j-k-1,sz[cp]-j-1)%mod*v[cp])%mod;
+			cp=f[cp];
+		}
+		for(int j=0;j!=n;++j) ans[i]=(ans[i]+dp[1][j]*a[j+1])%mod;
+	}
+	for(int i=1;i&lt;=n;++i) cout&lt;&lt;ans[i]&lt;&lt;&quot; &quot;; cout&lt;&lt;endl;
+}
+//O(n^3)
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">1e9</span><span class="hljs-number">+7</span>;
+vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">5005</span>]; <span class="hljs-type">int</span> ans[<span class="hljs-number">5005</span>],pd[<span class="hljs-number">5005</span>];
+<span class="hljs-type">int</span> n,f[<span class="hljs-number">5005</span>],dp[<span class="hljs-number">5005</span>][<span class="hljs-number">5005</span>],v[<span class="hljs-number">5005</span>],a[<span class="hljs-number">5005</span>],sz[<span class="hljs-number">5005</span>],jc[<span class="hljs-number">5005</span>],ny[<span class="hljs-number">5005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">qpow</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b)</span></span>{
+	<span class="hljs-type">int</span> ret=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(;b;b&gt;&gt;=<span class="hljs-number">1</span>,a=a*a%mod)
+		(b&amp;<span class="hljs-number">1</span>)&amp;&amp;(ret=ret*a%mod);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{
+	sz[p]=<span class="hljs-number">1</span>; v[p]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p])
+		<span class="hljs-built_in">dfs</span>(sp),sz[p]+=sz[sp],
+		v[p]=v[p]*v[sp]%mod;
+	pd[p]=v[p]=v[p]*sz[p]%mod;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">cvl</span><span class="hljs-params">(<span class="hljs-type">int</span> n,<span class="hljs-type">int</span> m)</span></span>{
+	<span class="hljs-keyword">if</span>(n&lt;m) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+	<span class="hljs-keyword">return</span> jc[n]*ny[m]%mod*ny[n-m]%mod;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n; jc[<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) jc[i]=jc[i<span class="hljs-number">-1</span>]*i%mod;
+	ny[n]=<span class="hljs-built_in">qpow</span>(jc[n],mod<span class="hljs-number">-2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n;i&gt;=<span class="hljs-number">1</span>;i--) ny[i<span class="hljs-number">-1</span>]=ny[i]*i%mod;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">2</span>;i&lt;=n;++i)
+		cin&gt;&gt;f[i],son[f[i]].<span class="hljs-built_in">emplace_back</span>(i);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;a[i];
+	<span class="hljs-built_in">dfs</span>(<span class="hljs-number">1</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n;i&gt;=<span class="hljs-number">2</span>;--i)
+		v[i]=jc[sz[f[i]]-sz[i]]*<span class="hljs-built_in">qpow</span>(v[f[i]],mod<span class="hljs-number">-2</span>)%mod*v[i]%mod*sz[f[i]]%mod*<span class="hljs-built_in">qpow</span>(sz[f[i]]-sz[i],mod<span class="hljs-number">-2</span>)%mod;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k&lt;=n;++k)
+				dp[j][k]=<span class="hljs-number">0</span>;
+		dp[i][<span class="hljs-number">0</span>]=jc[sz[i]]*<span class="hljs-built_in">qpow</span>(pd[i],mod<span class="hljs-number">-2</span>)%mod; <span class="hljs-type">int</span> cp=i;
+		<span class="hljs-keyword">while</span>(cp!=<span class="hljs-number">1</span>){
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=sz[cp];++j)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">1</span>;k&lt;=sz[f[cp]]-sz[cp];++k)
+					dp[f[cp]][j+k]=(dp[f[cp]][j+k]+dp[cp][j]*<span class="hljs-built_in">cvl</span>(j+k<span class="hljs-number">-1</span>,j)%mod
+					*<span class="hljs-built_in">cvl</span>(sz[f[cp]]-j-k<span class="hljs-number">-1</span>,sz[cp]-j<span class="hljs-number">-1</span>)%mod*v[cp])%mod;
+			cp=f[cp];
+		}
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=n;++j) ans[i]=(ans[i]+dp[<span class="hljs-number">1</span>][j]*a[j<span class="hljs-number">+1</span>])%mod;
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cout&lt;&lt;ans[i]&lt;&lt;<span class="hljs-string">&quot; &quot;</span>; cout&lt;&lt;endl;
+}
+<span class="hljs-comment">//O(n^3)</span>
+</code></pre>
+</div>
+</div>
+<p>然而 $O(n^3)$ 的时间复杂度不足以通过此题，你还需要使用反向 DP 的技巧进行优化，大方向也比较明确，留给读者自行思考，不再赘述。</p>
 </div>
         <div class="footer">
             <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>

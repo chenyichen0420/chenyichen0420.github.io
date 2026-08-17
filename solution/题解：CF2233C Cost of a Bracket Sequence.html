@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="color-scheme" content="light dark">
-    <title>题解：AT_abc248_g [ABC248G] GCD cost on the tree</title>
+    <title>题解：CF2233C Cost of a Bracket Sequence</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -220,102 +220,120 @@
     <div class="search-results" id="searchResults"></div>
 </div>
         <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
-<p>感觉这种对 $gcd$ 什么的容斥方法已经非常的普及了。</p>
-<p>就是这样的：我们考虑将对 $=k$ 的贡献转换成 $\mid k$ 的贡献，然后把其倍数给砍掉就是 $=k$ 的贡献了。</p>
-<p>在这道题中，我们考虑统计 $f(d)=\sum_{d\mid \gcd(i,j)}dis(i,j)$ 的值，然后就有答案是 $\sum_{i\ge1}d(f(d)-\sum_{j\ge2}f(jd))$。考虑 $f(d)$ 怎么计算。</p>
-<p>显然对 $f(d)$ 有贡献的路径 $(i,j)$，满足 $\forall k\in(i,j)$，$d\mid a_k$。</p>
-<p>于是我们将所有的因数的出现位置记出来，然后这样的路径就是若干个连通块内部的路径。接下来考虑对于一个连通块，怎么统计出所有路径的长度。</p>
-<p>显然，这些连通块仍然是树形结构，于是我们考虑我们要计算的就是一个子树中的所有路径的长度之和。</p>
-<p>不妨遍历这个树上的每一个节点，统计子树中经过这个节点的路径的长度之和，这是简单的，我们记录出每一颗子树到这个节点的路径长度和以及个数，然后就可以简单计算出来了。</p>
-<p>完了之后按照前面给的公式直接计算就行了，时间复杂度是 $n\sigma_0(n)+n\log n$，可以通过此题，参考代码如下：</p>
+<p>我感觉我这个 $O(n)$ 的做法的思路是比较像人的。</p>
+<p>首先，这个问题显然可以看作是套娃问题。内层的问题是给定括号串，问最长的合法子序列的长度，外层是怎么删能使得内层的答案最小。</p>
+<p>非常套路的，我们想一下内层问题的解法。一个非常好想且显然正确的 $O(n)$ 的做法是这样的：</p>
+<p>我们遇到左括号就直接选上，遇到右括号就能选就选。最后把多选的左括号删掉。</p>
+<p>形式化的，我们认为左括号是 $+1$，右括号是 $-1$，我们维护答案和一个计数器。初值都是 $0$。</p>
+<p>遇到 $+1$ 就将二者都 $+1$，遇到 $-1$ 时，如果计数器非 $0$，那么计数器 $-1$，答案 $+1$。</p>
+<p>最终的答案是答案减去计数器，因为末尾可能有多要了的没匹配上的左括号。</p>
+<p>现在考虑怎么去删点来让答案最小。</p>
+<p>显然，一个上界估计是的我一次操作一定能够让答案减一，也就是每一对括号我们恰好删除其中一个，直到没有匹配的括号或者操作次数用尽。</p>
+<p>考虑怎么达到这一点。</p>
+<p>考虑最后出现剩余的一部分，显然对于这一部分删掉左括号不一定是最优的，因为左括号出现了剩余，因此这一部分我们一定只会删除右括号。</p>
+<p>但是更靠前的部分呢？更靠前的部分是因为右括号过多被强制中断了，于是类似末尾的，删除右括号可能有别的右括号顶上来，于是我们只删除左括号即可。</p>
+<p>显然时间复杂度可以做到 $O(n)$，参考代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
     <span class="code-lang">CPP</span>
-    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+    <button class="copy-btn" data-code="#include &lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
-constexpr int mod=998244353;
-int n,a[100005],ans[100005],c[100005],v[100005],nc[100005],ret;
-vector&lt;int&gt;son[100005],ap[100005]; bool cs[100005];
-inline void mad(int&amp; l,const int r){(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
-inline void dfs(int p,int a){
-	c[p]=v[p]=1; nc[p]=cs[p]=0;
-	for(int sp:son[p]) if(cs[sp]){
-		dfs(sp,a);
-		nc[p]=(nc[p]+c[p]*v[sp]+c[sp]*v[p])%mod;
-		mad(c[p],c[sp]); v[p]=(v[p]+v[sp]+c[sp])%mod;
+int t, n, m; char c[5005], ans[5005];
+struct sev {
+	int l, r, c;
+};
+vector&lt;sev&gt;seg; int cp;
+signed main() {
+	ios::sync_with_stdio(0);
+	for (cin &gt;&gt; t; t; t--) {
+		cin &gt;&gt; n &gt;&gt; m &gt;&gt; c; seg.clear();
+		for (int i = 0, j = 0; i != n; j = i = j + 1) {
+			if (c[i] == ')') continue;
+			int cnt = 1; j = i + 1;
+			while (j != n) {
+				if (c[j] == '(') cnt++;
+				else cnt--;
+				if (cnt &lt; 0) break;
+				j++;
+			}
+			if (j != n) cnt++; j--;
+			seg.push_back({ i, j ,cnt });
+		}
+		for (int i = 0; i != n; ++i) ans[i] = '0';
+		for (const auto&amp; v : seg)
+			if (v.c) {
+				for (int i = v.l; i &lt;= v.r; ++i)
+					if (c[i] == ')' &amp;&amp; m) m--, ans[i] = '1';
+			}
+			else {
+				for (int i = v.l; i &lt;= v.r; ++i)
+					if (c[i] == '(' &amp;&amp; m) m--, ans[i] = '1';
+			}
+		for (int i = 0; i != n; ++i) cout &lt;&lt; ans[i]; cout &lt;&lt; endl;
+		/*
+		删掉一些字符，使得最长闭合括号子序列的长度最小
+		注意是子序列而非子串
+
+		原问题可以使用贪心法 O(n) 的求解出来。
+		具体来说，遇到一个左括号必加，遇到一个右括号如果能加就加
+		于是最优决策是若干闭合串和末尾一个不必合串
+		不闭合串我们挖掉末尾的 )，闭合串我们挖所有的 (
+		*/
 	}
-	mad(ans[a],nc[p]);
 }
-signed main(){
-	ios::sync_with_stdio(0); cin&gt;&gt;n;
-	for(int i=1;i&lt;=n;++i){
-		cin&gt;&gt;a[i];
-		for(int j=1;j*j&lt;=a[i];++j)
-			if(a[i]%j==0) ap[j].emplace_back(i);
-		for(int j=1;j*j&lt;a[i];++j)
-			if(a[i]%j==0) ap[a[i]/j].emplace_back(i);
-	}
-	for(int i=1,l,r;i!=n;++i)
-		cin&gt;&gt;l&gt;&gt;r,
-		son[l].emplace_back(r),
-		son[r].emplace_back(l);
-	for(int i=1e5;i&gt;=1;i--) if(ap[i].size()){
-		for(int p:ap[i]) cs[p]=1;
-		for(int p:ap[i]) if(cs[p]) dfs(p,i);
-		for(int v=i*2;v&lt;=1e5;v+=i) mad(ans[i],mod-ans[v]);
-	}
-	for(int i=1;i&lt;=1e5;++i) ret=(ret+i*ans[i])%mod;
-	cout&lt;&lt;ret&lt;&lt;endl;
-}
-//私は猫です!
-//Written by cbc on nyarch linux.
 ">复制</button>
 </div>
 <div class="code-content">
-    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
 <span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
 <span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
-<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>;
-<span class="hljs-type">int</span> n,a[<span class="hljs-number">100005</span>],ans[<span class="hljs-number">100005</span>],c[<span class="hljs-number">100005</span>],v[<span class="hljs-number">100005</span>],nc[<span class="hljs-number">100005</span>],ret;
-vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">100005</span>],ap[<span class="hljs-number">100005</span>]; <span class="hljs-type">bool</span> cs[<span class="hljs-number">100005</span>];
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp; l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> a)</span></span>{
-	c[p]=v[p]=<span class="hljs-number">1</span>; nc[p]=cs[p]=<span class="hljs-number">0</span>;
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(cs[sp]){
-		<span class="hljs-built_in">dfs</span>(sp,a);
-		nc[p]=(nc[p]+c[p]*v[sp]+c[sp]*v[p])%mod;
-		<span class="hljs-built_in">mad</span>(c[p],c[sp]); v[p]=(v[p]+v[sp]+c[sp])%mod;
+<span class="hljs-type">int</span> t, n, m; <span class="hljs-type">char</span> c[<span class="hljs-number">5005</span>], ans[<span class="hljs-number">5005</span>];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">sev</span> {
+	<span class="hljs-type">int</span> l, r, c;
+};
+vector&lt;sev&gt;seg; <span class="hljs-type">int</span> cp;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span> (cin &gt;&gt; t; t; t--) {
+		cin &gt;&gt; n &gt;&gt; m &gt;&gt; c; seg.<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>, j = <span class="hljs-number">0</span>; i != n; j = i = j + <span class="hljs-number">1</span>) {
+			<span class="hljs-keyword">if</span> (c[i] == <span class="hljs-string">&#x27;)&#x27;</span>) <span class="hljs-keyword">continue</span>;
+			<span class="hljs-type">int</span> cnt = <span class="hljs-number">1</span>; j = i + <span class="hljs-number">1</span>;
+			<span class="hljs-keyword">while</span> (j != n) {
+				<span class="hljs-keyword">if</span> (c[j] == <span class="hljs-string">&#x27;(&#x27;</span>) cnt++;
+				<span class="hljs-keyword">else</span> cnt--;
+				<span class="hljs-keyword">if</span> (cnt &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">break</span>;
+				j++;
+			}
+			<span class="hljs-keyword">if</span> (j != n) cnt++; j--;
+			seg.<span class="hljs-built_in">push_back</span>({ i, j ,cnt });
+		}
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i != n; ++i) ans[i] = <span class="hljs-string">&#x27;0&#x27;</span>;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp; v : seg)
+			<span class="hljs-keyword">if</span> (v.c) {
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = v.l; i &lt;= v.r; ++i)
+					<span class="hljs-keyword">if</span> (c[i] == <span class="hljs-string">&#x27;)&#x27;</span> &amp;&amp; m) m--, ans[i] = <span class="hljs-string">&#x27;1&#x27;</span>;
+			}
+			<span class="hljs-keyword">else</span> {
+				<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = v.l; i &lt;= v.r; ++i)
+					<span class="hljs-keyword">if</span> (c[i] == <span class="hljs-string">&#x27;(&#x27;</span> &amp;&amp; m) m--, ans[i] = <span class="hljs-string">&#x27;1&#x27;</span>;
+			}
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i != n; ++i) cout &lt;&lt; ans[i]; cout &lt;&lt; endl;
+		<span class="hljs-comment">/*
+		删掉一些字符，使得最长闭合括号子序列的长度最小
+		注意是子序列而非子串
+
+		原问题可以使用贪心法 O(n) 的求解出来。
+		具体来说，遇到一个左括号必加，遇到一个右括号如果能加就加
+		于是最优决策是若干闭合串和末尾一个不必合串
+		不闭合串我们挖掉末尾的 )，闭合串我们挖所有的 (
+		*/</span>
 	}
-	<span class="hljs-built_in">mad</span>(ans[a],nc[p]);
 }
-<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
-	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
-		cin&gt;&gt;a[i];
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j*j&lt;=a[i];++j)
-			<span class="hljs-keyword">if</span>(a[i]%j==<span class="hljs-number">0</span>) ap[j].<span class="hljs-built_in">emplace_back</span>(i);
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j*j&lt;a[i];++j)
-			<span class="hljs-keyword">if</span>(a[i]%j==<span class="hljs-number">0</span>) ap[a[i]/j].<span class="hljs-built_in">emplace_back</span>(i);
-	}
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i!=n;++i)
-		cin&gt;&gt;l&gt;&gt;r,
-		son[l].<span class="hljs-built_in">emplace_back</span>(r),
-		son[r].<span class="hljs-built_in">emplace_back</span>(l);
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1e5</span>;i&gt;=<span class="hljs-number">1</span>;i--) <span class="hljs-keyword">if</span>(ap[i].<span class="hljs-built_in">size</span>()){
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p:ap[i]) cs[p]=<span class="hljs-number">1</span>;
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p:ap[i]) <span class="hljs-keyword">if</span>(cs[p]) <span class="hljs-built_in">dfs</span>(p,i);
-		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v=i*<span class="hljs-number">2</span>;v&lt;=<span class="hljs-number">1e5</span>;v+=i) <span class="hljs-built_in">mad</span>(ans[i],mod-ans[v]);
-	}
-	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-number">1e5</span>;++i) ret=(ret+i*ans[i])%mod;
-	cout&lt;&lt;ret&lt;&lt;endl;
-}
-<span class="hljs-comment">//私は猫です!</span>
-<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
 </code></pre>
 </div>
 </div>
-<p>注：上面时间复杂度中的 $\sigma_0$ 实际上表示的是 $1\sim n$ 中的所有数字的因数个数的最大值，在 $10^5$ 范围内只有大约 $130$，不大。</p>
 </div>
         <div class="footer">
             <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
