@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P10527 [XJTUPC 2024] 最后一块石头的重量</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>感觉是很经典的一道题目，但是之前就是没遇到过。</p>
+<p>首先，不难把题意转化成有 $n$ 个数字 $a$，构造序列 $b$，满足 $b_i\in\set{1,-1}$，且 $\operatorname{abs}(\sum_{i=1}^na_ib_i)$ 尽可能小。</p>
+<p>一个非常简单的想法是使用 $dp_{p,i}$ 表示在前 $p$ 个数字能不能取到 $i$。显然是一个 $O(\frac{n^2V}{\omega})$ 的算法，应该是过不去的。</p>
+<p>我们考虑怎么优化。目前的主要问题是我们的状态是 $01$，一般来说不是特别优秀，我们希望能够往值里面塞一点更有用的信息。</p>
+<p>我们可以记 $V=5000$，由于 $a_i\in[1,V]$，因此，显然我总是有一种重新排列求和顺序的方法，满足上面的求和的式子在任意一步都是在 $[-V,V]$ 的范围内的。</p>
+<p>虽然这仍然不好做，但是这到也给了我们一点启示：我有没有可能强制让他在每一步都必须在这个范围内？</p>
+<p>我们考虑把这个问题转化成 01 背包。一种非常自然的想法是把问题变成所有数字都加，然后选一些数字减去他们的两倍，使得最终的结果的绝对值最小。</p>
+<p>令 $sum=\sum_{i=1}^na_i$，则我选出来的数字的和肯定在 $[\frac{sum}{2}-V,\frac{sum}{2}+V]$ 之间。</p>
+<p>于是我们有了这样一个想法：我能不能先取一段尽可能接近 $\frac{sum}{2}$ 的前缀，并且认为我们选了这一段，随后再进行调整？</p>
+<p>这么做似乎是有一定的道理的：调整一个数字的代价是明确的，而且每一个数字都只有调整或者不调整两种选择。</p>
+<p>最重要的是，我调整左边的就是在减，调整右边的就是在增，没有任何顺序限制或者必须选的限制，这非常有利于我们解决这个问题。</p>
+<p>于是我们考虑设计出这样的一个状态：$dp_{v,l,r}$，表示我已经决定了在 $[l,r]$ 范围内的数值要不要调整，此时能否得到 $v$。显然转移方向仍然是 $l$ 扩展或者 $r$ 扩展。</p>
+<p>不过不难注意到这仍然是一个 $\frac{n^2V}{w}$ 的思路，但是这个状态设计的优化方向是明确的：</p>
+<p>$v$ 绝对没法优化掉，因为一对 $(l,r)$ 固然对应了多个完全没有规律的 $v$，因此我们只能考虑优化掉 $l,r$。</p>
+<p>此时我们不妨考虑优化 $l$，那么对于固定的 $r,v$，$l$ 有什么特性呢？非常显然：如果 $dp_{v,l,r}$ 为 $1$，则 $dp_{v,l-\Delta,r}$ 全部都是 $1$，也就是说可以认为 $dp_{v,l,r}$ 在 $(v,r)$ 固定的时候是有单调性的，总是存在一个 $l_0$ 满足 $dp_{v,l,r}=[l\le l_0]$。</p>
+<p>至此，豁然开朗，我设计状态为 $dp_{v,r}$ 表示存在调整 $[l,r]$ 区间内的状态可以取到 $v$ 的最大的 $l$。转移仍然是显然的，不过看起来仍然是一个 $n^2V$ 的复杂度。</p>
+<p>只需要再注意到一点：只有当 $l\ge dp_{v,r-1}$ 的时候才有必要进行 $l\to dp_{v,r}$ 的转移，不然的话 $dp_{v,r-1}\to dp_{v,r}$ 的转移会把这个贡献统计进去。</p>
+<p>因此对于固定的 $v$，所有的 $r$ 对应的 $l$ 的枚举量只有 $O(n)$，因此总时间复杂度可以做到 $O(nV)$。</p>
+<p>参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+int n,a[10005],dp[2][10005],sm,cs,cp,ans;
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n; ans=5000;
+	for(int i=1;i&lt;=n;++i) cin&gt;&gt;a[i],sm+=a[i];
+	sort(a+1,a+n+1,greater&lt;int&gt;());
+	for(int i=1;i&lt;=n;++i)
+		if(cs+a[i]&gt;sm/2){
+			cp=i-1; break;
+		}
+		else cs+=a[i];
+	dp[cp&amp;1][5000-sm/2+cs]=cp+1;
+	for(int i=cp+1;i&lt;=n;++i){
+		memcpy(dp[i&amp;1],dp[i-1&amp;1],sizeof dp[0]);
+		for(int j=0;j+a[i]&lt;=10000;++j)
+			dp[i&amp;1][j+a[i]]=max(dp[i&amp;1][j+a[i]],dp[i-1&amp;1][j]);
+		for(int j=10000;j&gt;=0;--j)
+			for(int k=max(dp[i-1&amp;1][j],1);k&lt;dp[i&amp;1][j];++k)
+				if(j&gt;=a[k]) dp[i&amp;1][j-a[k]]=max(dp[i&amp;1][j-a[k]],k);
+	}
+	for(int j=0;j&lt;=10000;++j) if(dp[n&amp;1][j])
+		ans=min(ans,abs(sm-2*(sm/2-5000+j)));
+	cout&lt;&lt;ans&lt;&lt;endl;
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-type">int</span> n,a[<span class="hljs-number">10005</span>],dp[<span class="hljs-number">2</span>][<span class="hljs-number">10005</span>],sm,cs,cp,ans;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n; ans=<span class="hljs-number">5000</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;a[i],sm+=a[i];
+	<span class="hljs-built_in">sort</span>(a<span class="hljs-number">+1</span>,a+n<span class="hljs-number">+1</span>,<span class="hljs-built_in">greater</span>&lt;<span class="hljs-type">int</span>&gt;());
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+		<span class="hljs-keyword">if</span>(cs+a[i]&gt;sm/<span class="hljs-number">2</span>){
+			cp=i<span class="hljs-number">-1</span>; <span class="hljs-keyword">break</span>;
+		}
+		<span class="hljs-keyword">else</span> cs+=a[i];
+	dp[cp&amp;<span class="hljs-number">1</span>][<span class="hljs-number">5000</span>-sm/<span class="hljs-number">2</span>+cs]=cp<span class="hljs-number">+1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=cp<span class="hljs-number">+1</span>;i&lt;=n;++i){
+		<span class="hljs-built_in">memcpy</span>(dp[i&amp;<span class="hljs-number">1</span>],dp[i<span class="hljs-number">-1</span>&amp;<span class="hljs-number">1</span>],<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j+a[i]&lt;=<span class="hljs-number">10000</span>;++j)
+			dp[i&amp;<span class="hljs-number">1</span>][j+a[i]]=<span class="hljs-built_in">max</span>(dp[i&amp;<span class="hljs-number">1</span>][j+a[i]],dp[i<span class="hljs-number">-1</span>&amp;<span class="hljs-number">1</span>][j]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">10000</span>;j&gt;=<span class="hljs-number">0</span>;--j)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-built_in">max</span>(dp[i<span class="hljs-number">-1</span>&amp;<span class="hljs-number">1</span>][j],<span class="hljs-number">1</span>);k&lt;dp[i&amp;<span class="hljs-number">1</span>][j];++k)
+				<span class="hljs-keyword">if</span>(j&gt;=a[k]) dp[i&amp;<span class="hljs-number">1</span>][j-a[k]]=<span class="hljs-built_in">max</span>(dp[i&amp;<span class="hljs-number">1</span>][j-a[k]],k);
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=<span class="hljs-number">10000</span>;++j) <span class="hljs-keyword">if</span>(dp[n&amp;<span class="hljs-number">1</span>][j])
+		ans=<span class="hljs-built_in">min</span>(ans,<span class="hljs-built_in">abs</span>(sm<span class="hljs-number">-2</span>*(sm/<span class="hljs-number">2</span><span class="hljs-number">-5000</span>+j)));
+	cout&lt;&lt;ans&lt;&lt;endl;
+}
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

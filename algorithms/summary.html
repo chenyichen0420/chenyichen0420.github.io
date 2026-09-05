@@ -293,6 +293,7 @@
 <p>我在 2026/06/11~12 进行了一轮自动化扫描，博客中未完成的部分可以参见<a href="./audit.html">审计报告</a>。</p>
 <p>审计报告并非实时生成的：这是在本地运行大约 12h 的大模型得到的产物，因此审计报告可能每一两个月才会更新一次。</p>
 <h1 id="大纲">大纲</h1>
+<p>待加入：析合树，<a href="https://www.luogu.com.cn/problem/AT_arc221_e">https://www.luogu.com.cn/problem/AT_arc221_e</a></p>
 <blockquote>
 <p><a href="#%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92">动态规划</a></p>
 <blockquote>
@@ -405,6 +406,7 @@
 <p>普通分块</p>
 <p>值域分块</p>
 <p>根号重构</p>
+<p>定长分块</p>
 <p>树分块</p>
 <p>应用</p>
 </blockquote>
@@ -5888,6 +5890,330 @@ struct seg_tree {
 </code></pre>
 </div>
 </div>
+<h3 id="定长分块">定长分块</h3>
+<p>顾名思义，就是按照一个指定的长度进行分块的操作，但是这么说其实很有误导性：你会说别的分块不就是定长分块吗？</p>
+<p>其实不然。定长分块的本质是“静态索引”，其表现类似点分树中预处理的各级重心信息——人为划定边界仅为快速定位提供下标映射，其本身不做任何信息处理。而我们之前所说的各种分块本质是“动态维护”，其表现类似线段树的懒标记与上传机制——分块不仅是空间划分，更是一个管辖单元（自治域），必须维护块的集合信息（如区间和、最值）。</p>
+<p>定长分块只是人为划分边界，不维护状态，而普通分块是维护一整个块的某种信息，甚至对于整个块的暂存修改。虽然二者的中心思想是统一的：通过将数据分段来人为构造一定的限制或者保证。</p>
+<p>看两道例题，你就能够理解到定长分块的“仅形式”的特征了。<a href="https://www.luogu.com.cn/problem/P9877">T1</a><a href="https://www.luogu.com.cn/problem/P14638">T2</a>。</p>
+<p>先看 T1，其实题意非常简单：带修查询区间内长度不超过固定常数的最大子段和。</p>
+<p>其实看到这种固定长度的时候就需要警觉是不是可以定长分块了。比如这道题，我们试着按照 $c$ 作为块长进行一下定长分块，看看会发生什么呢？</p>
+<p>你会发现，所有的区间，要么完整的包含在一个块内部，要么跨越了恰好两个块，没有其他情况了。这恰恰解释了我之前所说的那个那个中心思想：人为构造一定的保证。</p>
+<p>不过显然这题并不是这么一切就做完了。块内的信息确实可以使用线段树快速的维护了（显然，$c$ 的块长保证了这部分内求出来的最大子段和就是合法的，线段树的 $O(\log c)$ 是优于分块暴力重算的 $O(c)$ 的），但是那些跨块的我们似乎仍然没有处理好。</p>
+<p>这时候按照 $c$ 进行定长分块的第二层好处就显现出来了。我们不妨先写一写跨块的那些区间的形式表达式：$\max s_r-\min s_l$。其中要求 $r-l\le c$。</p>
+<p>我们把两个块的部分上下放到一起，此时发现突破口了：</p>
+<p><img src="https://chenyichen0420.netlify.app/picbed/20260901nointer.png" alt=""></p>
+<p>我要求后面那个块的结束位置早于前面那个块的开始位置。</p>
+<p>我们直接做带上这个限制的最大子区间和，发现确实可做，于是整体时间复杂度就降到了单个 $\log$！</p>
+<p>具体来说，当查询 $[l,r]$ 这个区间的时候，我们分情况讨论：</p>
+<ol>
+<li>如果 $r-l+1\le c$，直接在线段树上查询 $[l,r]$ 的最大子段和即可，时间复杂度 $O(\log)$。</li>
+<li>如果 $l,r$ 处在相邻两块（显然不可能处在同一块，否则归到前一种情况），那么答案要么是 $[l,l+c-1]$ 的最大子段和，要么是 $[r-c+1,r]$ 的最大子段和，要么是 $l^\prime\in[l,r-c],r^\prime\in[l+c,r],l^\prime>r^\prime-c$ 的区间 $[l^\prime,r^\prime]$ 的和的最大值。显然前两项仍然是线段树 $O(\log)$ 查询，最后一项可以通过每一个块维护的相邻块有限制线段树直接 $O(\log)$ 查处来。</li>
+<li>$l,r$ 处在不相邻块，显然答案只有可能是中间段段内贡献，中间段段间贡献，$[l,l+c-1]$ 的最大子段和，$[r-c+1,r]$ 的最大子段和，$r^\prime-c>l^\prime\ge l$ 的区间 $[l^\prime,r^\prime]$ 的和，$l^\prime+c<r^\prime\le r$ 的区间 $[l^\prime,r^\prime]$ 的和这几种中的最大值，每一项都可以 $O(\log)$ 查出来。</li>
+</ol>
+<p>至于修改的时候，更改一下全局最大子段和线段树，更新一下块内贡献线段树，块间贡献线段树即可，时间复杂度仍然是 $O(\log)$ 的。</p>
+<p>参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int ninf=-1e18;
+#define blk(p) ((p-1)/c+1)
+int n,m,c,a[400005],l[200005],r[200005];
+struct val{
+    int s,lm,rm,v;
+    inline void set(int c){
+        s=c; lm=rm=v=max(c,0ll);
+    }
+    inline val operator+(const val&amp;r)const{
+        static val ret;
+        ret.s=s+r.s;
+        ret.lm=max(lm,s+r.lm);
+        ret.rm=max(r.rm,rm+r.s);
+        ret.v=max({v,r.v,rm+r.lm});
+        return ret;
+    }
+};
+struct seg_tree_nlim{
+    struct node{ int l,r; val v; }re[200005&lt;&lt;2];
+    inline void build(int l,int r,int p){
+        re[p].l=l; re[p].r=r;
+        if(l==r) return re[p].v.set(a[l]);
+        build((l+r&gt;&gt;1)+1,r,p&lt;&lt;1|1);
+        build(l,l+r&gt;&gt;1,p&lt;&lt;1);
+        re[p].v=re[p&lt;&lt;1].v+re[p&lt;&lt;1|1].v;
+    }
+    inline void ins(int cp,int cv,int p){
+        if(re[p].l==re[p].r) return re[p].v.set(cv);
+        ins(cp,cv,p&lt;&lt;1|(cp&gt;re[p&lt;&lt;1].r));
+        re[p].v=re[p&lt;&lt;1].v+re[p&lt;&lt;1|1].v;
+    }
+    inline val que(int l,int r,int p){
+        if(re[p].l&gt;=l&amp;&amp;re[p].r&lt;=r) return re[p].v;
+        if(r&lt;=re[p&lt;&lt;1].r) return que(l,r,p&lt;&lt;1);
+        if(l&gt;re[p&lt;&lt;1].r) return que(l,r,p&lt;&lt;1|1);
+        return que(l,r,p&lt;&lt;1)+que(l,r,p&lt;&lt;1|1);
+    }
+}sgtn;
+struct vat{
+    int s1,s2,mx1,mx2,mx;
+    inline void set(int v1,int v2){
+        s1=v1; s2=v2; mx1=max(v1,0ll);
+        mx2=max(v2,0ll); mx=max({v1,v2,0ll});
+    }
+    inline vat operator+(const vat&amp;r)const{
+        static vat ret;
+        ret.s1=s1+r.s1; ret.s2=s2+r.s2;
+        ret.mx1=max(mx1,s1+r.mx1);
+        ret.mx2=max(r.mx2,r.s2+mx2);
+        ret.mx=max({mx+r.s2,r.mx+s1,mx1+r.mx2});
+        return ret;
+    }
+};
+struct seg_tree_cblk{
+    struct node{ int l,r; vat v; }; vector&lt;node&gt;re;
+    inline void build(int l,int r,int p){
+        if(re.size()&lt;=p) re.resize(p+1);
+        re[p].l=l; re[p].r=r;
+        if(l==r) return re[p].v.set(a[l+c],a[l]);
+        build((l+r&gt;&gt;1)+1,r,p&lt;&lt;1|1);
+        build(l,(l+r&gt;&gt;1),p&lt;&lt;1);
+        re[p].v=re[p&lt;&lt;1].v+re[p&lt;&lt;1|1].v;
+    }
+    inline void ins(int cp,int p){
+        if(re[p].l==re[p].r)
+            return re[p].v.set(a[cp+c],a[cp]);
+        ins(cp,p&lt;&lt;1|(cp&gt;re[p&lt;&lt;1].r));
+        re[p].v=re[p&lt;&lt;1].v+re[p&lt;&lt;1|1].v;
+    }
+    inline vat que(int l,int r,int p){
+        if(l&gt;r) return {0,0,ninf,ninf,ninf};
+        if(re[p].l&gt;=l&amp;&amp;re[p].r&lt;=r) return re[p].v;
+        if(r&lt;=re[p&lt;&lt;1].r) return que(l,r,p&lt;&lt;1);
+        if(l&gt;re[p&lt;&lt;1].r) return que(l,r,p&lt;&lt;1|1);
+        return que(l,r,p&lt;&lt;1)+que(l,r,p&lt;&lt;1|1);
+    }
+}sgtb[200005];
+struct seg_tree_mxbk{
+    struct node{ int l,r,v; }re[200005&lt;&lt;2];
+    inline void build(int l,int r,int p){
+        re[p].l=l; re[p].r=r;
+        if(l==r) return;
+        build((l+r&gt;&gt;1)+1,r,p&lt;&lt;1|1);
+        build(l,(l+r&gt;&gt;1),p&lt;&lt;1);
+    }
+    inline void ins(int cp,int cv,int p){
+        if(re[p].l==re[p].r) return void(re[p].v=cv);
+        ins(cp,cv,p&lt;&lt;1|(cp&gt;re[p&lt;&lt;1].r));
+        re[p].v=max(re[p&lt;&lt;1].v,re[p&lt;&lt;1|1].v); 
+    }
+    inline int que(int l,int r,int p){
+        if(l&gt;r) return ninf;
+        if(re[p].l&gt;=l&amp;&amp;re[p].r&lt;=r) return re[p].v;
+        if(r&lt;=re[p&lt;&lt;1].r) return que(l,r,p&lt;&lt;1);
+        if(l&gt;re[p&lt;&lt;1].r) return que(l,r,p&lt;&lt;1|1);
+        return max(que(l,r,p&lt;&lt;1),que(l,r,p&lt;&lt;1|1));
+    }
+}sgtms,sgtmc;
+signed main(){
+    ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m&gt;&gt;c;
+    for(int i=1;i&lt;=n;++i) cin&gt;&gt;a[i];
+    sgtn.build(1,n,1);
+	for(int i=1;i&lt;=n;++i) r[blk(i)]=i;
+    for(int i=n;i&gt;=1;i--) l[blk(i)]=i;
+    for(int i=1;i&lt;=blk(n);++i)
+        sgtb[i].build(l[i],r[i],1);
+    sgtms.build(1,blk(n),1);
+    sgtmc.build(1,blk(n),1);
+    for(int i=1;i&lt;=blk(n);++i)
+        sgtms.ins(i,sgtn.que(l[i],r[i],1).v,1);
+    for(int i=1;i!=blk(n);++i)
+        sgtmc.ins(i,sgtb[i].que(l[i],r[i],1).mx,1);
+    for(int i=1,o,x,y;i&lt;=m;++i)
+        if(cin&gt;&gt;o&gt;&gt;x&gt;&gt;y,o&amp;1){
+            sgtn.ins(x,y,1); int bc=blk(x);
+            sgtms.ins(bc,sgtn.que(l[bc],r[bc],1).v,1);
+            a[x]=y; sgtb[bc].ins(x,1);
+            sgtmc.ins(bc,sgtb[bc].que(l[bc],r[bc],1).mx,1);
+            if(bc!=1)
+                sgtb[bc-1].ins(x-c,1),
+                sgtmc.ins(bc-1,sgtb[bc-1].que(l[bc-1],r[bc-1],1).mx,1);
+        }
+        else
+            if(y-x+1&lt;=c) cout&lt;&lt;sgtn.que(x,y,1).v&lt;&lt;endl;
+            else if(blk(x)+1==blk(y)){
+                vat tmp=sgtb[blk(x)].que(x,y-c,1);
+                tmp.mx+=sgtb[blk(x)].que(l[blk(x)],x-1,1).s1;
+                tmp.mx+=sgtb[blk(x)].que(y-c+1,r[blk(x)],1).s2;
+                int mx=max(sgtn.que(x,x+c-1,1).v,sgtn.que(y-c+1,y,1).v);
+                cout&lt;&lt;max(mx,tmp.mx)&lt;&lt;endl;
+            }
+            else{
+                vat tmp1=sgtb[blk(x)].que(x,r[blk(x)],1);
+                tmp1.mx+=sgtb[blk(x)].que(l[blk(x)],x-1,1).s1;
+                tmp1.mx=max(tmp1.mx,sgtn.que(x,x+c-1,1).v);
+                vat tmp2=sgtb[blk(y)-1].que(l[blk(y)-1],y-c,1);
+                tmp2.mx+=sgtb[blk(y)-1].que(y-c+1,r[blk(y)-1],1).s2;
+                tmp2.mx=max(tmp2.mx,sgtn.que(y-c+1,y,1).v);
+                int mx3=sgtms.que(blk(x)+1,blk(y)-1,1);
+                int mx4=sgtmc.que(blk(x)+1,blk(y)-2,1);
+                cout&lt;&lt;max({tmp1.mx,tmp2.mx,mx3,mx4})&lt;&lt;endl;
+            }
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> ninf=<span class="hljs-number">-1e18</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> blk(p) ((p-1)/c+1)</span>
+<span class="hljs-type">int</span> n,m,c,a[<span class="hljs-number">400005</span>],l[<span class="hljs-number">200005</span>],r[<span class="hljs-number">200005</span>];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">val</span>{
+    <span class="hljs-type">int</span> s,lm,rm,v;
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">set</span><span class="hljs-params">(<span class="hljs-type">int</span> c)</span></span>{
+        s=c; lm=rm=v=<span class="hljs-built_in">max</span>(c,<span class="hljs-number">0ll</span>);
+    }
+    <span class="hljs-keyword">inline</span> val <span class="hljs-keyword">operator</span>+(<span class="hljs-type">const</span> val&amp;r)<span class="hljs-type">const</span>{
+        <span class="hljs-type">static</span> val ret;
+        ret.s=s+r.s;
+        ret.lm=<span class="hljs-built_in">max</span>(lm,s+r.lm);
+        ret.rm=<span class="hljs-built_in">max</span>(r.rm,rm+r.s);
+        ret.v=<span class="hljs-built_in">max</span>({v,r.v,rm+r.lm});
+        <span class="hljs-keyword">return</span> ret;
+    }
+};
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">seg_tree_nlim</span>{
+    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>{ <span class="hljs-type">int</span> l,r; val v; }re[<span class="hljs-number">200005</span>&lt;&lt;<span class="hljs-number">2</span>];
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">build</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+        re[p].l=l; re[p].r=r;
+        <span class="hljs-keyword">if</span>(l==r) <span class="hljs-keyword">return</span> re[p].v.<span class="hljs-built_in">set</span>(a[l]);
+        <span class="hljs-built_in">build</span>((l+r&gt;&gt;<span class="hljs-number">1</span>)<span class="hljs-number">+1</span>,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+        <span class="hljs-built_in">build</span>(l,l+r&gt;&gt;<span class="hljs-number">1</span>,p&lt;&lt;<span class="hljs-number">1</span>);
+        re[p].v=re[p&lt;&lt;<span class="hljs-number">1</span>].v+re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v;
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> cp,<span class="hljs-type">int</span> cv,<span class="hljs-type">int</span> p)</span></span>{
+        <span class="hljs-keyword">if</span>(re[p].l==re[p].r) <span class="hljs-keyword">return</span> re[p].v.<span class="hljs-built_in">set</span>(cv);
+        <span class="hljs-built_in">ins</span>(cp,cv,p&lt;&lt;<span class="hljs-number">1</span>|(cp&gt;re[p&lt;&lt;<span class="hljs-number">1</span>].r));
+        re[p].v=re[p&lt;&lt;<span class="hljs-number">1</span>].v+re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v;
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> val <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+        <span class="hljs-keyword">if</span>(re[p].l&gt;=l&amp;&amp;re[p].r&lt;=r) <span class="hljs-keyword">return</span> re[p].v;
+        <span class="hljs-keyword">if</span>(r&lt;=re[p&lt;&lt;<span class="hljs-number">1</span>].r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">if</span>(l&gt;re[p&lt;&lt;<span class="hljs-number">1</span>].r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>)+<span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+    }
+}sgtn;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">vat</span>{
+    <span class="hljs-type">int</span> s1,s2,mx1,mx2,mx;
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">set</span><span class="hljs-params">(<span class="hljs-type">int</span> v1,<span class="hljs-type">int</span> v2)</span></span>{
+        s1=v1; s2=v2; mx1=<span class="hljs-built_in">max</span>(v1,<span class="hljs-number">0ll</span>);
+        mx2=<span class="hljs-built_in">max</span>(v2,<span class="hljs-number">0ll</span>); mx=<span class="hljs-built_in">max</span>({v1,v2,<span class="hljs-number">0ll</span>});
+    }
+    <span class="hljs-keyword">inline</span> vat <span class="hljs-keyword">operator</span>+(<span class="hljs-type">const</span> vat&amp;r)<span class="hljs-type">const</span>{
+        <span class="hljs-type">static</span> vat ret;
+        ret.s1=s1+r.s1; ret.s2=s2+r.s2;
+        ret.mx1=<span class="hljs-built_in">max</span>(mx1,s1+r.mx1);
+        ret.mx2=<span class="hljs-built_in">max</span>(r.mx2,r.s2+mx2);
+        ret.mx=<span class="hljs-built_in">max</span>({mx+r.s2,r.mx+s1,mx1+r.mx2});
+        <span class="hljs-keyword">return</span> ret;
+    }
+};
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">seg_tree_cblk</span>{
+    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>{ <span class="hljs-type">int</span> l,r; vat v; }; vector&lt;node&gt;re;
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">build</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+        <span class="hljs-keyword">if</span>(re.<span class="hljs-built_in">size</span>()&lt;=p) re.<span class="hljs-built_in">resize</span>(p<span class="hljs-number">+1</span>);
+        re[p].l=l; re[p].r=r;
+        <span class="hljs-keyword">if</span>(l==r) <span class="hljs-keyword">return</span> re[p].v.<span class="hljs-built_in">set</span>(a[l+c],a[l]);
+        <span class="hljs-built_in">build</span>((l+r&gt;&gt;<span class="hljs-number">1</span>)<span class="hljs-number">+1</span>,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+        <span class="hljs-built_in">build</span>(l,(l+r&gt;&gt;<span class="hljs-number">1</span>),p&lt;&lt;<span class="hljs-number">1</span>);
+        re[p].v=re[p&lt;&lt;<span class="hljs-number">1</span>].v+re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v;
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> cp,<span class="hljs-type">int</span> p)</span></span>{
+        <span class="hljs-keyword">if</span>(re[p].l==re[p].r)
+            <span class="hljs-keyword">return</span> re[p].v.<span class="hljs-built_in">set</span>(a[cp+c],a[cp]);
+        <span class="hljs-built_in">ins</span>(cp,p&lt;&lt;<span class="hljs-number">1</span>|(cp&gt;re[p&lt;&lt;<span class="hljs-number">1</span>].r));
+        re[p].v=re[p&lt;&lt;<span class="hljs-number">1</span>].v+re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v;
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> vat <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+        <span class="hljs-keyword">if</span>(l&gt;r) <span class="hljs-keyword">return</span> {<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,ninf,ninf,ninf};
+        <span class="hljs-keyword">if</span>(re[p].l&gt;=l&amp;&amp;re[p].r&lt;=r) <span class="hljs-keyword">return</span> re[p].v;
+        <span class="hljs-keyword">if</span>(r&lt;=re[p&lt;&lt;<span class="hljs-number">1</span>].r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">if</span>(l&gt;re[p&lt;&lt;<span class="hljs-number">1</span>].r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>)+<span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+    }
+}sgtb[<span class="hljs-number">200005</span>];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">seg_tree_mxbk</span>{
+    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>{ <span class="hljs-type">int</span> l,r,v; }re[<span class="hljs-number">200005</span>&lt;&lt;<span class="hljs-number">2</span>];
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">build</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+        re[p].l=l; re[p].r=r;
+        <span class="hljs-keyword">if</span>(l==r) <span class="hljs-keyword">return</span>;
+        <span class="hljs-built_in">build</span>((l+r&gt;&gt;<span class="hljs-number">1</span>)<span class="hljs-number">+1</span>,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+        <span class="hljs-built_in">build</span>(l,(l+r&gt;&gt;<span class="hljs-number">1</span>),p&lt;&lt;<span class="hljs-number">1</span>);
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> cp,<span class="hljs-type">int</span> cv,<span class="hljs-type">int</span> p)</span></span>{
+        <span class="hljs-keyword">if</span>(re[p].l==re[p].r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(re[p].v=cv);
+        <span class="hljs-built_in">ins</span>(cp,cv,p&lt;&lt;<span class="hljs-number">1</span>|(cp&gt;re[p&lt;&lt;<span class="hljs-number">1</span>].r));
+        re[p].v=<span class="hljs-built_in">max</span>(re[p&lt;&lt;<span class="hljs-number">1</span>].v,re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v); 
+    }
+    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+        <span class="hljs-keyword">if</span>(l&gt;r) <span class="hljs-keyword">return</span> ninf;
+        <span class="hljs-keyword">if</span>(re[p].l&gt;=l&amp;&amp;re[p].r&lt;=r) <span class="hljs-keyword">return</span> re[p].v;
+        <span class="hljs-keyword">if</span>(r&lt;=re[p&lt;&lt;<span class="hljs-number">1</span>].r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">if</span>(l&gt;re[p&lt;&lt;<span class="hljs-number">1</span>].r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-built_in">max</span>(<span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>),<span class="hljs-built_in">que</span>(l,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>));
+    }
+}sgtms,sgtmc;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m&gt;&gt;c;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;a[i];
+    sgtn.<span class="hljs-built_in">build</span>(<span class="hljs-number">1</span>,n,<span class="hljs-number">1</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) r[<span class="hljs-built_in">blk</span>(i)]=i;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n;i&gt;=<span class="hljs-number">1</span>;i--) l[<span class="hljs-built_in">blk</span>(i)]=i;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-built_in">blk</span>(n);++i)
+        sgtb[i].<span class="hljs-built_in">build</span>(l[i],r[i],<span class="hljs-number">1</span>);
+    sgtms.<span class="hljs-built_in">build</span>(<span class="hljs-number">1</span>,<span class="hljs-built_in">blk</span>(n),<span class="hljs-number">1</span>);
+    sgtmc.<span class="hljs-built_in">build</span>(<span class="hljs-number">1</span>,<span class="hljs-built_in">blk</span>(n),<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-built_in">blk</span>(n);++i)
+        sgtms.<span class="hljs-built_in">ins</span>(i,sgtn.<span class="hljs-built_in">que</span>(l[i],r[i],<span class="hljs-number">1</span>).v,<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=<span class="hljs-built_in">blk</span>(n);++i)
+        sgtmc.<span class="hljs-built_in">ins</span>(i,sgtb[i].<span class="hljs-built_in">que</span>(l[i],r[i],<span class="hljs-number">1</span>).mx,<span class="hljs-number">1</span>);
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,o,x,y;i&lt;=m;++i)
+        <span class="hljs-keyword">if</span>(cin&gt;&gt;o&gt;&gt;x&gt;&gt;y,o&amp;<span class="hljs-number">1</span>){
+            sgtn.<span class="hljs-built_in">ins</span>(x,y,<span class="hljs-number">1</span>); <span class="hljs-type">int</span> bc=<span class="hljs-built_in">blk</span>(x);
+            sgtms.<span class="hljs-built_in">ins</span>(bc,sgtn.<span class="hljs-built_in">que</span>(l[bc],r[bc],<span class="hljs-number">1</span>).v,<span class="hljs-number">1</span>);
+            a[x]=y; sgtb[bc].<span class="hljs-built_in">ins</span>(x,<span class="hljs-number">1</span>);
+            sgtmc.<span class="hljs-built_in">ins</span>(bc,sgtb[bc].<span class="hljs-built_in">que</span>(l[bc],r[bc],<span class="hljs-number">1</span>).mx,<span class="hljs-number">1</span>);
+            <span class="hljs-keyword">if</span>(bc!=<span class="hljs-number">1</span>)
+                sgtb[bc<span class="hljs-number">-1</span>].<span class="hljs-built_in">ins</span>(x-c,<span class="hljs-number">1</span>),
+                sgtmc.<span class="hljs-built_in">ins</span>(bc<span class="hljs-number">-1</span>,sgtb[bc<span class="hljs-number">-1</span>].<span class="hljs-built_in">que</span>(l[bc<span class="hljs-number">-1</span>],r[bc<span class="hljs-number">-1</span>],<span class="hljs-number">1</span>).mx,<span class="hljs-number">1</span>);
+        }
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-keyword">if</span>(y-x<span class="hljs-number">+1</span>&lt;=c) cout&lt;&lt;sgtn.<span class="hljs-built_in">que</span>(x,y,<span class="hljs-number">1</span>).v&lt;&lt;endl;
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(<span class="hljs-built_in">blk</span>(x)<span class="hljs-number">+1</span>==<span class="hljs-built_in">blk</span>(y)){
+                vat tmp=sgtb[<span class="hljs-built_in">blk</span>(x)].<span class="hljs-built_in">que</span>(x,y-c,<span class="hljs-number">1</span>);
+                tmp.mx+=sgtb[<span class="hljs-built_in">blk</span>(x)].<span class="hljs-built_in">que</span>(l[<span class="hljs-built_in">blk</span>(x)],x<span class="hljs-number">-1</span>,<span class="hljs-number">1</span>).s1;
+                tmp.mx+=sgtb[<span class="hljs-built_in">blk</span>(x)].<span class="hljs-built_in">que</span>(y-c<span class="hljs-number">+1</span>,r[<span class="hljs-built_in">blk</span>(x)],<span class="hljs-number">1</span>).s2;
+                <span class="hljs-type">int</span> mx=<span class="hljs-built_in">max</span>(sgtn.<span class="hljs-built_in">que</span>(x,x+c<span class="hljs-number">-1</span>,<span class="hljs-number">1</span>).v,sgtn.<span class="hljs-built_in">que</span>(y-c<span class="hljs-number">+1</span>,y,<span class="hljs-number">1</span>).v);
+                cout&lt;&lt;<span class="hljs-built_in">max</span>(mx,tmp.mx)&lt;&lt;endl;
+            }
+            <span class="hljs-keyword">else</span>{
+                vat tmp1=sgtb[<span class="hljs-built_in">blk</span>(x)].<span class="hljs-built_in">que</span>(x,r[<span class="hljs-built_in">blk</span>(x)],<span class="hljs-number">1</span>);
+                tmp<span class="hljs-number">1.</span>mx+=sgtb[<span class="hljs-built_in">blk</span>(x)].<span class="hljs-built_in">que</span>(l[<span class="hljs-built_in">blk</span>(x)],x<span class="hljs-number">-1</span>,<span class="hljs-number">1</span>).s1;
+                tmp<span class="hljs-number">1.</span>mx=<span class="hljs-built_in">max</span>(tmp<span class="hljs-number">1.</span>mx,sgtn.<span class="hljs-built_in">que</span>(x,x+c<span class="hljs-number">-1</span>,<span class="hljs-number">1</span>).v);
+                vat tmp2=sgtb[<span class="hljs-built_in">blk</span>(y)<span class="hljs-number">-1</span>].<span class="hljs-built_in">que</span>(l[<span class="hljs-built_in">blk</span>(y)<span class="hljs-number">-1</span>],y-c,<span class="hljs-number">1</span>);
+                tmp<span class="hljs-number">2.</span>mx+=sgtb[<span class="hljs-built_in">blk</span>(y)<span class="hljs-number">-1</span>].<span class="hljs-built_in">que</span>(y-c<span class="hljs-number">+1</span>,r[<span class="hljs-built_in">blk</span>(y)<span class="hljs-number">-1</span>],<span class="hljs-number">1</span>).s2;
+                tmp<span class="hljs-number">2.</span>mx=<span class="hljs-built_in">max</span>(tmp<span class="hljs-number">2.</span>mx,sgtn.<span class="hljs-built_in">que</span>(y-c<span class="hljs-number">+1</span>,y,<span class="hljs-number">1</span>).v);
+                <span class="hljs-type">int</span> mx3=sgtms.<span class="hljs-built_in">que</span>(<span class="hljs-built_in">blk</span>(x)<span class="hljs-number">+1</span>,<span class="hljs-built_in">blk</span>(y)<span class="hljs-number">-1</span>,<span class="hljs-number">1</span>);
+                <span class="hljs-type">int</span> mx4=sgtmc.<span class="hljs-built_in">que</span>(<span class="hljs-built_in">blk</span>(x)<span class="hljs-number">+1</span>,<span class="hljs-built_in">blk</span>(y)<span class="hljs-number">-2</span>,<span class="hljs-number">1</span>);
+                cout&lt;&lt;<span class="hljs-built_in">max</span>({tmp<span class="hljs-number">1.</span>mx,tmp<span class="hljs-number">2.</span>mx,mx3,mx4})&lt;&lt;endl;
+            }
+}
+</code></pre>
+</div>
+</div>
+<p>再看 T2，题意仍然非常简单：多次查询一个整数序列的长度在某两个不固定的数值之间的所有子区间和的最大值。要求单次时间复杂度做到 $O(n)$。</p>
 <h3 id="根号重构">根号重构</h3>
 <p>重点在于重构这个词。一道比较典型的例题是这样的：给定一个序列，操作为在指定位置插入一个数，或者查询某一个位置是什么数。</p>
 <p>注意到，暴力的实现方式就是将那个位置后面的数字向后移动，然后把这个数字插入进去。时间复杂度是和序列长度成正比的。</p>

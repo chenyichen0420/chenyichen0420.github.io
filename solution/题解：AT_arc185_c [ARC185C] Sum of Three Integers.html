@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：AT_arc185_c [ARC185C] Sum of Three Integers</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>其实看到几个数字的和的时候，就应该往卷积那方面猜了。</p>
+<p>等价于 $x-a_i=a_j+a_k$，于是我们考虑枚举 $a_i$，同时利用卷积计算出 $a_j+a_k=v$ 的方案数。</p>
+<p>后面那一步其实是简单的：我们考虑每出现一个 $a$，就将 $x^a$ 的系数增加 $1$，得到的多项式 $f(x)$，我们计算其平方 $[x^v]f^2(x)$ 即为 $a_j+a_k=v$ 的方案数。但是这并不是我们需要的数值。我们需要的是满足 $j<k$ 的情况下 $a_j+a_k=v$ 的方案数。</p>
+<p>不过这是简单的。我们令 $g(x)=f^2(x)$，则显然 $[x^{2a_i}]g(x)$ 应该减少 $1$，减完之后我们再给每一项的系数除以 $2$ 即可得到我们想要的东西。</p>
+<p>不过这还没有完，我们还需要在枚举 $i$ 的时候是否存在 $j,k\neq i$ 满足 $a_j+a_k=x-a_i$，不过这似乎是简单的。</p>
+<p>此时再重复的话，显然至少出现了两个 $a_i$，于是将次数减少 $x-2\times a_i$ 在 $a$ 中的出现次数。</p>
+<p>但是特别注意：如果 $3\times a_i=x$，则显然我们多去了一次，于是再 $+1$ 即可。</p>
+<p>此时我们就得到了 $a_j+a_k=x-a_i$ 的方案数。如果这个方案数不为 $0$，我们就可以去找 $j,k$ 了。</p>
+<p>实现也很简单：直接枚举 $j$，如果 $a$ 中出现过 $x-a_i-a_j$，那么再枚举 $k$。这样做其实仍然是 $O(n)$ 的，因为一个数字重复出现，导致误认为存在 $k$ 的情况的出现次数显然最多只有 $1$。</p>
+<p>此题可解，时间复杂度 $O(V\log V+n)$，参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+// #define int long long
+constexpr int mod=998244353;
+using cpx=complex&lt;double&gt;;
+int n,m,a[1000005],lim,cp,ac[1000005]; vector&lt;cpx&gt;v; vector&lt;int&gt;sp;
+using cpx=complex&lt;double&gt;;
+const double pi = acos(-1);
+inline void fft(int lim,vector&lt;cpx&gt;&amp;v,const vector&lt;int&gt;&amp;sp) {
+	for (int i = 0; i &lt; lim; ++i)
+		if (i &lt; sp[i]) swap(v[i], v[sp[i]]);
+	for (int ml = 1; ml &lt; lim; ml &lt;&lt;= 1) {
+		cpx tv(cos(pi / ml), sin(pi / ml));
+		for (int p = 0; p &lt; lim; p += ml &lt;&lt; 1) {
+			cpx vl(1, 0), tmp;
+			for (int i = 0; i &lt; ml; ++i, vl *= tv)
+				tmp = v[p + i + ml] * vl, 
+				v[p + i + ml] = v[p + i] - tmp,
+				v[p + i] += tmp;
+		}
+	}
+}
+inline void out(int i,int j,int k){
+	cout&lt;&lt;min({i,j,k})&lt;&lt;&quot; &quot;&lt;&lt;i+j+k-min({i,j,k})-max({i,j,k})&lt;&lt;&quot; &quot;&lt;&lt;max({i,j,k})&lt;&lt;endl;
+	exit(0);
+}
+signed main(){
+	lim=1; while(lim&lt;1e6) lim&lt;&lt;=1,cp++;
+	sp.resize(lim&lt;&lt;1); v.resize(lim&lt;&lt;1);
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m;
+	for(int i=1;i!=lim&lt;&lt;1;++i)
+		sp[i]=(sp[i&gt;&gt;1]&gt;&gt;1)|((i&amp;1)&lt;&lt;cp);
+	for(int i=1;i&lt;=n;++i) cin&gt;&gt;a[i],v[a[i]]+=1,ac[a[i]]++;
+	fft(lim*2,v,sp); for(auto&amp;a:v) a*=a; fft(lim*2,v,sp);
+	reverse(v.begin()+1,v.begin()+lim*2);
+	for(int i=0;i&lt;=2e6;++i) sp[i]=v[i].real()/lim/2+1e-3;
+	for(int i=1;i&lt;=n;++i) sp[a[i]*2]--;
+	for(int i=0;i&lt;=2e6;++i) sp[i]&gt;&gt;=1;
+	for(int i=1;i&lt;=n;++i){
+		if(a[i]&gt;=m) continue;
+		int cnt=sp[m-a[i]];
+		if(a[i]*2&lt;m) cnt-=ac[m-2*a[i]];
+		if(a[i]*3==m) cnt++;
+		if(cnt)
+			for(int j=1;j&lt;=n;++j)
+				if(i!=j&amp;&amp;m-a[i]-a[j]&gt;0&amp;&amp;ac[m-a[i]-a[j]])
+					for(int k=1;k&lt;=n;++k) if(a[i]+a[j]+a[k]==m)
+						if(k!=i&amp;&amp;k!=j) out(i,j,k);
+	}
+	cout&lt;&lt;&quot;-1\n&quot;;
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-comment">// #define int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>;
+<span class="hljs-keyword">using</span> cpx=complex&lt;<span class="hljs-type">double</span>&gt;;
+<span class="hljs-type">int</span> n,m,a[<span class="hljs-number">1000005</span>],lim,cp,ac[<span class="hljs-number">1000005</span>]; vector&lt;cpx&gt;v; vector&lt;<span class="hljs-type">int</span>&gt;sp;
+<span class="hljs-keyword">using</span> cpx=complex&lt;<span class="hljs-type">double</span>&gt;;
+<span class="hljs-type">const</span> <span class="hljs-type">double</span> pi = <span class="hljs-built_in">acos</span>(<span class="hljs-number">-1</span>);
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">fft</span><span class="hljs-params">(<span class="hljs-type">int</span> lim,vector&lt;cpx&gt;&amp;v,<span class="hljs-type">const</span> vector&lt;<span class="hljs-type">int</span>&gt;&amp;sp)</span> </span>{
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; lim; ++i)
+		<span class="hljs-keyword">if</span> (i &lt; sp[i]) <span class="hljs-built_in">swap</span>(v[i], v[sp[i]]);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> ml = <span class="hljs-number">1</span>; ml &lt; lim; ml &lt;&lt;= <span class="hljs-number">1</span>) {
+		<span class="hljs-function">cpx <span class="hljs-title">tv</span><span class="hljs-params">(cos(pi / ml), sin(pi / ml))</span></span>;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> p = <span class="hljs-number">0</span>; p &lt; lim; p += ml &lt;&lt; <span class="hljs-number">1</span>) {
+			<span class="hljs-function">cpx <span class="hljs-title">vl</span><span class="hljs-params">(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>)</span>, tmp</span>;
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; ml; ++i, vl *= tv)
+				tmp = v[p + i + ml] * vl, 
+				v[p + i + ml] = v[p + i] - tmp,
+				v[p + i] += tmp;
+		}
+	}
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">out</span><span class="hljs-params">(<span class="hljs-type">int</span> i,<span class="hljs-type">int</span> j,<span class="hljs-type">int</span> k)</span></span>{
+	cout&lt;&lt;<span class="hljs-built_in">min</span>({i,j,k})&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;i+j+k-<span class="hljs-built_in">min</span>({i,j,k})-<span class="hljs-built_in">max</span>({i,j,k})&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;<span class="hljs-built_in">max</span>({i,j,k})&lt;&lt;endl;
+	<span class="hljs-built_in">exit</span>(<span class="hljs-number">0</span>);
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	lim=<span class="hljs-number">1</span>; <span class="hljs-keyword">while</span>(lim&lt;<span class="hljs-number">1e6</span>) lim&lt;&lt;=<span class="hljs-number">1</span>,cp++;
+	sp.<span class="hljs-built_in">resize</span>(lim&lt;&lt;<span class="hljs-number">1</span>); v.<span class="hljs-built_in">resize</span>(lim&lt;&lt;<span class="hljs-number">1</span>);
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=lim&lt;&lt;<span class="hljs-number">1</span>;++i)
+		sp[i]=(sp[i&gt;&gt;<span class="hljs-number">1</span>]&gt;&gt;<span class="hljs-number">1</span>)|((i&amp;<span class="hljs-number">1</span>)&lt;&lt;cp);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;a[i],v[a[i]]+=<span class="hljs-number">1</span>,ac[a[i]]++;
+	<span class="hljs-built_in">fft</span>(lim*<span class="hljs-number">2</span>,v,sp); <span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;a:v) a*=a; <span class="hljs-built_in">fft</span>(lim*<span class="hljs-number">2</span>,v,sp);
+	<span class="hljs-built_in">reverse</span>(v.<span class="hljs-built_in">begin</span>()<span class="hljs-number">+1</span>,v.<span class="hljs-built_in">begin</span>()+lim*<span class="hljs-number">2</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=<span class="hljs-number">2e6</span>;++i) sp[i]=v[i].<span class="hljs-built_in">real</span>()/lim/<span class="hljs-number">2</span><span class="hljs-number">+1e-3</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) sp[a[i]*<span class="hljs-number">2</span>]--;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=<span class="hljs-number">2e6</span>;++i) sp[i]&gt;&gt;=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i){
+		<span class="hljs-keyword">if</span>(a[i]&gt;=m) <span class="hljs-keyword">continue</span>;
+		<span class="hljs-type">int</span> cnt=sp[m-a[i]];
+		<span class="hljs-keyword">if</span>(a[i]*<span class="hljs-number">2</span>&lt;m) cnt-=ac[m<span class="hljs-number">-2</span>*a[i]];
+		<span class="hljs-keyword">if</span>(a[i]*<span class="hljs-number">3</span>==m) cnt++;
+		<span class="hljs-keyword">if</span>(cnt)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=n;++j)
+				<span class="hljs-keyword">if</span>(i!=j&amp;&amp;m-a[i]-a[j]&gt;<span class="hljs-number">0</span>&amp;&amp;ac[m-a[i]-a[j]])
+					<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">1</span>;k&lt;=n;++k) <span class="hljs-keyword">if</span>(a[i]+a[j]+a[k]==m)
+						<span class="hljs-keyword">if</span>(k!=i&amp;&amp;k!=j) <span class="hljs-built_in">out</span>(i,j,k);
+	}
+	cout&lt;&lt;<span class="hljs-string">&quot;-1\n&quot;</span>;
+}
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

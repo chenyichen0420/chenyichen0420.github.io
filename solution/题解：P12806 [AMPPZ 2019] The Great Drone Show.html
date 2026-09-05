@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P12806 [AMPPZ 2019] The Great Drone Show</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>我非得每天听大狗叫吗？</p>
+<p>突破口在于两点：</p>
+<ol>
+<li>所有的电线的投影是不交的，也就是说整张图是一个简单平面图。</li>
+<li>总边数最大只有 $3n$。</li>
+</ol>
+<p>于是，任意时刻，在整张图当中必定存在点，使得其度数不超过 $5$。我们将这些点连的边定为外向边（也就是指出去，后面会解释），随后删除这个点和这些边。重复操作直到图被删空。</p>
+<p>于是我们得到了一个有向图。我们想要做的事情是说，每一次发生更改的时候，我们<strong>只主动更新</strong>一个点的<strong>出边</strong>所指向的点的信息，而<strong>不主动接受</strong>一个点的入边带来的信息。</p>
+<p>如果我们可以做到这一点的话，显然时间复杂度就是每一次 $O(1)$ 的了（实际上最多就是 $5$ 个点）。</p>
+<p>事实上，我们的确可以做到，思考流程如下：</p>
+<p>首先，对于出边，我们直接在更新的时候进行暴力检验就行了，这显然不是瓶颈。重点在于我应该怎么保证每一条边只被删除一次，尤其是入边被动删除。</p>
+<p>注意到一个非常强的性质：无人机的横纵坐标不变，也就是说每一个电缆的限制都可以描述为两个无人机的高差不超过指定值。这个值可以 $O(1)$ 预处理出来。</p>
+<p>于是对于每一个节点 $u$，我们要求指向他的节点 $v$ 一直满足 $h_v-\Delta h\le h_u\le h_v+\Delta h$。</p>
+<p>于是我们直接在每一个节点维护两个 <code>set</code>，一个是指向他的节点的 $(h_v-\Delta h,edgeid_{u,v})$，另一个是 $(h_v+\Delta h,edgeid_{u,v})$。这样我们就可以快速遍历所有不合法的入边并断开了。</p>
+<p>此外，这个信息的更新也是简单的，我们直接遍历出边的时候删除就的元素并添加新的元素就行了。</p>
+<p>做完这一步，难点就没了，后面就是将整个过程倒过来，按照删边的时间顺序倒序合并所有的连通块。</p>
+<p>直接建立一个类似什么 kruskal 重构树的结构出来，然后把答案拍上去，每一次查询的时候求一个 LCA 就行了。</p>
+<p>每一步的时间复杂度都是单个 $\log$，不过我实现的常数比较大。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr bool online=0;
+// #define MDEBUG
+#ifndef MDEBUG
+#define sipt
+#define sopt
+struct IO {
+#define mxsz (1 &lt;&lt; 21)
+	char buf[mxsz], * p1, * p2;
+	char pbuf[mxsz], * pp; bool acc[128];
+	IO() : p1(buf), p2(buf), pp(pbuf) {}
+	~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
+	inline char gc() {
+		if (p1 == p2) p2 = (p1 = buf) + fread(buf, 1, mxsz, stdin);
+		return p1 == p2 ? ' ' : *p1++;
+	}
+	inline void setacc(const char* c) { while (*c) acc[*c++] = 1; }
+	inline char getc() { char c; while (!acc[c = gc()]); return c; }
+#ifndef sipt
+	inline int read() {
+		int r = 0; char c = gc(); while (c &lt; '0' || c&gt;'9') c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return r;
+	}
+#else
+	inline int read() {
+		int r = 0; char c = gc(); bool rev = 0;
+		while (c &lt; '0' || c&gt;'9') rev |= (c == '-'), c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return rev ? ~r + 1 : r;
+	}
+#endif
+	inline void push(const char&amp; c) {
+		if (pp - pbuf == mxsz) fwrite(pbuf, 1, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	inline void write(int x) {
+		static char sta[22]; int top = 0;
+		do sta[top++] = x % 10, x /= 10; while (x);
+		while (top) push(sta[--top] ^ 48);
+	}
+	inline void write(int x, char opc) {
+#ifdef sopt
+		if (x &lt; 0) push('-'), x = ~x + 1;
+#endif
+		write(x), push(opc);
+	}
+	inline void puts(const char* c) { while (*c) push(*c++); }
+} io;
+#else
+struct IO{
+	inline int read(){
+		int v; cin&gt;&gt;v; return v;
+	}
+	inline void write(int v,char c){
+		cout&lt;&lt;v&lt;&lt;c;
+	}
+}io;
+#endif
+constexpr int doc=5e5+5,edc=1.5e6+5,moc=1e6+5;
+int t,n,m,k,x[doc],y[doc],h[doc],l[edc],r[edc];
+struct cable{int p,id,v;}; vector&lt;cable&gt;cab[doc],oca[doc];
+pair&lt;int,int&gt;tcut[edc]; int csd[edc],du[doc]; queue&lt;int&gt;q;
+inline int calr(int l,int r,int v){
+	v=v*v-(x[l]-x[r])*(x[l]-x[r])-(y[l]-y[r])*(y[l]-y[r]);
+	int ret=sqrt(v); while(ret*ret&lt;=v) ret++;
+	while(ret*ret&gt;v) ret--; return ret;
+}
+set&lt;pair&lt;int,int&gt;&gt;high[doc];
+set&lt;pair&lt;int,int&gt;,greater&lt;pair&lt;int,int&gt;&gt;&gt;low[doc];
+int f[moc],v[moc],id; vector&lt;int&gt;son[moc];
+inline int find(int p){return f[p]!=p?f[p]=find(f[p]):p;}
+int d[moc],fa[moc][20];
+inline void dfs(int p,int f){
+	fa[p][0]=f; d[p]=d[f]+1;
+	for(int i=1;i&lt;=19;++i)
+		fa[p][i]=fa[fa[p][i-1]][i-1];
+	for(int sp:son[p]) dfs(sp,p);
+}
+inline int lca(int l,int r){
+	if(d[l]&lt;d[r]) swap(l,r);
+	for(int i=19;i&gt;=0;i--)
+		if(d[fa[l][i]]&gt;=d[r]) l=fa[l][i];
+	if(l==r) return l;
+	for(int i=19;i&gt;=0;i--)
+		if(fa[l][i]!=fa[r][i]) l=fa[l][i],r=fa[r][i];
+	return fa[l][0];
+}
+signed main(){
+	if(online)
+		freopen(&quot;drone.in&quot;,&quot;r&quot;,stdin),
+		freopen(&quot;drone.out&quot;,&quot;w&quot;,stdout);
+	ios::sync_with_stdio(0);
+	for(t=io.read();t;t--){
+		n=io.read();
+		for(int i=1;i&lt;=n;++i) x[i]=io.read(),y[i]=io.read();
+		for(int i=1;i&lt;=n;++i) cab[i].clear(),oca[i].clear();
+		for(int i=1;i&lt;=n;++i) h[i]=du[i]=0;
+		for(int i=1;i&lt;=n*2;++i) son[i].clear();
+		for(int i=1;i&lt;=n;++i) low[i].clear();
+		for(int i=1;i&lt;=n;++i) high[i].clear();
+		m=io.read();
+		for(int i=1,l,r,v;i&lt;=m;++i)
+			l=io.read(),r=io.read(),
+			v=io.read(),tcut[i]={-1,i},
+			cab[l].push_back({r,i,v}),
+			cab[r].push_back({l,i,v}),
+			::l[i]=l,::r[i]=r,
+			du[l]++,du[r]++,csd[i]=0;
+		for(int i=1;i&lt;=n;++i)
+			if(du[i]&lt;=5) q.emplace(i);
+		while(q.size()){
+			int p=q.front(); q.pop();
+			for(const auto&amp;v:cab[p]) if(!csd[v.id]){
+				int var=calr(p,v.p,v.v); csd[v.id]=p;
+				oca[p].push_back({v.p,v.id,var});
+				high[v.p].emplace(var,v.id);
+				low[v.p].emplace(-var,v.id);
+				// cerr&lt;&lt;p&lt;&lt;&quot; &quot;&lt;&lt;v.p&lt;&lt;&quot; &quot;&lt;&lt;var&lt;&lt;endl;
+				// cerr&lt;&lt;v.id&lt;&lt;&quot; &quot;&lt;&lt;p&lt;&lt;endl;
+				if(--du[v.p]==5) q.emplace(v.p);
+			}
+		}
+		k=io.read();
+		for(int i=1,p,cv;i&lt;=k;++i){
+			p=io.read(); cv=io.read(); h[p]+=cv;
+			for(const auto&amp;v:oca[p])
+				if(tcut[v.id].first==-1){
+					high[v.p].erase(make_pair(h[p]-cv+v.v,v.id));
+					low[v.p].erase(make_pair(h[p]-cv-v.v,v.id));
+					if(abs(h[p]-h[v.p])&gt;v.v) tcut[v.id].first=i;
+					else
+						high[v.p].emplace(h[p]+v.v,v.id),
+						low[v.p].emplace(h[p]-v.v,v.id);
+				}
+			// cerr&lt;&lt;p&lt;&lt;&quot;:\n&quot;;
+			// for(const auto&amp;v:high[p]) cerr&lt;&lt;v.first&lt;&lt;&quot; &quot;&lt;&lt;v.second&lt;&lt;&quot;   &quot;; cerr&lt;&lt;endl;
+			// for(const auto&amp;v:low[p]) cerr&lt;&lt;v.first&lt;&lt;&quot; &quot;&lt;&lt;v.second&lt;&lt;&quot;   &quot;; cerr&lt;&lt;endl;
+			while(high[p].size()&amp;&amp;high[p].begin()-&gt;first&lt;h[p]){
+				pair&lt;int,int&gt; v=*high[p].begin(); high[p].erase(high[p].begin());
+				if(tcut[v.second].first==-1) tcut[v.second].first=i;
+			}
+			while(low[p].size()&amp;&amp;low[p].begin()-&gt;first&gt;h[p]){
+				pair&lt;int,int&gt; v=*low[p].begin(); low[p].erase(low[p].begin());
+				if(tcut[v.second].first==-1) tcut[v.second].first=i;
+			}
+		}
+		// for(int i=1;i&lt;=m;++i)
+		// 	cerr&lt;&lt;tcut[i].first&lt;&lt;&quot; &quot;; cerr&lt;&lt;endl;
+		iota(f,f+n*2+1,0); id=n;
+		for(int i=1;i&lt;=n;++i) v[i]=-1;
+		for(int i=1;i&lt;=n;++i)
+			for(const auto&amp;v:oca[i])
+				if(tcut[v.id].first==-1){
+					int l=find(i),r=find(v.p);
+					if(l!=r){
+						f[l]=f[r]=++id;
+						son[id].emplace_back(l);
+						son[id].emplace_back(r);
+						::v[id]=-1;
+					}
+				}
+		sort(tcut+1,tcut+m+1,greater&lt;pair&lt;int,int&gt;&gt;());
+		for(int i=1;i&lt;=m;++i){
+			int x=find(l[tcut[i].second]);
+			int y=find(r[tcut[i].second]);
+			if(x!=y){
+				f[x]=f[y]=++id;
+				son[id].emplace_back(x);
+				son[id].emplace_back(y);
+				v[id]=tcut[i].first;
+			}
+		}
+		dfs(id,0); k=io.read();
+		for(int i=1,l,r;i&lt;=k;++i)
+			l=io.read(),r=io.read(),io.write(v[lca(l,r)],'\n');
+	}
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> online=<span class="hljs-number">0</span>;
+<span class="hljs-comment">// #define MDEBUG</span>
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> MDEBUG</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> sipt</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> sopt</span>
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">IO</span> {
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> mxsz (1 &lt;&lt; 21)</span>
+	<span class="hljs-type">char</span> buf[mxsz], * p1, * p2;
+	<span class="hljs-type">char</span> pbuf[mxsz], * pp; <span class="hljs-type">bool</span> acc[<span class="hljs-number">128</span>];
+	<span class="hljs-built_in">IO</span>() : <span class="hljs-built_in">p1</span>(buf), <span class="hljs-built_in">p2</span>(buf), <span class="hljs-built_in">pp</span>(pbuf) {}
+	~<span class="hljs-built_in">IO</span>() { <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, pp - pbuf, stdout); }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">gc</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">if</span> (p1 == p2) p2 = (p1 = buf) + <span class="hljs-built_in">fread</span>(buf, <span class="hljs-number">1</span>, mxsz, stdin);
+		<span class="hljs-keyword">return</span> p1 == p2 ? <span class="hljs-string">&#x27; &#x27;</span> : *p1++;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">setacc</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* c)</span> </span>{ <span class="hljs-keyword">while</span> (*c) acc[*c++] = <span class="hljs-number">1</span>; }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">getc</span><span class="hljs-params">()</span> </span>{ <span class="hljs-type">char</span> c; <span class="hljs-keyword">while</span> (!acc[c = <span class="hljs-built_in">gc</span>()]); <span class="hljs-keyword">return</span> c; }
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> sipt</span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-type">bool</span> rev = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) rev |= (c == <span class="hljs-string">&#x27;-&#x27;</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> rev ? ~r + <span class="hljs-number">1</span> : r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">push</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>&amp; c)</span> </span>{
+		<span class="hljs-keyword">if</span> (pp - pbuf == mxsz) <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> </span>{
+		<span class="hljs-type">static</span> <span class="hljs-type">char</span> sta[<span class="hljs-number">22</span>]; <span class="hljs-type">int</span> top = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">do</span> sta[top++] = x % <span class="hljs-number">10</span>, x /= <span class="hljs-number">10</span>; <span class="hljs-keyword">while</span> (x);
+		<span class="hljs-keyword">while</span> (top) <span class="hljs-built_in">push</span>(sta[--top] ^ <span class="hljs-number">48</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">char</span> opc)</span> </span>{
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> sopt</span>
+		<span class="hljs-keyword">if</span> (x &lt; <span class="hljs-number">0</span>) <span class="hljs-built_in">push</span>(<span class="hljs-string">&#x27;-&#x27;</span>), x = ~x + <span class="hljs-number">1</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-built_in">write</span>(x), <span class="hljs-built_in">push</span>(opc);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">puts</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* c)</span> </span>{ <span class="hljs-keyword">while</span> (*c) <span class="hljs-built_in">push</span>(*c++); }
+} io;
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">IO</span>{
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-type">int</span> v; cin&gt;&gt;v; <span class="hljs-keyword">return</span> v;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> v,<span class="hljs-type">char</span> c)</span></span>{
+		cout&lt;&lt;v&lt;&lt;c;
+	}
+}io;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> doc=<span class="hljs-number">5e5</span><span class="hljs-number">+5</span>,edc=<span class="hljs-number">1.5e6</span><span class="hljs-number">+5</span>,moc=<span class="hljs-number">1e6</span><span class="hljs-number">+5</span>;
+<span class="hljs-type">int</span> t,n,m,k,x[doc],y[doc],h[doc],l[edc],r[edc];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">cable</span>{<span class="hljs-type">int</span> p,id,v;}; vector&lt;cable&gt;cab[doc],oca[doc];
+pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;tcut[edc]; <span class="hljs-type">int</span> csd[edc],du[doc]; queue&lt;<span class="hljs-type">int</span>&gt;q;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">calr</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> v)</span></span>{
+	v=v*v-(x[l]-x[r])*(x[l]-x[r])-(y[l]-y[r])*(y[l]-y[r]);
+	<span class="hljs-type">int</span> ret=<span class="hljs-built_in">sqrt</span>(v); <span class="hljs-keyword">while</span>(ret*ret&lt;=v) ret++;
+	<span class="hljs-keyword">while</span>(ret*ret&gt;v) ret--; <span class="hljs-keyword">return</span> ret;
+}
+set&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&gt;high[doc];
+set&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;,greater&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&gt;&gt;low[doc];
+<span class="hljs-type">int</span> f[moc],v[moc],id; vector&lt;<span class="hljs-type">int</span>&gt;son[moc];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">find</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{<span class="hljs-keyword">return</span> f[p]!=p?f[p]=<span class="hljs-built_in">find</span>(f[p]):p;}
+<span class="hljs-type">int</span> d[moc],fa[moc][<span class="hljs-number">20</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f)</span></span>{
+	fa[p][<span class="hljs-number">0</span>]=f; d[p]=d[f]<span class="hljs-number">+1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-number">19</span>;++i)
+		fa[p][i]=fa[fa[p][i<span class="hljs-number">-1</span>]][i<span class="hljs-number">-1</span>];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-built_in">dfs</span>(sp,p);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">lca</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r)</span></span>{
+	<span class="hljs-keyword">if</span>(d[l]&lt;d[r]) <span class="hljs-built_in">swap</span>(l,r);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">19</span>;i&gt;=<span class="hljs-number">0</span>;i--)
+		<span class="hljs-keyword">if</span>(d[fa[l][i]]&gt;=d[r]) l=fa[l][i];
+	<span class="hljs-keyword">if</span>(l==r) <span class="hljs-keyword">return</span> l;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">19</span>;i&gt;=<span class="hljs-number">0</span>;i--)
+		<span class="hljs-keyword">if</span>(fa[l][i]!=fa[r][i]) l=fa[l][i],r=fa[r][i];
+	<span class="hljs-keyword">return</span> fa[l][<span class="hljs-number">0</span>];
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">if</span>(online)
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;drone.in&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>,stdin),
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;drone.out&quot;</span>,<span class="hljs-string">&quot;w&quot;</span>,stdout);
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(t=io.<span class="hljs-built_in">read</span>();t;t--){
+		n=io.<span class="hljs-built_in">read</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) x[i]=io.<span class="hljs-built_in">read</span>(),y[i]=io.<span class="hljs-built_in">read</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cab[i].<span class="hljs-built_in">clear</span>(),oca[i].<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) h[i]=du[i]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n*<span class="hljs-number">2</span>;++i) son[i].<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) low[i].<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) high[i].<span class="hljs-built_in">clear</span>();
+		m=io.<span class="hljs-built_in">read</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r,v;i&lt;=m;++i)
+			l=io.<span class="hljs-built_in">read</span>(),r=io.<span class="hljs-built_in">read</span>(),
+			v=io.<span class="hljs-built_in">read</span>(),tcut[i]={<span class="hljs-number">-1</span>,i},
+			cab[l].<span class="hljs-built_in">push_back</span>({r,i,v}),
+			cab[r].<span class="hljs-built_in">push_back</span>({l,i,v}),
+			::l[i]=l,::r[i]=r,
+			du[l]++,du[r]++,csd[i]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+			<span class="hljs-keyword">if</span>(du[i]&lt;=<span class="hljs-number">5</span>) q.<span class="hljs-built_in">emplace</span>(i);
+		<span class="hljs-keyword">while</span>(q.<span class="hljs-built_in">size</span>()){
+			<span class="hljs-type">int</span> p=q.<span class="hljs-built_in">front</span>(); q.<span class="hljs-built_in">pop</span>();
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp;v:cab[p]) <span class="hljs-keyword">if</span>(!csd[v.id]){
+				<span class="hljs-type">int</span> var=<span class="hljs-built_in">calr</span>(p,v.p,v.v); csd[v.id]=p;
+				oca[p].<span class="hljs-built_in">push_back</span>({v.p,v.id,var});
+				high[v.p].<span class="hljs-built_in">emplace</span>(var,v.id);
+				low[v.p].<span class="hljs-built_in">emplace</span>(-var,v.id);
+				<span class="hljs-comment">// cerr&lt;&lt;p&lt;&lt;&quot; &quot;&lt;&lt;v.p&lt;&lt;&quot; &quot;&lt;&lt;var&lt;&lt;endl;</span>
+				<span class="hljs-comment">// cerr&lt;&lt;v.id&lt;&lt;&quot; &quot;&lt;&lt;p&lt;&lt;endl;</span>
+				<span class="hljs-keyword">if</span>(--du[v.p]==<span class="hljs-number">5</span>) q.<span class="hljs-built_in">emplace</span>(v.p);
+			}
+		}
+		k=io.<span class="hljs-built_in">read</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,p,cv;i&lt;=k;++i){
+			p=io.<span class="hljs-built_in">read</span>(); cv=io.<span class="hljs-built_in">read</span>(); h[p]+=cv;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp;v:oca[p])
+				<span class="hljs-keyword">if</span>(tcut[v.id].first==<span class="hljs-number">-1</span>){
+					high[v.p].<span class="hljs-built_in">erase</span>(<span class="hljs-built_in">make_pair</span>(h[p]-cv+v.v,v.id));
+					low[v.p].<span class="hljs-built_in">erase</span>(<span class="hljs-built_in">make_pair</span>(h[p]-cv-v.v,v.id));
+					<span class="hljs-keyword">if</span>(<span class="hljs-built_in">abs</span>(h[p]-h[v.p])&gt;v.v) tcut[v.id].first=i;
+					<span class="hljs-keyword">else</span>
+						high[v.p].<span class="hljs-built_in">emplace</span>(h[p]+v.v,v.id),
+						low[v.p].<span class="hljs-built_in">emplace</span>(h[p]-v.v,v.id);
+				}
+			<span class="hljs-comment">// cerr&lt;&lt;p&lt;&lt;&quot;:\n&quot;;</span>
+			<span class="hljs-comment">// for(const auto&amp;v:high[p]) cerr&lt;&lt;v.first&lt;&lt;&quot; &quot;&lt;&lt;v.second&lt;&lt;&quot;   &quot;; cerr&lt;&lt;endl;</span>
+			<span class="hljs-comment">// for(const auto&amp;v:low[p]) cerr&lt;&lt;v.first&lt;&lt;&quot; &quot;&lt;&lt;v.second&lt;&lt;&quot;   &quot;; cerr&lt;&lt;endl;</span>
+			<span class="hljs-keyword">while</span>(high[p].<span class="hljs-built_in">size</span>()&amp;&amp;high[p].<span class="hljs-built_in">begin</span>()-&gt;first&lt;h[p]){
+				pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt; v=*high[p].<span class="hljs-built_in">begin</span>(); high[p].<span class="hljs-built_in">erase</span>(high[p].<span class="hljs-built_in">begin</span>());
+				<span class="hljs-keyword">if</span>(tcut[v.second].first==<span class="hljs-number">-1</span>) tcut[v.second].first=i;
+			}
+			<span class="hljs-keyword">while</span>(low[p].<span class="hljs-built_in">size</span>()&amp;&amp;low[p].<span class="hljs-built_in">begin</span>()-&gt;first&gt;h[p]){
+				pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt; v=*low[p].<span class="hljs-built_in">begin</span>(); low[p].<span class="hljs-built_in">erase</span>(low[p].<span class="hljs-built_in">begin</span>());
+				<span class="hljs-keyword">if</span>(tcut[v.second].first==<span class="hljs-number">-1</span>) tcut[v.second].first=i;
+			}
+		}
+		<span class="hljs-comment">// for(int i=1;i&lt;=m;++i)</span>
+		<span class="hljs-comment">// 	cerr&lt;&lt;tcut[i].first&lt;&lt;&quot; &quot;; cerr&lt;&lt;endl;</span>
+		<span class="hljs-built_in">iota</span>(f,f+n*<span class="hljs-number">2</span><span class="hljs-number">+1</span>,<span class="hljs-number">0</span>); id=n;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) v[i]=<span class="hljs-number">-1</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp;v:oca[i])
+				<span class="hljs-keyword">if</span>(tcut[v.id].first==<span class="hljs-number">-1</span>){
+					<span class="hljs-type">int</span> l=<span class="hljs-built_in">find</span>(i),r=<span class="hljs-built_in">find</span>(v.p);
+					<span class="hljs-keyword">if</span>(l!=r){
+						f[l]=f[r]=++id;
+						son[id].<span class="hljs-built_in">emplace_back</span>(l);
+						son[id].<span class="hljs-built_in">emplace_back</span>(r);
+						::v[id]=<span class="hljs-number">-1</span>;
+					}
+				}
+		<span class="hljs-built_in">sort</span>(tcut<span class="hljs-number">+1</span>,tcut+m<span class="hljs-number">+1</span>,greater&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&gt;());
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=m;++i){
+			<span class="hljs-type">int</span> x=<span class="hljs-built_in">find</span>(l[tcut[i].second]);
+			<span class="hljs-type">int</span> y=<span class="hljs-built_in">find</span>(r[tcut[i].second]);
+			<span class="hljs-keyword">if</span>(x!=y){
+				f[x]=f[y]=++id;
+				son[id].<span class="hljs-built_in">emplace_back</span>(x);
+				son[id].<span class="hljs-built_in">emplace_back</span>(y);
+				v[id]=tcut[i].first;
+			}
+		}
+		<span class="hljs-built_in">dfs</span>(id,<span class="hljs-number">0</span>); k=io.<span class="hljs-built_in">read</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i&lt;=k;++i)
+			l=io.<span class="hljs-built_in">read</span>(),r=io.<span class="hljs-built_in">read</span>(),io.<span class="hljs-built_in">write</span>(v[<span class="hljs-built_in">lca</span>(l,r)],<span class="hljs-string">&#x27;\n&#x27;</span>);
+	}
+}
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
