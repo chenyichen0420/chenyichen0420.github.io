@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P6844 [CEOI 2019] Building Skyscrapers</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>考试的时候理解错题意了，写了一大坨对完了的东西获得 0pts。</p>
+<p>题意是按照一定的顺序建造楼房，要求后建的与之前建的<strong>八连通</strong>，<strong>建造的时候</strong>与外界连通而非最终与外界连通。问建造顺序反过来的字典序最大方案。</p>
+<p>其实最后要求的东西已经强烈暗示我们需要逆序去做这个问题。于是显然问题变成了两个子问题：</p>
+<ol>
+<li>如何判断一栋楼与外界连通？</li>
+<li>如何判断一个点是不是割点？</li>
+</ol>
+<p>第一个问题是相对简单的：我们可以先把所有楼房建起来，将外围的空地标记为外围连通，内部的空地分别使用不同的标记。显然我们只需要关注房子周围的八格内的空地即可，其他的不会造成影响。</p>
+<p>当拆除一栋房子的时候，按照要求，他必须和外界连通，因此我们将和这栋房子挨着的内部空地重新标记为与外部连通即可。</p>
+<p>显然，空地的数量是 $O(n)$ 的，且最多被重新标注一次，因此这一部分的时间复杂度可以暂且视为 $O(n)$。</p>
+<p>第二个问题相对困难一些，不过由于房子是八连通的，因此我们不难列举出来<strong>可能的</strong>割点必然形如下面两种情况之一：</p>
+<p><img src="https://chenyichen0420.netlify.app/picbed/20260825cutpoint.png" alt=""></p>
+<p>其中红点表示要删除的点，绿点和蓝点分别表示将要被割开的两个连通块，白点表示没有房子的位置。</p>
+<p>更加细致的推导一下，我们发现：那两个白点必须是连通的。充分性是显然的，必要性是说如果不连通，则绿色和蓝色连通，不是真正的割点。</p>
+<p>于是我们判断割点就变成了判断这个点是否满足上述两个形式中的某一个。具体来说就是绿色有点，蓝色有点，白色是相同空白连通块。需要注意：上面的形状可以旋转，因此实际上有 $6$ 个情况需要判断。</p>
+<p>于是直接大力模拟就行了。下面是我写的被卡常的代码：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+constexpr int inf=1e9+5,
+dx[]={0,0,1,-1,1,1,-1,-1},
+dy[]={1,-1,0,0,1,-1,1,-1};
+int n,t,idc,f[200005]; pair&lt;int,int&gt;p[200005];
+map&lt;pair&lt;int,int&gt;,int&gt;pid; int cnt=0,ed=0;
+vector&lt;int&gt;ans; set&lt;int,greater&lt;int&gt;&gt;s;
+bool inq[200005];
+inline void dfs(const pair&lt;int,int&gt;&amp;p){
+    int cid=pid[p]; f[cid]=cid; pair&lt;int,int&gt;np; cnt++;
+    for(int i=0;i!=8;++i){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        if(pid.count(np)&amp;&amp;!f[pid[np]]) dfs(np);
+    }
+}
+struct validator{ vector&lt;int&gt;ep,ap,bp; }val[6];
+inline bool split(const pair&lt;int,int&gt;&amp;p,int vi){
+    pair&lt;int,int&gt;np; validator&amp;v=val[vi];
+    np=p;np.first+=dx[v.ep[0]],np.second+=dy[v.ep[0]];
+    int ed1=pid[np]; if(ed1&gt;0) return 0;
+    np=p;np.first+=dx[v.ep[1]],np.second+=dy[v.ep[1]];
+    int ed2=pid[np]; if(ed2&gt;0) return 0;
+    if(ed1!=ed2) return 0;
+    bool hsa=0,hsb=0;
+    for(int i:v.ap){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        if(pid[np]&gt;0){hsa=1;break;}
+    }
+    for(int i:v.bp){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        if(pid[np]&gt;0){hsb=1;break;}
+    }
+    return hsa&amp;&amp;hsb;
+}
+inline bool valid(const pair&lt;int,int&gt;&amp;p){
+    bool hso=0; pair&lt;int,int&gt;np; 
+    for(int i=0;i!=4;++i){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        if(pid[np]==-1){hso=1;break;}
+    }
+    if(!hso) return 0;
+    for(int i=0;i!=6;++i)
+        if(split(p,i)) return 0;
+    return 1;
+}
+inline void dfe(const pair&lt;int,int&gt;&amp;p,bool ck=0){
+    pid[p]=ed; pair&lt;int,int&gt;np;
+    for(int i=0;i!=4;++i){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        if(pid.count(np)&amp;&amp;pid[np]!=ed&amp;&amp;pid[np]&lt;=0) dfe(np,ck);
+    }
+    if(ck){
+        for(int j=0;j!=8;++j){
+            int id=pid[{p.first+dx[j],p.second+dy[j]}];
+            if(id&gt;0){
+                if(!inq[id]&amp;&amp;valid(::p[id])) s.emplace(id),inq[id]=1;
+                else if(inq[id]&amp;&amp;!valid(::p[id])) s.erase(id),inq[id]=0;
+            }
+        }
+    }
+}
+signed main(){
+    ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;t;
+    for(int i=1;i&lt;=n;++i)
+        cin&gt;&gt;p[i].first&gt;&gt;p[i].second,pid[p[i]]=i;
+    if(dfs(p[1]),cnt!=n) return puts(&quot;NO&quot;),0;
+    for(int i=1;i&lt;=n;++i)
+        for(int j=0;j!=8;++j)
+            if(!pid.count({p[i].first+dx[j],p[i].second+dy[j]}))
+                pid[{p[i].first+dx[j],p[i].second+dy[j]}]=0;
+    for(const auto&amp;v:pid) if(v.second==0) ed--,dfe(v.first);
+    val[0].ep={0,1}; val[0].ap={5,2,4}; val[0].bp={7,3,6};
+    val[1].ep={2,3}; val[1].ap={5,1,7}; val[1].bp={4,0,6};
+    val[2].ep={1,2}; val[2].ap={5}; val[2].bp={4,0,6,3,7};
+    val[3].ep={2,0}; val[3].ap={4}; val[3].bp={6,3,7,1,5};
+    val[4].ep={0,3}; val[4].ap={6}; val[4].bp={7,1,5,2,4};
+    val[5].ep={3,1}; val[5].ap={7}; val[5].bp={5,2,4,0,6};
+    for(int i=1;i&lt;=n;++i) if(valid(p[i])) s.emplace(i),inq[i]=1;
+    for(ed=-1;s.size();){
+        int v=*s.begin(); s.erase(s.begin()); inq[v]=0;
+        ans.emplace_back(v); dfe(p[v],1);
+    }
+    reverse(ans.begin(),ans.end()); cout&lt;&lt;&quot;YES\n&quot;;
+    for(int v:ans) cout&lt;&lt;v&lt;&lt;&quot;\n&quot;;
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> inf=<span class="hljs-number">1e9</span><span class="hljs-number">+5</span>,
+dx[]={<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">-1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">-1</span>,<span class="hljs-number">-1</span>},
+dy[]={<span class="hljs-number">1</span>,<span class="hljs-number">-1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">-1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">-1</span>};
+<span class="hljs-type">int</span> n,t,idc,f[<span class="hljs-number">200005</span>]; pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;p[<span class="hljs-number">200005</span>];
+map&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;,<span class="hljs-type">int</span>&gt;pid; <span class="hljs-type">int</span> cnt=<span class="hljs-number">0</span>,ed=<span class="hljs-number">0</span>;
+vector&lt;<span class="hljs-type">int</span>&gt;ans; set&lt;<span class="hljs-type">int</span>,greater&lt;<span class="hljs-type">int</span>&gt;&gt;s;
+<span class="hljs-type">bool</span> inq[<span class="hljs-number">200005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">const</span> pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&amp;p)</span></span>{
+    <span class="hljs-type">int</span> cid=pid[p]; f[cid]=cid; pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;np; cnt++;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">8</span>;++i){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        <span class="hljs-keyword">if</span>(pid.<span class="hljs-built_in">count</span>(np)&amp;&amp;!f[pid[np]]) <span class="hljs-built_in">dfs</span>(np);
+    }
+}
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">validator</span>{ vector&lt;<span class="hljs-type">int</span>&gt;ep,ap,bp; }val[<span class="hljs-number">6</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">split</span><span class="hljs-params">(<span class="hljs-type">const</span> pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&amp;p,<span class="hljs-type">int</span> vi)</span></span>{
+    pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;np; validator&amp;v=val[vi];
+    np=p;np.first+=dx[v.ep[<span class="hljs-number">0</span>]],np.second+=dy[v.ep[<span class="hljs-number">0</span>]];
+    <span class="hljs-type">int</span> ed1=pid[np]; <span class="hljs-keyword">if</span>(ed1&gt;<span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    np=p;np.first+=dx[v.ep[<span class="hljs-number">1</span>]],np.second+=dy[v.ep[<span class="hljs-number">1</span>]];
+    <span class="hljs-type">int</span> ed2=pid[np]; <span class="hljs-keyword">if</span>(ed2&gt;<span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">if</span>(ed1!=ed2) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    <span class="hljs-type">bool</span> hsa=<span class="hljs-number">0</span>,hsb=<span class="hljs-number">0</span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i:v.ap){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        <span class="hljs-keyword">if</span>(pid[np]&gt;<span class="hljs-number">0</span>){hsa=<span class="hljs-number">1</span>;<span class="hljs-keyword">break</span>;}
+    }
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i:v.bp){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        <span class="hljs-keyword">if</span>(pid[np]&gt;<span class="hljs-number">0</span>){hsb=<span class="hljs-number">1</span>;<span class="hljs-keyword">break</span>;}
+    }
+    <span class="hljs-keyword">return</span> hsa&amp;&amp;hsb;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">bool</span> <span class="hljs-title">valid</span><span class="hljs-params">(<span class="hljs-type">const</span> pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&amp;p)</span></span>{
+    <span class="hljs-type">bool</span> hso=<span class="hljs-number">0</span>; pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;np; 
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">4</span>;++i){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        <span class="hljs-keyword">if</span>(pid[np]==<span class="hljs-number">-1</span>){hso=<span class="hljs-number">1</span>;<span class="hljs-keyword">break</span>;}
+    }
+    <span class="hljs-keyword">if</span>(!hso) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">6</span>;++i)
+        <span class="hljs-keyword">if</span>(<span class="hljs-built_in">split</span>(p,i)) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfe</span><span class="hljs-params">(<span class="hljs-type">const</span> pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&amp;p,<span class="hljs-type">bool</span> ck=<span class="hljs-number">0</span>)</span></span>{
+    pid[p]=ed; pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;np;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">4</span>;++i){
+        np=p;np.first+=dx[i],np.second+=dy[i];
+        <span class="hljs-keyword">if</span>(pid.<span class="hljs-built_in">count</span>(np)&amp;&amp;pid[np]!=ed&amp;&amp;pid[np]&lt;=<span class="hljs-number">0</span>) <span class="hljs-built_in">dfe</span>(np,ck);
+    }
+    <span class="hljs-keyword">if</span>(ck){
+        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">8</span>;++j){
+            <span class="hljs-type">int</span> id=pid[{p.first+dx[j],p.second+dy[j]}];
+            <span class="hljs-keyword">if</span>(id&gt;<span class="hljs-number">0</span>){
+                <span class="hljs-keyword">if</span>(!inq[id]&amp;&amp;<span class="hljs-built_in">valid</span>(::p[id])) s.<span class="hljs-built_in">emplace</span>(id),inq[id]=<span class="hljs-number">1</span>;
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(inq[id]&amp;&amp;!<span class="hljs-built_in">valid</span>(::p[id])) s.<span class="hljs-built_in">erase</span>(id),inq[id]=<span class="hljs-number">0</span>;
+            }
+        }
+    }
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;t;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+        cin&gt;&gt;p[i].first&gt;&gt;p[i].second,pid[p[i]]=i;
+    <span class="hljs-keyword">if</span>(<span class="hljs-built_in">dfs</span>(p[<span class="hljs-number">1</span>]),cnt!=n) <span class="hljs-keyword">return</span> <span class="hljs-built_in">puts</span>(<span class="hljs-string">&quot;NO&quot;</span>),<span class="hljs-number">0</span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">8</span>;++j)
+            <span class="hljs-keyword">if</span>(!pid.<span class="hljs-built_in">count</span>({p[i].first+dx[j],p[i].second+dy[j]}))
+                pid[{p[i].first+dx[j],p[i].second+dy[j]}]=<span class="hljs-number">0</span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp;v:pid) <span class="hljs-keyword">if</span>(v.second==<span class="hljs-number">0</span>) ed--,<span class="hljs-built_in">dfe</span>(v.first);
+    val[<span class="hljs-number">0</span>].ep={<span class="hljs-number">0</span>,<span class="hljs-number">1</span>}; val[<span class="hljs-number">0</span>].ap={<span class="hljs-number">5</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>}; val[<span class="hljs-number">0</span>].bp={<span class="hljs-number">7</span>,<span class="hljs-number">3</span>,<span class="hljs-number">6</span>};
+    val[<span class="hljs-number">1</span>].ep={<span class="hljs-number">2</span>,<span class="hljs-number">3</span>}; val[<span class="hljs-number">1</span>].ap={<span class="hljs-number">5</span>,<span class="hljs-number">1</span>,<span class="hljs-number">7</span>}; val[<span class="hljs-number">1</span>].bp={<span class="hljs-number">4</span>,<span class="hljs-number">0</span>,<span class="hljs-number">6</span>};
+    val[<span class="hljs-number">2</span>].ep={<span class="hljs-number">1</span>,<span class="hljs-number">2</span>}; val[<span class="hljs-number">2</span>].ap={<span class="hljs-number">5</span>}; val[<span class="hljs-number">2</span>].bp={<span class="hljs-number">4</span>,<span class="hljs-number">0</span>,<span class="hljs-number">6</span>,<span class="hljs-number">3</span>,<span class="hljs-number">7</span>};
+    val[<span class="hljs-number">3</span>].ep={<span class="hljs-number">2</span>,<span class="hljs-number">0</span>}; val[<span class="hljs-number">3</span>].ap={<span class="hljs-number">4</span>}; val[<span class="hljs-number">3</span>].bp={<span class="hljs-number">6</span>,<span class="hljs-number">3</span>,<span class="hljs-number">7</span>,<span class="hljs-number">1</span>,<span class="hljs-number">5</span>};
+    val[<span class="hljs-number">4</span>].ep={<span class="hljs-number">0</span>,<span class="hljs-number">3</span>}; val[<span class="hljs-number">4</span>].ap={<span class="hljs-number">6</span>}; val[<span class="hljs-number">4</span>].bp={<span class="hljs-number">7</span>,<span class="hljs-number">1</span>,<span class="hljs-number">5</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>};
+    val[<span class="hljs-number">5</span>].ep={<span class="hljs-number">3</span>,<span class="hljs-number">1</span>}; val[<span class="hljs-number">5</span>].ap={<span class="hljs-number">7</span>}; val[<span class="hljs-number">5</span>].bp={<span class="hljs-number">5</span>,<span class="hljs-number">2</span>,<span class="hljs-number">4</span>,<span class="hljs-number">0</span>,<span class="hljs-number">6</span>};
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) <span class="hljs-keyword">if</span>(<span class="hljs-built_in">valid</span>(p[i])) s.<span class="hljs-built_in">emplace</span>(i),inq[i]=<span class="hljs-number">1</span>;
+    <span class="hljs-keyword">for</span>(ed=<span class="hljs-number">-1</span>;s.<span class="hljs-built_in">size</span>();){
+        <span class="hljs-type">int</span> v=*s.<span class="hljs-built_in">begin</span>(); s.<span class="hljs-built_in">erase</span>(s.<span class="hljs-built_in">begin</span>()); inq[v]=<span class="hljs-number">0</span>;
+        ans.<span class="hljs-built_in">emplace_back</span>(v); <span class="hljs-built_in">dfe</span>(p[v],<span class="hljs-number">1</span>);
+    }
+    <span class="hljs-built_in">reverse</span>(ans.<span class="hljs-built_in">begin</span>(),ans.<span class="hljs-built_in">end</span>()); cout&lt;&lt;<span class="hljs-string">&quot;YES\n&quot;</span>;
+    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> v:ans) cout&lt;&lt;v&lt;&lt;<span class="hljs-string">&quot;\n&quot;</span>;
+}
+</code></pre>
+</div>
+</div>
+<p>要改过也非常简单：把 <code>map&lt;pair&lt;int,int&gt;,int&gt;</code> 改成 <code>map&lt;long long,int&gt;</code> 优化比较效率就可以通过了，这里的代码主要展示逻辑，仅供参考，就暂且不改了。</p>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P17392 [ICPC 2018 Shenyang R] Sockpuppets</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>这种技巧的话，我愿称之为寻找最小限制。</p>
+<p>考虑一个非常容易想到的 DP 状态：</p>
+<p>$dp_{p,i,j,k}$ 表示在 trie 树上的以 $p$ 节点为根的子树当中，有 $i$ 个未使用的马甲，$j$ 个在到根链上需要一个马甲的作弊者，$k$ 个需要两个马甲的作弊者的方案数。</p>
+<p>显然这个东西状态数过大，无法做掉此题。但是我们注意到一个非常强的限制：字符串长度 $\le10$。</p>
+<p>也就是说，在到根链上，最多也就只有 $10$ 个潜在的马甲，$10$ 个潜在的作弊者。</p>
+<p>于是我们重新设计状态 $dp_{p,i,j,k}$ 表示在以 $p$ 节点为根的子树当中，有 $i$ 个决定要被使用，但暂未使用的马甲，$j$ 个在到根链上需要一个马甲的作弊者，$k$ 个需要两个马甲的作弊者的方案数。</p>
+<p>此时，假设 $p$ 的到根链上有 $a$ 个作弊者，$b$ 个马甲，那么显然，只有 $i\le2a,j+2k\le b$ 的状态才是有效的状态。</p>
+<p>暴力检验得出，到在 $a+b\le10$ 的情况下，单个点的合法状态数量最多只有 $36$，因此直接暴力做树上 DP 就是正确的。</p>
+<p>转移式子是十分好推的，不再赘述，不懂得可以参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int mod=1e9+7;
+int t,n,m,re[20005][26],rc,rt[20005]; string s;
+inline void ins(string&amp;s,int t){
+	int cp=0;
+	for(char c:s){
+		if(!re[cp][c-'a']) re[cp][c-'a']=++rc;
+		cp=re[cp][c-'a'];
+	}
+	rt[cp]=t;
+}
+vector&lt;vector&lt;vector&lt;int&gt;&gt;&gt;dp[20005],tmp;
+inline void mad(int&amp;l,const int r){(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+inline void dfs(int p,int c1,int c2){
+	c1+=(rt[p]==1); c2+=(rt[p]==2);
+	dp[p].clear(); dp[p].resize(c1&lt;&lt;1|1);
+	for(int i=0;i&lt;=(c1&lt;&lt;1);++i){
+		dp[p][i].resize(c2+1);
+		for(int j=0;j&lt;=c2;++j)
+			dp[p][i][j].assign((c2-j&gt;&gt;1)+1,0);
+	}
+	auto emp=dp[p]; dp[p][0][0][0]=1;
+	for(int sp:re[p]) if(sp){
+		dfs(sp,c1,c2); auto res=emp; swap(res,dp[p]);
+		for(int i=0;i&lt;=(c1&lt;&lt;1);++i)
+			for(int j=0;j&lt;=c2;++j)
+				for(int k=0;k*2+j&lt;=c2;++k)
+					if(res[i][j][k])
+						for(int a=0;i+a&lt;=(c1&lt;&lt;1);++a)
+							for(int b=0;b+j&lt;=c2;++b)
+								for(int c=0;(k+c)*2+b+j&lt;=c2;++c)
+									dp[p][i+a][j+b][k+c]=(dp[p][i+a][j+b][k+c]+res[i][j][k]*dp[sp][a][b][c])%mod;
+	}
+	if(rt[p]==1){
+		emp=dp[p]; //我是作弊的，我有 6 类不同的决策
+		for(int i=0;i&lt;=(c1&lt;&lt;1);++i)
+			for(int j=0;j&lt;=c2;++j)
+				for(int k=0;k*2+j&lt;=c2;++k){
+					//第一类：啥也不干（那我凭啥是作弊者啊？？），就是原始贡献，已经计入
+					//第二类：底下薅一个，于是可用马甲--
+					if(i) dp[p][i-1][j][k]=(dp[p][i-1][j][k]+emp[i][j][k]*i)%mod;
+					//第三类：底下薅两个，于是可用马甲-=2
+					if(i&gt;1) dp[p][i-2][j][k]=(dp[p][i-2][j][k]+emp[i][j][k]*i*(i-1)/2)%mod;
+					//第四类：向上天要一份粮，于是单独需求++
+					if(j) mad(dp[p][i][j][k],emp[i][j-1][k]);
+					//第五类：向上天要两份粮，于是成对需求++
+					if(k) mad(dp[p][i][j][k],emp[i][j][k-1]);
+					//第六类：上接天宫，下连地府
+					if(j&amp;&amp;i) dp[p][i-1][j][k]=(dp[p][i-1][j][k]+emp[i][j-1][k]*i)%mod;
+				}
+	}
+	if(rt[p]==2){
+		emp=dp[p]; //我是马甲，我有 4 类不同的决策
+		for(int i=0;i&lt;=(c1&lt;&lt;1);++i)
+			for(int j=0;j&lt;=c2;++j)
+				for(int k=0;k*2+j&lt;=c2;++k){
+					//第一类：吃白饭的大肥鱼，就是原始贡献，已经计入
+					//第二类：我决定为祖先效力
+					if(i) mad(dp[p][i][j][k],emp[i-1][j][k]);
+					//第三类：我可以吞掉一个单独马甲需求
+					if(j) dp[p][i][j-1][k]=(dp[p][i][j-1][k]+emp[i][j][k]*j)%mod;
+					//第四类：我可以砍掉一个双重马甲需求
+					if(j!=c2&amp;&amp;k) dp[p][i][j+1][k-1]=(dp[p][i][j+1][k-1]+emp[i][j][k]*k)%mod;
+				}
+	}
+}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;t;
+	for(int tt=1;tt&lt;=t;++tt){
+		cin&gt;&gt;n&gt;&gt;m; rc=0;
+		memset(rt,0,sizeof rt);
+		memset(re,0,sizeof re);
+		for(int i=1;i&lt;=n;++i) cin&gt;&gt;s,ins(s,1);
+		for(int i=1;i&lt;=m;++i) cin&gt;&gt;s,ins(s,2);
+		dfs(0,0,0);
+		cout&lt;&lt;&quot;Case #&quot;&lt;&lt;tt&lt;&lt;&quot;: &quot;&lt;&lt;dp[0][0][0][0]&lt;&lt;endl;
+	}
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">1e9</span><span class="hljs-number">+7</span>;
+<span class="hljs-type">int</span> t,n,m,re[<span class="hljs-number">20005</span>][<span class="hljs-number">26</span>],rc,rt[<span class="hljs-number">20005</span>]; string s;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(string&amp;s,<span class="hljs-type">int</span> t)</span></span>{
+	<span class="hljs-type">int</span> cp=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">char</span> c:s){
+		<span class="hljs-keyword">if</span>(!re[cp][c-<span class="hljs-string">&#x27;a&#x27;</span>]) re[cp][c-<span class="hljs-string">&#x27;a&#x27;</span>]=++rc;
+		cp=re[cp][c-<span class="hljs-string">&#x27;a&#x27;</span>];
+	}
+	rt[cp]=t;
+}
+vector&lt;vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt;&gt;dp[<span class="hljs-number">20005</span>],tmp;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">mad</span><span class="hljs-params">(<span class="hljs-type">int</span>&amp;l,<span class="hljs-type">const</span> <span class="hljs-type">int</span> r)</span></span>{(l+=r)&gt;=mod&amp;&amp;(l-=mod);}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> c1,<span class="hljs-type">int</span> c2)</span></span>{
+	c1+=(rt[p]==<span class="hljs-number">1</span>); c2+=(rt[p]==<span class="hljs-number">2</span>);
+	dp[p].<span class="hljs-built_in">clear</span>(); dp[p].<span class="hljs-built_in">resize</span>(c1&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=(c1&lt;&lt;<span class="hljs-number">1</span>);++i){
+		dp[p][i].<span class="hljs-built_in">resize</span>(c2<span class="hljs-number">+1</span>);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=c2;++j)
+			dp[p][i][j].<span class="hljs-built_in">assign</span>((c2-j&gt;&gt;<span class="hljs-number">1</span>)<span class="hljs-number">+1</span>,<span class="hljs-number">0</span>);
+	}
+	<span class="hljs-keyword">auto</span> emp=dp[p]; dp[p][<span class="hljs-number">0</span>][<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:re[p]) <span class="hljs-keyword">if</span>(sp){
+		<span class="hljs-built_in">dfs</span>(sp,c1,c2); <span class="hljs-keyword">auto</span> res=emp; <span class="hljs-built_in">swap</span>(res,dp[p]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=(c1&lt;&lt;<span class="hljs-number">1</span>);++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=c2;++j)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k*<span class="hljs-number">2</span>+j&lt;=c2;++k)
+					<span class="hljs-keyword">if</span>(res[i][j][k])
+						<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> a=<span class="hljs-number">0</span>;i+a&lt;=(c1&lt;&lt;<span class="hljs-number">1</span>);++a)
+							<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> b=<span class="hljs-number">0</span>;b+j&lt;=c2;++b)
+								<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> c=<span class="hljs-number">0</span>;(k+c)*<span class="hljs-number">2</span>+b+j&lt;=c2;++c)
+									dp[p][i+a][j+b][k+c]=(dp[p][i+a][j+b][k+c]+res[i][j][k]*dp[sp][a][b][c])%mod;
+	}
+	<span class="hljs-keyword">if</span>(rt[p]==<span class="hljs-number">1</span>){
+		emp=dp[p]; <span class="hljs-comment">//我是作弊的，我有 6 类不同的决策</span>
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=(c1&lt;&lt;<span class="hljs-number">1</span>);++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=c2;++j)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k*<span class="hljs-number">2</span>+j&lt;=c2;++k){
+					<span class="hljs-comment">//第一类：啥也不干（那我凭啥是作弊者啊？？），就是原始贡献，已经计入</span>
+					<span class="hljs-comment">//第二类：底下薅一个，于是可用马甲--</span>
+					<span class="hljs-keyword">if</span>(i) dp[p][i<span class="hljs-number">-1</span>][j][k]=(dp[p][i<span class="hljs-number">-1</span>][j][k]+emp[i][j][k]*i)%mod;
+					<span class="hljs-comment">//第三类：底下薅两个，于是可用马甲-=2</span>
+					<span class="hljs-keyword">if</span>(i&gt;<span class="hljs-number">1</span>) dp[p][i<span class="hljs-number">-2</span>][j][k]=(dp[p][i<span class="hljs-number">-2</span>][j][k]+emp[i][j][k]*i*(i<span class="hljs-number">-1</span>)/<span class="hljs-number">2</span>)%mod;
+					<span class="hljs-comment">//第四类：向上天要一份粮，于是单独需求++</span>
+					<span class="hljs-keyword">if</span>(j) <span class="hljs-built_in">mad</span>(dp[p][i][j][k],emp[i][j<span class="hljs-number">-1</span>][k]);
+					<span class="hljs-comment">//第五类：向上天要两份粮，于是成对需求++</span>
+					<span class="hljs-keyword">if</span>(k) <span class="hljs-built_in">mad</span>(dp[p][i][j][k],emp[i][j][k<span class="hljs-number">-1</span>]);
+					<span class="hljs-comment">//第六类：上接天宫，下连地府</span>
+					<span class="hljs-keyword">if</span>(j&amp;&amp;i) dp[p][i<span class="hljs-number">-1</span>][j][k]=(dp[p][i<span class="hljs-number">-1</span>][j][k]+emp[i][j<span class="hljs-number">-1</span>][k]*i)%mod;
+				}
+	}
+	<span class="hljs-keyword">if</span>(rt[p]==<span class="hljs-number">2</span>){
+		emp=dp[p]; <span class="hljs-comment">//我是马甲，我有 4 类不同的决策</span>
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;=(c1&lt;&lt;<span class="hljs-number">1</span>);++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j&lt;=c2;++j)
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> k=<span class="hljs-number">0</span>;k*<span class="hljs-number">2</span>+j&lt;=c2;++k){
+					<span class="hljs-comment">//第一类：吃白饭的大肥鱼，就是原始贡献，已经计入</span>
+					<span class="hljs-comment">//第二类：我决定为祖先效力</span>
+					<span class="hljs-keyword">if</span>(i) <span class="hljs-built_in">mad</span>(dp[p][i][j][k],emp[i<span class="hljs-number">-1</span>][j][k]);
+					<span class="hljs-comment">//第三类：我可以吞掉一个单独马甲需求</span>
+					<span class="hljs-keyword">if</span>(j) dp[p][i][j<span class="hljs-number">-1</span>][k]=(dp[p][i][j<span class="hljs-number">-1</span>][k]+emp[i][j][k]*j)%mod;
+					<span class="hljs-comment">//第四类：我可以砍掉一个双重马甲需求</span>
+					<span class="hljs-keyword">if</span>(j!=c2&amp;&amp;k) dp[p][i][j<span class="hljs-number">+1</span>][k<span class="hljs-number">-1</span>]=(dp[p][i][j<span class="hljs-number">+1</span>][k<span class="hljs-number">-1</span>]+emp[i][j][k]*k)%mod;
+				}
+	}
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;t;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> tt=<span class="hljs-number">1</span>;tt&lt;=t;++tt){
+		cin&gt;&gt;n&gt;&gt;m; rc=<span class="hljs-number">0</span>;
+		<span class="hljs-built_in">memset</span>(rt,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> rt);
+		<span class="hljs-built_in">memset</span>(re,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> re);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;s,<span class="hljs-built_in">ins</span>(s,<span class="hljs-number">1</span>);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=m;++i) cin&gt;&gt;s,<span class="hljs-built_in">ins</span>(s,<span class="hljs-number">2</span>);
+		<span class="hljs-built_in">dfs</span>(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>);
+		cout&lt;&lt;<span class="hljs-string">&quot;Case #&quot;</span>&lt;&lt;tt&lt;&lt;<span class="hljs-string">&quot;: &quot;</span>&lt;&lt;dp[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>][<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]&lt;&lt;endl;
+	}
+}
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

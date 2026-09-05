@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：CF2255C Even If the World Turns</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>思路自然的题目，有写题解却写的神神秘秘。</p>
+<p>我们需要在被交互库干一车神秘的操作的前提下传递确定的信息，那肯定就是去找不变量啊！于是我们的核心就是找不变量。</p>
+<p>考虑一个简单的问题：如果交互库不做任何操作的话，你能够设计出哪些方法传递信息？</p>
+<p>显然你可以考虑让所有的黑点的 $x,y$ 的和，平均值，异或值什么的等于传递的目标点，然后把信息传递过去。</p>
+<p>但是注意到你只能交换一次，所以说直接对 $x,y$ 进行位运算和乘除法基本就被排除了（可能构造不出来），剩下的就是做加法一类的。</p>
+<p>做加法基本上就是直接加起来得到目标点，或者平均值等于目标点这两类，别的说实话想不到什么了。</p>
+<p>选择加法显然是不行的：对于位移操作，记录信息中的目标点偏移了黑点数乘上偏移量，而实际上目标点只偏移了偏移量。</p>
+<p>这再一次暗示了平均值的正确性，让我们来验证一下：</p>
+<p>首先，在位移操作下其记录的信息确实是准确的。</p>
+<p>其次，在旋转操作中，由于 $y\to x$，所以 $x$ 一维的信息是准确的，又由于 $n-x+1\to y$，$\frac{1}{c}\sum(n-x+1)=(n+1)-\frac{1}{c}\sum x=(n-x_0+1)$，所以 $y$ 一维的信息是准确的。</p>
+<p>然后，在轴对称操作中，$x$ 一维的信息显然是准确的，$(n-y+1)\to y$，类似上面的推导，$y$ 一维的信息也是准确的。</p>
+<p>最后是有点反直觉的取反操作。我们分析一下所有点的 $x$ 坐标总和 $\bmod n$，发现总和 $\frac{n(n+1)}{2}\times n$ 一定是 $n$ 的倍数，因此 $\frac{\sum x}{c}\equiv\frac{\frac{n(n+1)}{2}\times n-\sum x}{n^2-c}\pmod n$，如果有 $\gcd(c,n)=1$ 的话。事实上，题面中确实有。</p>
+<p>至此，我们成功找到并检验了取平均值是一个一定可构造且不变的量，此题可解。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+int t,n,c,sx,sy,vx,vy,tx,ty; string type;
+char mp[805][805];
+inline void first(){
+	for(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; c=sx=sy=0;
+		for(int i=0;i!=n;++i)
+			for(int j=0;j!=n;++j)
+				cin&gt;&gt;mp[i][j];
+		for(int i=0;i!=n;++i)
+			for(int j=0;j!=n;++j)
+				if(mp[i][j]=='#')
+					c++,sx+=i,sy+=j;
+		cin&gt;&gt;vx&gt;&gt;vy;
+		vx--,vy--;
+		vx*=c,vy*=c;
+		bool swp=0;
+		for(int i=0;i!=n&amp;&amp;!swp;++i)
+			for(int j=0;j!=n&amp;&amp;!swp;++j)
+				if(mp[i][j]=='#'){
+					sx-=i; sy-=j;
+					tx=((vx-sx)%n+n)%n;
+					ty=((vy-sy)%n+n)%n;
+					if(mp[tx][ty]!='#')
+						swp=1,cout&lt;&lt;i+1&lt;&lt;&quot; &quot;&lt;&lt;j+1&lt;&lt;&quot; &quot;&lt;&lt;tx+1&lt;&lt;&quot; &quot;&lt;&lt;ty+1&lt;&lt;endl;
+					sx+=i; sy+=j;
+				}
+		if(!swp) cout&lt;&lt;&quot;1 1 1 1\n&quot;;
+	}
+}
+inline void second(){
+	for(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; c=sx=sy=0;
+		for(int i=0;i!=n;++i)
+			for(int j=0;j!=n;++j)
+				cin&gt;&gt;mp[i][j];
+		for(int i=0;i!=n;++i)
+			for(int j=0;j!=n;++j)
+				if(mp[i][j]=='#')
+					c++,sx+=i,sy+=j;
+		int rev=0;
+		for(int i=1;i!=n;++i)
+			if(c*i%n==1){
+				rev=i; break;
+			}
+		sx=sx*rev%n;
+		sy=sy*rev%n;
+		cout&lt;&lt;sx+1&lt;&lt;&quot; &quot;&lt;&lt;sy+1&lt;&lt;endl;
+	}
+}
+signed main(){
+	ios::sync_with_stdio(0);
+	if(cin&gt;&gt;type,type[0]=='f') first();
+	else second();
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-type">int</span> t,n,c,sx,sy,vx,vy,tx,ty; string type;
+<span class="hljs-type">char</span> mp[<span class="hljs-number">805</span>][<span class="hljs-number">805</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">first</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span>(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; c=sx=sy=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=n;++j)
+				cin&gt;&gt;mp[i][j];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=n;++j)
+				<span class="hljs-keyword">if</span>(mp[i][j]==<span class="hljs-string">&#x27;#&#x27;</span>)
+					c++,sx+=i,sy+=j;
+		cin&gt;&gt;vx&gt;&gt;vy;
+		vx--,vy--;
+		vx*=c,vy*=c;
+		<span class="hljs-type">bool</span> swp=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n&amp;&amp;!swp;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=n&amp;&amp;!swp;++j)
+				<span class="hljs-keyword">if</span>(mp[i][j]==<span class="hljs-string">&#x27;#&#x27;</span>){
+					sx-=i; sy-=j;
+					tx=((vx-sx)%n+n)%n;
+					ty=((vy-sy)%n+n)%n;
+					<span class="hljs-keyword">if</span>(mp[tx][ty]!=<span class="hljs-string">&#x27;#&#x27;</span>)
+						swp=<span class="hljs-number">1</span>,cout&lt;&lt;i<span class="hljs-number">+1</span>&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;j<span class="hljs-number">+1</span>&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;tx<span class="hljs-number">+1</span>&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;ty<span class="hljs-number">+1</span>&lt;&lt;endl;
+					sx+=i; sy+=j;
+				}
+		<span class="hljs-keyword">if</span>(!swp) cout&lt;&lt;<span class="hljs-string">&quot;1 1 1 1\n&quot;</span>;
+	}
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">second</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span>(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; c=sx=sy=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=n;++j)
+				cin&gt;&gt;mp[i][j];
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=n;++j)
+				<span class="hljs-keyword">if</span>(mp[i][j]==<span class="hljs-string">&#x27;#&#x27;</span>)
+					c++,sx+=i,sy+=j;
+		<span class="hljs-type">int</span> rev=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=n;++i)
+			<span class="hljs-keyword">if</span>(c*i%n==<span class="hljs-number">1</span>){
+				rev=i; <span class="hljs-keyword">break</span>;
+			}
+		sx=sx*rev%n;
+		sy=sy*rev%n;
+		cout&lt;&lt;sx<span class="hljs-number">+1</span>&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;sy<span class="hljs-number">+1</span>&lt;&lt;endl;
+	}
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">if</span>(cin&gt;&gt;type,type[<span class="hljs-number">0</span>]==<span class="hljs-string">&#x27;f&#x27;</span>) <span class="hljs-built_in">first</span>();
+	<span class="hljs-keyword">else</span> <span class="hljs-built_in">second</span>();
+}
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
