@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="color-scheme" content="light dark">
-    <title>题解：AT_arc197_a [ARC197A] Union of Grid Paths</title>
+    <title>题解：AT_arc229_f [ARC229F] Angst for All Pairs 2</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -220,38 +220,39 @@
     <div class="search-results" id="searchResults"></div>
 </div>
         <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
-<p>有一个结论很重要。我们不难发现，如果没有方向强制限制，那么每走一步所形成的阵线都是一条斜线。</p>
-<p>那么方向限制了什么呢？方向限制了你在这一步实际能到达的范围。但是不管你怎么限制，这条阵线都会是原先的那条线的<strong>一个子区间</strong>。</p>
-<p>其实也很显然，相邻两个之间可以通过两种方向的互换得到。二者不可达当且仅当互换后在某个方向上的操作个数小于强制要求个数，或者考虑上后面的强制操作后无法抵达终点。</p>
-<p>第二点很容易漏，但是只要考虑完整这两点，此题就可以迎刃而解了。代码如下：</p>
+<p>显然考虑转化成图论描述：有 $n$ 个点，你可以连一些边，使得我任意选两个点，这两个点都至少有一个点连了一条边，且这条边不能是连接两个点的。</p>
+<p>特判 $n\le 3$ 的情况，我们钦定 $n>3$，那么显然一种非常优秀的图形是菊花，其中最中间的点是整个花当中代价最小的那个点，注意 $n\le3$ 的时候会出现自环而不必出现菊花。</p>
+<p>但是，直接对前 $n-1$ 小的数字建立菊花不一定优秀。观察样例可以发现，有时候我会拆出来多个菊花。</p>
+<p>对比一个菊花和两个菊花，我们不难发现区别在于另一个菊花产生了非常多次贡献，但是总的边数可以减少一：少了连接两个菊花的中间点的边。</p>
+<p>于是我们直接枚举到底有几朵菊花即可。显然中间节点只会是代价最小的那些点。注意到一个菊花必须至少有两个花瓣才满足要求，因此我们限制菊花数量不超过 $\frac{n-1}{3}$ 即可。</p>
+<p>此题可解，时间复杂度 $O(n\log n)$，瓶颈在于排序，参考代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
     <span class="code-lang">CPP</span>
     <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
 using namespace std;
 #define int long long
-int t, n, m, cd[800005], cr[800005], ans; string s;
-int dx, ux, dy, uy;
-signed main() {
+int t,n,a[200005],s[200005],ans,tmp;
+signed main(){
 	ios::sync_with_stdio(0);
-	for (cin &gt;&gt; t;t;t--) {
-		cin &gt;&gt; n &gt;&gt; m &gt;&gt; s; ans = 1;
-		for (int i = 1;i &lt;= s.size();++i)
-			cd[i] = cd[i - 1] + (s[i - 1] == 'D'),
-			cr[i] = cr[i - 1] + (s[i - 1] == 'R');
-		dx = dy = ux = uy = 1;
-		for (int i = 1;i &lt;= s.size();++i) {
-			if (s[i - 1] == 'D') dy++, uy++;
-			else if (s[i - 1] == 'R') dx++, ux++;
-			else {
-				if (dy + (cd[s.size()] - cd[i]) + 1 &lt;= n) dy++;
-				else dx++;
-				if (ux + (cr[s.size()] - cr[i]) + 1 &lt;= m) ux++;
-				else uy++;
+	for(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; s[n]=0; ans=1e18;
+		for(int i=1;i&lt;=n;++i) cin&gt;&gt;a[i];
+		sort(a+1,a+n+1);
+		if(n==2) cout&lt;&lt;2*a[1]&lt;&lt;endl;
+		else if(n==3) cout&lt;&lt;3*a[1]+a[2]&lt;&lt;endl;
+		else{
+			n--;
+			for(int i=n;i&gt;=1;i--)
+				s[i]=s[i+1]+a[i];
+			for(int i=1;i&lt;=n/3;++i){
+				tmp=s[i+1];
+				tmp+=(s[2]-s[i+1])*2;
+				tmp+=(n-i-(i-1)*2)*a[1];
+				ans=min(ans,tmp);
 			}
-			ans += (ux - dx + 1);
+			cout&lt;&lt;ans&lt;&lt;endl;
 		}
-		cout &lt;&lt; ans &lt;&lt; endl;
 	}
 }
 ">复制</button>
@@ -260,28 +261,27 @@ signed main() {
     <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
 <span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
 <span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
-<span class="hljs-type">int</span> t, n, m, cd[<span class="hljs-number">800005</span>], cr[<span class="hljs-number">800005</span>], ans; string s;
-<span class="hljs-type">int</span> dx, ux, dy, uy;
-<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+<span class="hljs-type">int</span> t,n,a[<span class="hljs-number">200005</span>],s[<span class="hljs-number">200005</span>],ans,tmp;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
 	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
-	<span class="hljs-keyword">for</span> (cin &gt;&gt; t;t;t--) {
-		cin &gt;&gt; n &gt;&gt; m &gt;&gt; s; ans = <span class="hljs-number">1</span>;
-		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= s.<span class="hljs-built_in">size</span>();++i)
-			cd[i] = cd[i - <span class="hljs-number">1</span>] + (s[i - <span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;D&#x27;</span>),
-			cr[i] = cr[i - <span class="hljs-number">1</span>] + (s[i - <span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;R&#x27;</span>);
-		dx = dy = ux = uy = <span class="hljs-number">1</span>;
-		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>;i &lt;= s.<span class="hljs-built_in">size</span>();++i) {
-			<span class="hljs-keyword">if</span> (s[i - <span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;D&#x27;</span>) dy++, uy++;
-			<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (s[i - <span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;R&#x27;</span>) dx++, ux++;
-			<span class="hljs-keyword">else</span> {
-				<span class="hljs-keyword">if</span> (dy + (cd[s.<span class="hljs-built_in">size</span>()] - cd[i]) + <span class="hljs-number">1</span> &lt;= n) dy++;
-				<span class="hljs-keyword">else</span> dx++;
-				<span class="hljs-keyword">if</span> (ux + (cr[s.<span class="hljs-built_in">size</span>()] - cr[i]) + <span class="hljs-number">1</span> &lt;= m) ux++;
-				<span class="hljs-keyword">else</span> uy++;
+	<span class="hljs-keyword">for</span>(cin&gt;&gt;t;t;t--){
+		cin&gt;&gt;n; s[n]=<span class="hljs-number">0</span>; ans=<span class="hljs-number">1e18</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;a[i];
+		<span class="hljs-built_in">sort</span>(a<span class="hljs-number">+1</span>,a+n<span class="hljs-number">+1</span>);
+		<span class="hljs-keyword">if</span>(n==<span class="hljs-number">2</span>) cout&lt;&lt;<span class="hljs-number">2</span>*a[<span class="hljs-number">1</span>]&lt;&lt;endl;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(n==<span class="hljs-number">3</span>) cout&lt;&lt;<span class="hljs-number">3</span>*a[<span class="hljs-number">1</span>]+a[<span class="hljs-number">2</span>]&lt;&lt;endl;
+		<span class="hljs-keyword">else</span>{
+			n--;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n;i&gt;=<span class="hljs-number">1</span>;i--)
+				s[i]=s[i<span class="hljs-number">+1</span>]+a[i];
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n/<span class="hljs-number">3</span>;++i){
+				tmp=s[i<span class="hljs-number">+1</span>];
+				tmp+=(s[<span class="hljs-number">2</span>]-s[i<span class="hljs-number">+1</span>])*<span class="hljs-number">2</span>;
+				tmp+=(n-i-(i<span class="hljs-number">-1</span>)*<span class="hljs-number">2</span>)*a[<span class="hljs-number">1</span>];
+				ans=<span class="hljs-built_in">min</span>(ans,tmp);
 			}
-			ans += (ux - dx + <span class="hljs-number">1</span>);
+			cout&lt;&lt;ans&lt;&lt;endl;
 		}
-		cout &lt;&lt; ans &lt;&lt; endl;
 	}
 }
 </code></pre>

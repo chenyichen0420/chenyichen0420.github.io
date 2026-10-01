@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P17364 [ECNA 2024] Pony-less Express</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>其实看起来非常的善良，但是我一度认为正解时间复杂度不正确。</p>
+<p>根据题意，不难设计出一个 DP 状态：$dp_{p,t}$ 表示在 $t$ 时间到达 $p$ 的情况下，在 $p$ 为根的子树内的最小代价。</p>
+<p>令 $cnt_p$ 为 $p$ 节点的儿子节点数量，$sp_{p,i}$ 为 $p$ 节点的第 $i$ 个儿子，$[n]$ 表示长度为 $n$ 的排列构成的集合，于是转移是简单的：$\displaystyle dp_{p,t}=c_p(d_p-t)^2+(\min_{perm\in[cnt_p]}\sum_{i=1}^{cnt_p}dp_{sp_{p,perm_i},t+i})$。</p>
+<p>后面那个东西，也不难想到将其理解为子结点 $sp$ 匹配到时间 $t$ 会产生 $dp_{sp,t}$ 的代价，于是最小化匹配的代价。</p>
+<p>显然这个二分图最小权匹配可以使用 KM 算法解决。但是整体的时间复杂度？</p>
+<p>对于单个点，需要计算的 $t$ 的数量为 $O(n)$，每一次计算的时间复杂度为 $cnt^3$，于是总时间复杂度为 $O(\sum n\times cnt^3)\le O(n\times(\sum cnt^3))=O(n^4)$。</p>
+<p>显然常数还非常小，于是可以通过此题。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+vector&lt;int&gt;son[205];
+int n,c[205],d[205],dp[205][205],sz[205];
+struct mcbm{
+	int v[205][205],s;
+	int hl[205],hr[205];
+	bool vl[205],vr[205];
+	int pl[205],pr[205];
+	int del[205],lp[205];
+	inline void flip(int p){
+		while(p) pr[p]=lp[p],swap(p,pl[lp[p]]);
+	}
+	inline void bfs(int p){
+		memset(del,0x0f,sizeof del);
+		memset(lp,0,sizeof lp);
+		memset(vl,0,sizeof vl);
+		memset(vr,0,sizeof vr);
+		queue&lt;int&gt;q({p});
+		while(1){
+			while(q.size()){
+				p=q.front(); q.pop(); vl[p]=1;
+				for(int i=1;i&lt;=s;++i)
+					if(!vr[i]&amp;&amp;v[p][i]-hl[p]-hr[i]&lt;del[i]){
+						del[i]=v[p][i]-hl[p]-hr[i]; lp[i]=p;
+						if(!del[i])
+							if(vr[i]=1,!pr[i]) return flip(i);
+							else q.emplace(pr[i]);
+					}
+			}
+			int mind=1e9;
+			for(int i=1;i&lt;=s;++i)
+				if(!vr[i]) mind=min(mind,del[i]);
+			if(mind&gt;1e8) return;
+			for(int i=1;i&lt;=s;++i)
+				if(vl[i]) hl[i]+=mind;
+			for(int i=1;i&lt;=s;++i)
+				if(vr[i]) hr[i]-=mind;
+				else del[i]-=mind;
+			for(int i=1;i&lt;=s;++i)
+				if(!vr[i]&amp;&amp;!del[i])
+					if(vr[i]=1,!pr[i]) return flip(i);
+					else q.emplace(pr[i]);
+		}
+	}
+	inline int solve(){
+		memset(pl,0,sizeof pl);
+		memset(pr,0,sizeof pr);
+		memset(hl,0x3f,sizeof hl);
+		memset(hr,0,sizeof hr);
+		for(int i=1;i&lt;=s;++i)
+			for(int j=1;j&lt;=s;++j)
+				hl[i]=min(hl[i],v[i][j]);
+		for(int i=1;i&lt;=s;++i) bfs(i);
+		int ret=0;
+		for(int i=1;i&lt;=s;++i) ret+=hl[i]+hr[i];
+		return ret;
+	}
+}km;
+inline void dfs(int p,int f,int v){
+	int sc=0;
+	for(int sp:son[p]) if(sp!=f)
+		dfs(sp,p,v+1),sz[p]+=sz[sp],sc++;
+	if(!sc){
+		for(int t=v;t&lt;=n;++t)
+			dp[p][t]=c[p]*(d[p]-t)*(d[p]-t);
+		sz[p]=1; return;
+	}
+	for(int t=v;t&lt;=n-sz[p];++t){
+		km.s=sc; int pc=0;
+		for(int sp:son[p]) if(sp!=f){
+			pc++;
+			for(int j=t+1;j&lt;=t+sc;++j)
+				km.v[pc][j-t]=dp[sp][j];
+		}
+		dp[p][t]=km.solve();
+	}
+	for(int t=0;t&lt;=n-sz[p];++t)
+		dp[p][t]+=c[p]*(d[p]-t)*(d[p]-t);
+	sz[p]++;
+}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n;
+	/*
+	设计一个 dp_{p,v} 表示在 v 时刻到达 p，其子树内的最小代价
+	于是问题变成了找出子结点代价最小的排列
+	*/
+	for(int i=1,p;i&lt;=n;++i)
+		cin&gt;&gt;c[i]&gt;&gt;d[i]&gt;&gt;p,
+		son[p].emplace_back(i),
+		son[i].emplace_back(p);
+	dfs(0,0,0); cout&lt;&lt;dp[0][0]&lt;&lt;endl;
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">205</span>];
+<span class="hljs-type">int</span> n,c[<span class="hljs-number">205</span>],d[<span class="hljs-number">205</span>],dp[<span class="hljs-number">205</span>][<span class="hljs-number">205</span>],sz[<span class="hljs-number">205</span>];
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">mcbm</span>{
+	<span class="hljs-type">int</span> v[<span class="hljs-number">205</span>][<span class="hljs-number">205</span>],s;
+	<span class="hljs-type">int</span> hl[<span class="hljs-number">205</span>],hr[<span class="hljs-number">205</span>];
+	<span class="hljs-type">bool</span> vl[<span class="hljs-number">205</span>],vr[<span class="hljs-number">205</span>];
+	<span class="hljs-type">int</span> pl[<span class="hljs-number">205</span>],pr[<span class="hljs-number">205</span>];
+	<span class="hljs-type">int</span> del[<span class="hljs-number">205</span>],lp[<span class="hljs-number">205</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">flip</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">while</span>(p) pr[p]=lp[p],<span class="hljs-built_in">swap</span>(p,pl[lp[p]]);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">bfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-built_in">memset</span>(del,<span class="hljs-number">0x0f</span>,<span class="hljs-keyword">sizeof</span> del);
+		<span class="hljs-built_in">memset</span>(lp,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> lp);
+		<span class="hljs-built_in">memset</span>(vl,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> vl);
+		<span class="hljs-built_in">memset</span>(vr,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> vr);
+		queue&lt;<span class="hljs-type">int</span>&gt;<span class="hljs-built_in">q</span>({p});
+		<span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>){
+			<span class="hljs-keyword">while</span>(q.<span class="hljs-built_in">size</span>()){
+				p=q.<span class="hljs-built_in">front</span>(); q.<span class="hljs-built_in">pop</span>(); vl[p]=<span class="hljs-number">1</span>;
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=s;++i)
+					<span class="hljs-keyword">if</span>(!vr[i]&amp;&amp;v[p][i]-hl[p]-hr[i]&lt;del[i]){
+						del[i]=v[p][i]-hl[p]-hr[i]; lp[i]=p;
+						<span class="hljs-keyword">if</span>(!del[i])
+							<span class="hljs-keyword">if</span>(vr[i]=<span class="hljs-number">1</span>,!pr[i]) <span class="hljs-keyword">return</span> <span class="hljs-built_in">flip</span>(i);
+							<span class="hljs-keyword">else</span> q.<span class="hljs-built_in">emplace</span>(pr[i]);
+					}
+			}
+			<span class="hljs-type">int</span> mind=<span class="hljs-number">1e9</span>;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=s;++i)
+				<span class="hljs-keyword">if</span>(!vr[i]) mind=<span class="hljs-built_in">min</span>(mind,del[i]);
+			<span class="hljs-keyword">if</span>(mind&gt;<span class="hljs-number">1e8</span>) <span class="hljs-keyword">return</span>;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=s;++i)
+				<span class="hljs-keyword">if</span>(vl[i]) hl[i]+=mind;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=s;++i)
+				<span class="hljs-keyword">if</span>(vr[i]) hr[i]-=mind;
+				<span class="hljs-keyword">else</span> del[i]-=mind;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=s;++i)
+				<span class="hljs-keyword">if</span>(!vr[i]&amp;&amp;!del[i])
+					<span class="hljs-keyword">if</span>(vr[i]=<span class="hljs-number">1</span>,!pr[i]) <span class="hljs-keyword">return</span> <span class="hljs-built_in">flip</span>(i);
+					<span class="hljs-keyword">else</span> q.<span class="hljs-built_in">emplace</span>(pr[i]);
+		}
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">solve</span><span class="hljs-params">()</span></span>{
+		<span class="hljs-built_in">memset</span>(pl,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> pl);
+		<span class="hljs-built_in">memset</span>(pr,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> pr);
+		<span class="hljs-built_in">memset</span>(hl,<span class="hljs-number">0x3f</span>,<span class="hljs-keyword">sizeof</span> hl);
+		<span class="hljs-built_in">memset</span>(hr,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> hr);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=s;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=s;++j)
+				hl[i]=<span class="hljs-built_in">min</span>(hl[i],v[i][j]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=s;++i) <span class="hljs-built_in">bfs</span>(i);
+		<span class="hljs-type">int</span> ret=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=s;++i) ret+=hl[i]+hr[i];
+		<span class="hljs-keyword">return</span> ret;
+	}
+}km;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f,<span class="hljs-type">int</span> v)</span></span>{
+	<span class="hljs-type">int</span> sc=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(sp!=f)
+		<span class="hljs-built_in">dfs</span>(sp,p,v<span class="hljs-number">+1</span>),sz[p]+=sz[sp],sc++;
+	<span class="hljs-keyword">if</span>(!sc){
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> t=v;t&lt;=n;++t)
+			dp[p][t]=c[p]*(d[p]-t)*(d[p]-t);
+		sz[p]=<span class="hljs-number">1</span>; <span class="hljs-keyword">return</span>;
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> t=v;t&lt;=n-sz[p];++t){
+		km.s=sc; <span class="hljs-type">int</span> pc=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p]) <span class="hljs-keyword">if</span>(sp!=f){
+			pc++;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=t<span class="hljs-number">+1</span>;j&lt;=t+sc;++j)
+				km.v[pc][j-t]=dp[sp][j];
+		}
+		dp[p][t]=km.<span class="hljs-built_in">solve</span>();
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> t=<span class="hljs-number">0</span>;t&lt;=n-sz[p];++t)
+		dp[p][t]+=c[p]*(d[p]-t)*(d[p]-t);
+	sz[p]++;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
+	<span class="hljs-comment">/*
+	设计一个 dp_{p,v} 表示在 v 时刻到达 p，其子树内的最小代价
+	于是问题变成了找出子结点代价最小的排列
+	*/</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,p;i&lt;=n;++i)
+		cin&gt;&gt;c[i]&gt;&gt;d[i]&gt;&gt;p,
+		son[p].<span class="hljs-built_in">emplace_back</span>(i),
+		son[i].<span class="hljs-built_in">emplace_back</span>(p);
+	<span class="hljs-built_in">dfs</span>(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>); cout&lt;&lt;dp[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]&lt;&lt;endl;
+}
+</code></pre>
+</div>
+</div>
+<p>严格限制求解范围之后，常数具体是多小呢？显然我们可以构造出来的最坏情况就是根节点下面挂 $\frac{n}{2}$ 个节点，其中一个节点下面再挂 $\frac{n}{2}$ 个节点。此时的时间复杂度为 $(\frac{n}{2})^4$，显然足以通过此题。</p>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

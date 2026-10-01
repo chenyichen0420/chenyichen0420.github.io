@@ -237,9 +237,9 @@
 <li>$\alpha(G)\le\kappa(G)$。</li>
 </ol>
 <p>定义弦为一个简单环中连接不相邻的两个点的边。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423chord.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423chord.png" alt=""></p>
 <p>定义弦图为图中任意长度大于 $3$ 的简单环都至少有一个弦的图。左图是弦图，右图不是。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423chordmap.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423chordmap.png" alt=""></p>
 <p>对于弦图，有如下性质：</p>
 <ol>
 <li>弦图的每一个诱导子图一定是弦图；</li>
@@ -248,10 +248,10 @@
 <p>此外，给定一些区间，定义一个相交图为每个顶点表示一个区间，两个点有边当且仅当两个区间的交集非空。一个图为区间图当它是若干个区间的相交图。我们还有性质：区间图一定是弦图。</p>
 <h3 id="完美消除序列与判定">完美消除序列与判定</h3>
 <p>令 $\Nu(v)$ 表示与 $v$ 相邻的点集，称一个点为单纯点当且仅当 $V=\{v\}\cup\Nu(v)$ 的诱导子图为一个团。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423simplicial.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423simplicial.png" alt=""></p>
 <p>有引理：任何一个弦图都至少有一个单纯点，不是完全图的弦图至少有两个不相邻的单纯点。</p>
 <p>定义完美消除序列为一个序列 $v_1,v_2,\dots,v_n$ 满足 $\forall i\in[1,n]$，在 $V=\{v_i,v_{i+1},\dots,v_n\}$ 的诱导子图中 $v_i$ 是一个单纯点。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423perfect.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423perfect.png" alt=""></p>
 <p>有定理：一个无向图是弦图当且仅当它有一个完美消除序列。证明：</p>
 <p>充分性：由引理知任何一个弦图都至少有一个单纯点以及弦图的诱导子图都是弦图。可以使用数学归纳法假设当点数 $<n$ 的弦图一定有完美消除序列，那么点数为 $n$ 的弦图的完美消除序列可以由一个单纯点加上剩余点的诱导子图的完美消除序列得到。</p>
 <p>必要性：反证若无向图存在一个长度 $>3$ 的无弦环，不妨设环中在完美消除序列中出现最前面的点为 $v$，设环中 $v$ 与 $v_1,v_2$ 相连，根据完美消除序列的性质知 $v_1,v_2$ 相连，与环无弦矛盾。所以无向图为弦图。</p>
@@ -259,7 +259,7 @@
 <p>从 $n$ 到 $1$ 的顺序依次给点标号（标号为 $i$ 的点出现在完美消除序列的第 $i$ 个）。</p>
 <p>设 $label_i$ 表示第 $i$ 个点与多少个已标号的点相邻，每次选择 $label_i$ 最大的未标号的点进行标号。</p>
 <p>我们将这些点挂到其 $label$ 对应的链表上进行维护即可，时间复杂度是 $O(n+m)$ 的。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs8.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs7.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs6.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs5.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs4.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs3.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs2.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs1.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs8.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs7.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs6.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs5.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs4.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs3.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs2.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs1.png" alt=""></p>
 <p>完美消除序列的判定：</p>
 <p>设 $\{v_{i+1},\dots,v_n\}$ 中所有与 $v_i$ 相邻的点依次为 $v_{j_1},\dots,v_{j_k}$。只需判断 $v_{j_1}$ 是否与 $v_{j_2},\dots,v_{j_k}$ 相邻即可。时间复杂度为 $O(n+m)$。</p>
 <p><strong>重点在这里</strong>！很多人这一步没有写线性的，不过线性的其实很好写。</p>
@@ -277,13 +277,13 @@
 <h3 id="色数与团数">色数与团数</h3>
 <p>我们按照完美消除序列从后往前依次给每个点染色，给每个点染上可以染的最小的颜色即可。证明：</p>
 <p>设使用了 $T$ 种颜色，则 $T\ge\chi(G)$，又因为 $T=\kappa(G)\le\chi(G)$，所以 $\kappa(G)=\chi(G)=T$。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423mincolor.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mincolor.png" alt=""></p>
 <h3 id="最大独立集与最小团覆盖">最大独立集与最小团覆盖</h3>
 <p>最大独立集：完美消除序列从前往后能选就选。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423maxisolated.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423maxisolated.png" alt=""></p>
 <p>最小团覆盖：设最大独立集为 $\{p_1,p_2,\dots,p_t\}$，则 $\{p_1\cup\Nu(p_1),\dots,p_t\cup\Nu(p_t)\}$ 为最小团覆盖。证明：</p>
 <p>由独立集，$t\le\alpha(G)$；由团覆盖，$t\ge\kappa(G)$；结合 $\alpha(G)\le\kappa(G)$ 得 $\alpha(G)=\kappa(G)=t$，即最大独立集数等于最小团覆盖数。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423mingroup.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mingroup.png" alt=""></p>
 <p>本题的参考代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
