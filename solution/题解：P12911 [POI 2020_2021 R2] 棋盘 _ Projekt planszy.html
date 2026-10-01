@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="color-scheme" content="light dark">
-    <title>题解：P14195 [ICPC 2024 Hangzhou R] Identify Chord</title>
+    <title>题解：P12911 [POI 2020_2021 R2] 棋盘 _ Projekt planszy</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
@@ -220,156 +220,151 @@
     <div class="search-results" id="searchResults"></div>
 </div>
         <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
-<p>一个符合直觉的事实是如果我有一个跨度非常大的询问区间，那么我大概率能够“感觉到”有一个弦，也就是最短路必须经过弦。</p>
-<p>但是光这么说是没有用的，你得把他精准的找出来，而且步数不能太多。</p>
-<p>先来估计一个粗略的上界吧。按照前面的直觉，显然我们需要一个长度为 $\frac{n}{2}$ 的查询区间。然后看看我们能干什么：</p>
-<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260525findchord.png" alt=""></p>
-<p>在 $n$ 较大的时候，我们将其近似的看作一个圆，于是只有弦的中垂线是不满足要求的，其他的任意一个直径都是满足要求的。</p>
-<p>这也就启示我们，大概率区分不出来的长区间只有少数。是不是我随便找一个初始位置，然后随手转两下就能找到呢？</p>
-<p>在 $2\mid n$ 的情况下这确实是成立的，但是在 $2\nmid n$ 的情况下却存在一个特殊情况：长度为 $2$ 的弦。这时候，在半数长度为 $\lfloor\frac{n}{2}\rfloor$ 的查询看来都是完全没有问题的。我们希望的就是在奇数情况下，这个弦可以向上拱一下，再向下拱一下，这样就能覆盖所有情况了。</p>
-<p>这确实是不困难的，结合前面所说，我们可以严谨的说明最多只需要 $5$ 次操作（这是一个宽松的上界），我们就可以找到一个最段路必须经过弦的弦。</p>
-<p>光知道经过最短路可是没有用的，我们还需要定位到最短路。直接旋转过去是不现实的，我们考虑能不能先把一个端点对上，再对另一个端点？</p>
-<p>此时我们观察数据范围，容易注意到次数上限大约是 $\log$ 的，于是我们考虑能不能先将其中的一个端点给二分出来。</p>
-<p>考虑之前找到的特殊端点为 $l,r$，我们确认 $l-1,r$ 是否能够使得距离变小，如果是，那么说明有一个端点在比 $l$ 更小一些的某个位置（这里是循环的，总之就是不停的缩小，在缩到 $r$ 之前就可以遇到端点）。反之则说明在比 $l$ 更大一些的某一个位置。</p>
-<p>如何判断有没有跳过呢？如果 $l,r$ 的实际距离为 $d$，那么在正确方向上跳过之前，$l+\Delta d,r$ 的距离应该是 $d-\Delta d$。也就是说确实可以二分出端点。这部分需要的操作次数是 $\log n+1$ 的。</p>
-<p>我们最后考虑另一个端点在哪里。如果当前 $l,r$ 的距离是 $d$，那么真正的 $r$ 就应该是 $r\pm(d-1)$ 中的某一个。判定就是二者真实距离为 $1$ 且二者环上距离不为 $1$，这部分的操作次数是 $1$。</p>
-<p>于是总的操作次数就只有 $\log n+7=37$ 次，完全可以通过。代码如下：</p>
+<p>观察数据范围，感觉像是什么 $\log n+O(1)$ 一类的范围。于是考虑按照进制拆分一下。</p>
+<p>首先考虑一类最基本的元素 $2\times n$，这样的一个空白区域从左上角走到右下角的方案数恰为 $n$。</p>
+<p>于是我们考虑能不能采用二进制解决。显然最紧凑的安排方式是这样的：</p>
+<p>$\begin{matrix}
+   . & . & * & * & * & \dots \\
+   . & . & . & * & * & \dots \\
+   * & . & . & . & * & \dots \\
+   * & * & . & . & . & \dots \\
+   * & * & * & . & . & \dots \\
+   \dots & \dots & \dots & \dots & \dots & \dots \\
+\end{matrix}$</p>
+<p>但是这样做似乎无法扩展：容易注意到如果答案不是 $2^d$ 我们就完蛋了，我们没有办法整出来几个独立的 $2$ 的次幂（虽然实际上有办法做到）。</p>
+<p>此时鬼脑发力了。我认为类似二次幂这样拆肯定不行，根本原因在于我没有办法单独引出来几个分叉来消除掉余数。</p>
+<p>于是我考虑 $3$ 进制，发现空位不足以产生出余 $2$ 时的贡献（实际上也是可以的）。我又考虑 $4$ 进制，发现 $4$ 进制竟然是可以的。</p>
+<p>仍然考虑紧凑布局：</p>
+<p>$\begin{matrix}
+   . & . & . & . & * & \dots \\
+   . & . & . & . & . & \dots \\
+   * & * & * & . & . & \dots \\
+   * & * & * & . & . & \dots \\
+   * & * & * & . & . & \dots \\
+   \dots & \dots & \dots & \dots & \dots & \dots \\
+\end{matrix}$</p>
+<p>考虑第一个 $2\times 4$ 目标是产生 $4$ 倍后续贡献。如果此时 $\bmod 4$ 有余数，那么我们应该及时把多余部分处理掉。</p>
+<p>发现处理是简单的：</p>
+<p>如果 $\bmod 4=1$，那么我们需要导出一个贡献为 $1$ 的支路。一种方法如下所示：</p>
+<p>$\begin{matrix}
+   . & . & . & . & * & \dots \\
+   . & . & . & . & . & \dots \\
+   . & * & * & . & . & \dots \\
+   . & * & * & . & . & \dots \\
+   . & * & * & . & . & \dots \\
+   \dots & \dots & \dots & \dots & \dots & \dots \\
+\end{matrix}$</p>
+<p>如果 $\bmod 4=2$，那么我们需要导出一个贡献为 $1$ 的支路。一种方法如下所示：</p>
+<p>$\begin{matrix}
+   . & . & . & . & * & \dots \\
+   . & . & . & . & . & \dots \\
+   * & . & * & . & . & \dots \\
+   * & . & * & . & . & \dots \\
+   * & . & * & . & . & \dots \\
+   \dots & \dots & \dots & \dots & \dots & \dots \\
+\end{matrix}$</p>
+<p>如果 $\bmod 4=3$，那么我们需要导出一个贡献为 $1$ 的支路。一种方法如下所示：</p>
+<p>$\begin{matrix}
+   . & . & . & . & * & \dots \\
+   . & . & . & . & . & \dots \\
+   . & . & * & . & . & \dots \\
+   * & . & * & . & . & \dots \\
+   * & . & * & . & . & \dots \\
+   \dots & \dots & \dots & \dots & \dots & \dots \\
+\end{matrix}$</p>
+<p>于是此题可解，可以把矩形大小开到 $64$，参考代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
     <span class="code-lang">CPP</span>
     <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
-#include&lt;cassert&gt;
 using namespace std;
 #define int long long
-int t,n, ret, cnt;
-inline int ensure(int v){
-	return (v+n*5-1)%n+1;
-}
-inline int dis(int l,int r){
-	l=ensure(l); r=ensure(r);
-	if(l&gt;r) swap(l,r);
-	return min(r-l,l+n-r);
-}
-inline int ask(int l,int r){
-	if(dis(l,r)==1) return 1;
-	l=ensure(l); r=ensure(r);
-	cout&lt;&lt;&quot;? &quot;&lt;&lt;l&lt;&lt;&quot; &quot;&lt;&lt;r&lt;&lt;endl;
-	int v; cin&gt;&gt;v; return v;
-}
+int n,m; char a[65][65];
 signed main(){
-    ios::sync_with_stdio(0);
-	for(cin&gt;&gt;t;t;t--){
-		cin&gt;&gt;n; int p=1,da,p2=1+n/2,f=1; 
-		if(n&lt;=8){
-			bool hs=0;
-			for(int i=1;i&lt;=n;++i)
-				for(int j=i+1;j&lt;=n&amp;&amp;!hs;++j)
-					if(dis(i,j)!=1&amp;&amp;ask(i,j)==1)
-						cout&lt;&lt;&quot;! &quot;&lt;&lt;i&lt;&lt;&quot; &quot;&lt;&lt;j&lt;&lt;endl, hs=1;
-			cin&gt;&gt;ret;
-			continue;
+	ios::sync_with_stdio(0);
+	memset(a,'#',sizeof a); cin&gt;&gt;n; m=64;
+	for(int i=1;i&lt;=64;++i) a[64][i]=a[i][64]='.';
+	for(int px=1,py=1;px&lt;=60;px+=4,py+=4){
+		a[px+0][py+0]=a[px+0][py+1]=a[px+0][py+2]=a[px+0][py+3]='.';
+		a[px+1][py+0]=a[px+1][py+1]=a[px+1][py+2]=a[px+1][py+3]='.';
+		a[px+1][py+3]=a[px+2][py+3]=a[px+3][py+3]=a[px+4][py+3]='.';
+		a[px+1][py+4]=a[px+2][py+4]=a[px+3][py+4]=a[px+4][py+4]='.';
+		if((n&amp;3)==1)
+			for(int i=px+2;i&lt;=64;++i)
+				a[i][py+0]='.';
+		else if((n&amp;3)==2)
+			for(int i=px+2;i&lt;=64;++i)
+				a[i][py+1]='.';
+		else if((n&amp;3)==3){
+			a[px+2][py+0]='.';
+			for(int i=px+2;i&lt;=64;++i)
+				a[i][py+1]='.';
 		}
-		while(dis(p,p2)==(da=ask(p,p2))){
-			if(n&amp;1)
-				if(f) p2++,f^=1;
-				else p++,f^=1;
-			else p++,p2++;
+		n&gt;&gt;=2;
+		if((n&amp;3)==1)
+			for(int i=py+5;i&lt;=64;++i)
+				a[px+1][i]='.';
+		else if((n&amp;3)==2)
+			for(int i=py+5;i&lt;=64;++i)
+				a[px+2][i]='.';
+		else if((n&amp;3)==3){
+			a[px+1][py+5]='.';
+			for(int i=py+5;i&lt;=64;++i)
+				a[px+2][i]='.';
 		}
-		int l=0,r=n/2,mid;
-		if(ask(p+1,p2)==da-1){
-			while(l!=r){
-				mid=l+r+1&gt;&gt;1;
-				if(ask(p+mid,p2)==da-mid) l=mid;
-				else r=mid-1;
-			}
-			p+=l;
-		}
-		else if(ask(p-1,p2)==da-1){
-			while(l!=r){
-				mid=l+r+1&gt;&gt;1;
-				if(ask(p-mid,p2)==da-mid) l=mid;
-				else r=mid-1;
-			}
-			p-=l;
-		}
-		p=ensure(p);
-		da=ask(p,p2);
-		if(dis(p,p2-da+1)!=1&amp;&amp;ask(p,p2-1)==da-1) p2-=da-1;
-		else p2+=da-1;
-		p2=ensure(p2); cout&lt;&lt;&quot;! &quot;&lt;&lt;p&lt;&lt;&quot; &quot;&lt;&lt;p2&lt;&lt;endl;
-		cin&gt;&gt;ret;
+		n&gt;&gt;=2;
 	}
+	cout&lt;&lt;m&lt;&lt;endl;
+	for(int i=1;i&lt;=m;++i,cout&lt;&lt;endl)
+		for(int j=1;j&lt;=m;++j)
+			cout&lt;&lt;a[i][j];
 }
-//私は猫です!
-//Written by cbc on nyarch linux.
 ">复制</button>
 </div>
 <div class="code-content">
     <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
-<span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;cassert&gt;</span></span>
 <span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
 <span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
-<span class="hljs-type">int</span> t,n, ret, cnt;
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">ensure</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span></span>{
-	<span class="hljs-keyword">return</span> (v+n*<span class="hljs-number">5</span><span class="hljs-number">-1</span>)%n<span class="hljs-number">+1</span>;
-}
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">dis</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r)</span></span>{
-	l=<span class="hljs-built_in">ensure</span>(l); r=<span class="hljs-built_in">ensure</span>(r);
-	<span class="hljs-keyword">if</span>(l&gt;r) <span class="hljs-built_in">swap</span>(l,r);
-	<span class="hljs-keyword">return</span> <span class="hljs-built_in">min</span>(r-l,l+n-r);
-}
-<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">ask</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r)</span></span>{
-	<span class="hljs-keyword">if</span>(<span class="hljs-built_in">dis</span>(l,r)==<span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
-	l=<span class="hljs-built_in">ensure</span>(l); r=<span class="hljs-built_in">ensure</span>(r);
-	cout&lt;&lt;<span class="hljs-string">&quot;? &quot;</span>&lt;&lt;l&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;r&lt;&lt;endl;
-	<span class="hljs-type">int</span> v; cin&gt;&gt;v; <span class="hljs-keyword">return</span> v;
-}
+<span class="hljs-type">int</span> n,m; <span class="hljs-type">char</span> a[<span class="hljs-number">65</span>][<span class="hljs-number">65</span>];
 <span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
-    ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
-	<span class="hljs-keyword">for</span>(cin&gt;&gt;t;t;t--){
-		cin&gt;&gt;n; <span class="hljs-type">int</span> p=<span class="hljs-number">1</span>,da,p2=<span class="hljs-number">1</span>+n/<span class="hljs-number">2</span>,f=<span class="hljs-number">1</span>; 
-		<span class="hljs-keyword">if</span>(n&lt;=<span class="hljs-number">8</span>){
-			<span class="hljs-type">bool</span> hs=<span class="hljs-number">0</span>;
-			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
-				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=i<span class="hljs-number">+1</span>;j&lt;=n&amp;&amp;!hs;++j)
-					<span class="hljs-keyword">if</span>(<span class="hljs-built_in">dis</span>(i,j)!=<span class="hljs-number">1</span>&amp;&amp;<span class="hljs-built_in">ask</span>(i,j)==<span class="hljs-number">1</span>)
-						cout&lt;&lt;<span class="hljs-string">&quot;! &quot;</span>&lt;&lt;i&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;j&lt;&lt;endl, hs=<span class="hljs-number">1</span>;
-			cin&gt;&gt;ret;
-			<span class="hljs-keyword">continue</span>;
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-built_in">memset</span>(a,<span class="hljs-string">&#x27;#&#x27;</span>,<span class="hljs-keyword">sizeof</span> a); cin&gt;&gt;n; m=<span class="hljs-number">64</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-number">64</span>;++i) a[<span class="hljs-number">64</span>][i]=a[i][<span class="hljs-number">64</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> px=<span class="hljs-number">1</span>,py=<span class="hljs-number">1</span>;px&lt;=<span class="hljs-number">60</span>;px+=<span class="hljs-number">4</span>,py+=<span class="hljs-number">4</span>){
+		a[px<span class="hljs-number">+0</span>][py<span class="hljs-number">+0</span>]=a[px<span class="hljs-number">+0</span>][py<span class="hljs-number">+1</span>]=a[px<span class="hljs-number">+0</span>][py<span class="hljs-number">+2</span>]=a[px<span class="hljs-number">+0</span>][py<span class="hljs-number">+3</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+		a[px<span class="hljs-number">+1</span>][py<span class="hljs-number">+0</span>]=a[px<span class="hljs-number">+1</span>][py<span class="hljs-number">+1</span>]=a[px<span class="hljs-number">+1</span>][py<span class="hljs-number">+2</span>]=a[px<span class="hljs-number">+1</span>][py<span class="hljs-number">+3</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+		a[px<span class="hljs-number">+1</span>][py<span class="hljs-number">+3</span>]=a[px<span class="hljs-number">+2</span>][py<span class="hljs-number">+3</span>]=a[px<span class="hljs-number">+3</span>][py<span class="hljs-number">+3</span>]=a[px<span class="hljs-number">+4</span>][py<span class="hljs-number">+3</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+		a[px<span class="hljs-number">+1</span>][py<span class="hljs-number">+4</span>]=a[px<span class="hljs-number">+2</span>][py<span class="hljs-number">+4</span>]=a[px<span class="hljs-number">+3</span>][py<span class="hljs-number">+4</span>]=a[px<span class="hljs-number">+4</span>][py<span class="hljs-number">+4</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+		<span class="hljs-keyword">if</span>((n&amp;<span class="hljs-number">3</span>)==<span class="hljs-number">1</span>)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=px<span class="hljs-number">+2</span>;i&lt;=<span class="hljs-number">64</span>;++i)
+				a[i][py<span class="hljs-number">+0</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>((n&amp;<span class="hljs-number">3</span>)==<span class="hljs-number">2</span>)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=px<span class="hljs-number">+2</span>;i&lt;=<span class="hljs-number">64</span>;++i)
+				a[i][py<span class="hljs-number">+1</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>((n&amp;<span class="hljs-number">3</span>)==<span class="hljs-number">3</span>){
+			a[px<span class="hljs-number">+2</span>][py<span class="hljs-number">+0</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=px<span class="hljs-number">+2</span>;i&lt;=<span class="hljs-number">64</span>;++i)
+				a[i][py<span class="hljs-number">+1</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
 		}
-		<span class="hljs-keyword">while</span>(<span class="hljs-built_in">dis</span>(p,p2)==(da=<span class="hljs-built_in">ask</span>(p,p2))){
-			<span class="hljs-keyword">if</span>(n&amp;<span class="hljs-number">1</span>)
-				<span class="hljs-keyword">if</span>(f) p2++,f^=<span class="hljs-number">1</span>;
-				<span class="hljs-keyword">else</span> p++,f^=<span class="hljs-number">1</span>;
-			<span class="hljs-keyword">else</span> p++,p2++;
+		n&gt;&gt;=<span class="hljs-number">2</span>;
+		<span class="hljs-keyword">if</span>((n&amp;<span class="hljs-number">3</span>)==<span class="hljs-number">1</span>)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=py<span class="hljs-number">+5</span>;i&lt;=<span class="hljs-number">64</span>;++i)
+				a[px<span class="hljs-number">+1</span>][i]=<span class="hljs-string">&#x27;.&#x27;</span>;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>((n&amp;<span class="hljs-number">3</span>)==<span class="hljs-number">2</span>)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=py<span class="hljs-number">+5</span>;i&lt;=<span class="hljs-number">64</span>;++i)
+				a[px<span class="hljs-number">+2</span>][i]=<span class="hljs-string">&#x27;.&#x27;</span>;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>((n&amp;<span class="hljs-number">3</span>)==<span class="hljs-number">3</span>){
+			a[px<span class="hljs-number">+1</span>][py<span class="hljs-number">+5</span>]=<span class="hljs-string">&#x27;.&#x27;</span>;
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=py<span class="hljs-number">+5</span>;i&lt;=<span class="hljs-number">64</span>;++i)
+				a[px<span class="hljs-number">+2</span>][i]=<span class="hljs-string">&#x27;.&#x27;</span>;
 		}
-		<span class="hljs-type">int</span> l=<span class="hljs-number">0</span>,r=n/<span class="hljs-number">2</span>,mid;
-		<span class="hljs-keyword">if</span>(<span class="hljs-built_in">ask</span>(p<span class="hljs-number">+1</span>,p2)==da<span class="hljs-number">-1</span>){
-			<span class="hljs-keyword">while</span>(l!=r){
-				mid=l+r<span class="hljs-number">+1</span>&gt;&gt;<span class="hljs-number">1</span>;
-				<span class="hljs-keyword">if</span>(<span class="hljs-built_in">ask</span>(p+mid,p2)==da-mid) l=mid;
-				<span class="hljs-keyword">else</span> r=mid<span class="hljs-number">-1</span>;
-			}
-			p+=l;
-		}
-		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(<span class="hljs-built_in">ask</span>(p<span class="hljs-number">-1</span>,p2)==da<span class="hljs-number">-1</span>){
-			<span class="hljs-keyword">while</span>(l!=r){
-				mid=l+r<span class="hljs-number">+1</span>&gt;&gt;<span class="hljs-number">1</span>;
-				<span class="hljs-keyword">if</span>(<span class="hljs-built_in">ask</span>(p-mid,p2)==da-mid) l=mid;
-				<span class="hljs-keyword">else</span> r=mid<span class="hljs-number">-1</span>;
-			}
-			p-=l;
-		}
-		p=<span class="hljs-built_in">ensure</span>(p);
-		da=<span class="hljs-built_in">ask</span>(p,p2);
-		<span class="hljs-keyword">if</span>(<span class="hljs-built_in">dis</span>(p,p2-da<span class="hljs-number">+1</span>)!=<span class="hljs-number">1</span>&amp;&amp;<span class="hljs-built_in">ask</span>(p,p2<span class="hljs-number">-1</span>)==da<span class="hljs-number">-1</span>) p2-=da<span class="hljs-number">-1</span>;
-		<span class="hljs-keyword">else</span> p2+=da<span class="hljs-number">-1</span>;
-		p2=<span class="hljs-built_in">ensure</span>(p2); cout&lt;&lt;<span class="hljs-string">&quot;! &quot;</span>&lt;&lt;p&lt;&lt;<span class="hljs-string">&quot; &quot;</span>&lt;&lt;p2&lt;&lt;endl;
-		cin&gt;&gt;ret;
+		n&gt;&gt;=<span class="hljs-number">2</span>;
 	}
+	cout&lt;&lt;m&lt;&lt;endl;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=m;++i,cout&lt;&lt;endl)
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j&lt;=m;++j)
+			cout&lt;&lt;a[i][j];
 }
-<span class="hljs-comment">//私は猫です!</span>
-<span class="hljs-comment">//Written by cbc on nyarch linux.</span>
 </code></pre>
 </div>
 </div>
