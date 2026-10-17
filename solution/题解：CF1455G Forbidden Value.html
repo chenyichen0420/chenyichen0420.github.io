@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：CF1455G Forbidden Value</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>值域广，有效值数量与操作数成正比，一眼动态开点线段树优化 DP。</p>
+<p>考虑 $dp_{i,j}$ 表示前 $i$ 个操作做完之后数值为 $j$ 的最小代价。考虑转移：</p>
+<p>如果遇到赋值，且 $y\neq s$，那么 $dp_{i,p}=dp_{i-1,p}+v(p\neq y)$ 且 $dp_{i,y}=\min dp_{i-1,p}$。如果 $y=s$，那么直接 $dp_{i,p}=dp_{i-1,p}+v$ 即可。</p>
+<p>显然这就是全局最小值查询和全局加操作。</p>
+<p>如果遇到判断操作，那么我们递归下去做。本质上每一个 <code>if...else</code> 块内都是统一的形式：$x$ 初始值为 $v$，代价为 $a$，求执行完之后 $v$ 是各种值的代价。</p>
+<p>于是到达 <code>else</code> 的时候我们就需要将子块的答案合并上来。我们首先将 $v$ 的代价置为 $\inf$，然后将两颗线段树对应位置取最小值合并。</p>
+<p>这一步直接用正常的线段树合并就行了。</p>
+<p>然后就做完了，时间复杂度是 $O(n\log n)$ 的。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include &lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr int inf=1e18;
+int n,m,vp[200005][2],jmp[200005]; char op[200005][4]; stack&lt;int&gt;lp; signed rt;
+struct seg_tree{
+	struct node{
+		signed ls,rs; int v,t;
+		node():ls(0),rs(0),v(inf),t(0){};
+	}re[200005*32]; int id;
+	inline void add(int cl,int cr,int cv,int l,int r,signed &amp;p){
+		if(!p) p=++id;
+		if(cl&gt;=l&amp;&amp;cr&lt;=r) return re[p].v+=cv,void(re[p].t+=cv);
+		int mid=l+r&gt;&gt;1;
+		if(cl&lt;=mid) add(cl,cr,cv,l,mid,re[p].ls);
+		if(cr&gt;mid) add(cl,cr,cv,mid+1,r,re[p].rs);
+		re[p].v=min(re[re[p].ls].v,re[re[p].rs].v)+re[p].t;
+	}
+	inline void set(int cp,int cv,int l,int r,signed&amp;p){
+		if(!p) p=++id;
+		if(l==r) return void(re[p].v=cv);
+		int mid=l+r&gt;&gt;1; cv-=re[p].t;
+		if(cp&lt;=mid) set(cp,cv,l,mid,re[p].ls);
+		else set(cp,cv,mid+1,r,re[p].rs);
+		re[p].v=min(re[re[p].ls].v,re[re[p].rs].v)+re[p].t;
+	}
+	inline int que(int ql,int qr,int l,int r,signed p){
+		if(!p||ql&lt;=l&amp;&amp;qr&gt;=r) return re[p].v;
+		int mid=l+r&gt;&gt;1,ret=inf;
+		if(ql&lt;=mid) ret=min(ret,que(ql,qr,l,mid,re[p].ls));
+		if(qr&gt;mid) ret=min(ret,que(ql,qr,mid+1,r,re[p].rs));
+		return ret+re[p].t;
+	}
+	inline int at(int qp,int l,int r,signed p){
+		if(!p||l==r) return re[p].v;
+		int mid=l+r&gt;&gt;1,ret=re[p].t;
+		if(qp&lt;=mid) ret+=at(qp,l,mid,re[p].ls);
+		else ret+=at(qp,mid+1,r,re[p].rs);
+		return ret;
+	}
+	inline void merge(int l,int r,signed &amp;lp,signed op,int cl,int cr){
+		if(!op) return;
+		if(!lp){
+			lp=op; re[op].t+=cr-cl;
+			re[op].v+=cr-cl; return;
+		}
+		if(l==r){
+			re[lp].v=min(re[lp].v,re[op].v+cr-cl);
+			return;
+		}
+		int mid=l+r&gt;&gt;1; cl+=re[lp].t; cr+=re[op].t;
+		merge(l,mid,re[lp].ls,re[op].ls,cl,cr);
+		merge(mid+1,r,re[lp].rs,re[op].rs,cl,cr);
+		re[lp].v=min(re[re[lp].ls].v,re[re[lp].rs].v)+re[lp].t;
+	}
+}sgt;
+inline void sim(signed&amp;rt,int adr,int p,int v){
+	if(p==m) return; sgt.set(p,v,0,1e9,rt);
+	for(int a=adr+1;a!=jmp[adr];++a){
+		if(op[a][0]=='i'){
+			int pos=vp[a][0],val=sgt.at(pos,0,1e9,rt);
+			if(val&lt;inf){
+				signed ngs=0; sim(ngs,a,pos,val);
+				sgt.set(vp[a][0],inf,0,1e9,rt);
+				sgt.merge(0,1e9,rt,ngs,0,0);
+			}
+			a=jmp[a];
+		}
+		else{
+			if(vp[a][0]==m) sgt.add(0,1e9,vp[a][1],0,1e9,rt);
+			else{
+				int vm=sgt.que(0,1e9,0,1e9,rt);
+				sgt.add(0,1e9,vp[a][1],0,1e9,rt);
+				sgt.set(vp[a][0],vm,0,1e9,rt);
+			}
+		}
+	}
+}
+signed main(){
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m;
+	for(int i=1;i&lt;=n;++i)
+		if(cin&gt;&gt;op[i],op[i][0]!='e')
+			if(cin&gt;&gt;vp[i][0],op[i][0]!='i') cin&gt;&gt;vp[i][1];
+			else lp.emplace(i);
+		else jmp[lp.top()]=i,lp.pop();
+	op[0][0]='i'; op[n+1][0]='e'; jmp[0]=n+1;
+	sim(rt,0,0,0); cout&lt;&lt;sgt.re[rt].v&lt;&lt;endl;
+}
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> inf=<span class="hljs-number">1e18</span>;
+<span class="hljs-type">int</span> n,m,vp[<span class="hljs-number">200005</span>][<span class="hljs-number">2</span>],jmp[<span class="hljs-number">200005</span>]; <span class="hljs-type">char</span> op[<span class="hljs-number">200005</span>][<span class="hljs-number">4</span>]; stack&lt;<span class="hljs-type">int</span>&gt;lp; <span class="hljs-type">signed</span> rt;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">seg_tree</span>{
+	<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>{
+		<span class="hljs-type">signed</span> ls,rs; <span class="hljs-type">int</span> v,t;
+		<span class="hljs-built_in">node</span>():<span class="hljs-built_in">ls</span>(<span class="hljs-number">0</span>),<span class="hljs-built_in">rs</span>(<span class="hljs-number">0</span>),<span class="hljs-built_in">v</span>(inf),<span class="hljs-built_in">t</span>(<span class="hljs-number">0</span>){};
+	}re[<span class="hljs-number">200005</span>*<span class="hljs-number">32</span>]; <span class="hljs-type">int</span> id;
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">add</span><span class="hljs-params">(<span class="hljs-type">int</span> cl,<span class="hljs-type">int</span> cr,<span class="hljs-type">int</span> cv,<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">signed</span> &amp;p)</span></span>{
+		<span class="hljs-keyword">if</span>(!p) p=++id;
+		<span class="hljs-keyword">if</span>(cl&gt;=l&amp;&amp;cr&lt;=r) <span class="hljs-keyword">return</span> re[p].v+=cv,<span class="hljs-built_in">void</span>(re[p].t+=cv);
+		<span class="hljs-type">int</span> mid=l+r&gt;&gt;<span class="hljs-number">1</span>;
+		<span class="hljs-keyword">if</span>(cl&lt;=mid) <span class="hljs-built_in">add</span>(cl,cr,cv,l,mid,re[p].ls);
+		<span class="hljs-keyword">if</span>(cr&gt;mid) <span class="hljs-built_in">add</span>(cl,cr,cv,mid<span class="hljs-number">+1</span>,r,re[p].rs);
+		re[p].v=<span class="hljs-built_in">min</span>(re[re[p].ls].v,re[re[p].rs].v)+re[p].t;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">set</span><span class="hljs-params">(<span class="hljs-type">int</span> cp,<span class="hljs-type">int</span> cv,<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">signed</span>&amp;p)</span></span>{
+		<span class="hljs-keyword">if</span>(!p) p=++id;
+		<span class="hljs-keyword">if</span>(l==r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(re[p].v=cv);
+		<span class="hljs-type">int</span> mid=l+r&gt;&gt;<span class="hljs-number">1</span>; cv-=re[p].t;
+		<span class="hljs-keyword">if</span>(cp&lt;=mid) <span class="hljs-built_in">set</span>(cp,cv,l,mid,re[p].ls);
+		<span class="hljs-keyword">else</span> <span class="hljs-built_in">set</span>(cp,cv,mid<span class="hljs-number">+1</span>,r,re[p].rs);
+		re[p].v=<span class="hljs-built_in">min</span>(re[re[p].ls].v,re[re[p].rs].v)+re[p].t;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> ql,<span class="hljs-type">int</span> qr,<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">signed</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(!p||ql&lt;=l&amp;&amp;qr&gt;=r) <span class="hljs-keyword">return</span> re[p].v;
+		<span class="hljs-type">int</span> mid=l+r&gt;&gt;<span class="hljs-number">1</span>,ret=inf;
+		<span class="hljs-keyword">if</span>(ql&lt;=mid) ret=<span class="hljs-built_in">min</span>(ret,<span class="hljs-built_in">que</span>(ql,qr,l,mid,re[p].ls));
+		<span class="hljs-keyword">if</span>(qr&gt;mid) ret=<span class="hljs-built_in">min</span>(ret,<span class="hljs-built_in">que</span>(ql,qr,mid<span class="hljs-number">+1</span>,r,re[p].rs));
+		<span class="hljs-keyword">return</span> ret+re[p].t;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">at</span><span class="hljs-params">(<span class="hljs-type">int</span> qp,<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">signed</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(!p||l==r) <span class="hljs-keyword">return</span> re[p].v;
+		<span class="hljs-type">int</span> mid=l+r&gt;&gt;<span class="hljs-number">1</span>,ret=re[p].t;
+		<span class="hljs-keyword">if</span>(qp&lt;=mid) ret+=<span class="hljs-built_in">at</span>(qp,l,mid,re[p].ls);
+		<span class="hljs-keyword">else</span> ret+=<span class="hljs-built_in">at</span>(qp,mid<span class="hljs-number">+1</span>,r,re[p].rs);
+		<span class="hljs-keyword">return</span> ret;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">merge</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">signed</span> &amp;lp,<span class="hljs-type">signed</span> op,<span class="hljs-type">int</span> cl,<span class="hljs-type">int</span> cr)</span></span>{
+		<span class="hljs-keyword">if</span>(!op) <span class="hljs-keyword">return</span>;
+		<span class="hljs-keyword">if</span>(!lp){
+			lp=op; re[op].t+=cr-cl;
+			re[op].v+=cr-cl; <span class="hljs-keyword">return</span>;
+		}
+		<span class="hljs-keyword">if</span>(l==r){
+			re[lp].v=<span class="hljs-built_in">min</span>(re[lp].v,re[op].v+cr-cl);
+			<span class="hljs-keyword">return</span>;
+		}
+		<span class="hljs-type">int</span> mid=l+r&gt;&gt;<span class="hljs-number">1</span>; cl+=re[lp].t; cr+=re[op].t;
+		<span class="hljs-built_in">merge</span>(l,mid,re[lp].ls,re[op].ls,cl,cr);
+		<span class="hljs-built_in">merge</span>(mid<span class="hljs-number">+1</span>,r,re[lp].rs,re[op].rs,cl,cr);
+		re[lp].v=<span class="hljs-built_in">min</span>(re[re[lp].ls].v,re[re[lp].rs].v)+re[lp].t;
+	}
+}sgt;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">sim</span><span class="hljs-params">(<span class="hljs-type">signed</span>&amp;rt,<span class="hljs-type">int</span> adr,<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> v)</span></span>{
+	<span class="hljs-keyword">if</span>(p==m) <span class="hljs-keyword">return</span>; sgt.<span class="hljs-built_in">set</span>(p,v,<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,rt);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> a=adr<span class="hljs-number">+1</span>;a!=jmp[adr];++a){
+		<span class="hljs-keyword">if</span>(op[a][<span class="hljs-number">0</span>]==<span class="hljs-string">&#x27;i&#x27;</span>){
+			<span class="hljs-type">int</span> pos=vp[a][<span class="hljs-number">0</span>],val=sgt.<span class="hljs-built_in">at</span>(pos,<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,rt);
+			<span class="hljs-keyword">if</span>(val&lt;inf){
+				<span class="hljs-type">signed</span> ngs=<span class="hljs-number">0</span>; <span class="hljs-built_in">sim</span>(ngs,a,pos,val);
+				sgt.<span class="hljs-built_in">set</span>(vp[a][<span class="hljs-number">0</span>],inf,<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,rt);
+				sgt.<span class="hljs-built_in">merge</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,rt,ngs,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>);
+			}
+			a=jmp[a];
+		}
+		<span class="hljs-keyword">else</span>{
+			<span class="hljs-keyword">if</span>(vp[a][<span class="hljs-number">0</span>]==m) sgt.<span class="hljs-built_in">add</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,vp[a][<span class="hljs-number">1</span>],<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,rt);
+			<span class="hljs-keyword">else</span>{
+				<span class="hljs-type">int</span> vm=sgt.<span class="hljs-built_in">que</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,rt);
+				sgt.<span class="hljs-built_in">add</span>(<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,vp[a][<span class="hljs-number">1</span>],<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,rt);
+				sgt.<span class="hljs-built_in">set</span>(vp[a][<span class="hljs-number">0</span>],vm,<span class="hljs-number">0</span>,<span class="hljs-number">1e9</span>,rt);
+			}
+		}
+	}
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+		<span class="hljs-keyword">if</span>(cin&gt;&gt;op[i],op[i][<span class="hljs-number">0</span>]!=<span class="hljs-string">&#x27;e&#x27;</span>)
+			<span class="hljs-keyword">if</span>(cin&gt;&gt;vp[i][<span class="hljs-number">0</span>],op[i][<span class="hljs-number">0</span>]!=<span class="hljs-string">&#x27;i&#x27;</span>) cin&gt;&gt;vp[i][<span class="hljs-number">1</span>];
+			<span class="hljs-keyword">else</span> lp.<span class="hljs-built_in">emplace</span>(i);
+		<span class="hljs-keyword">else</span> jmp[lp.<span class="hljs-built_in">top</span>()]=i,lp.<span class="hljs-built_in">pop</span>();
+	op[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]=<span class="hljs-string">&#x27;i&#x27;</span>; op[n<span class="hljs-number">+1</span>][<span class="hljs-number">0</span>]=<span class="hljs-string">&#x27;e&#x27;</span>; jmp[<span class="hljs-number">0</span>]=n<span class="hljs-number">+1</span>;
+	<span class="hljs-built_in">sim</span>(rt,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>); cout&lt;&lt;sgt.re[rt].v&lt;&lt;endl;
+}
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
