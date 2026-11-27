@@ -290,8 +290,8 @@
 <p>还有半年，运气好的话一年，差不多就退役了，再往后就又是文化课了。</p>
 <p>折戟沉沙地，不妨又一搏。</p>
 <p>$\text{CSP RP++!}$。</p>
-<p>我在 2026/10/17 进行了一轮自动化扫描，博客中未完成的部分可以参见<a href="./audit.html">审计报告</a>。</p>
-<p>审计报告并非实时生成的，每一两个月更新一次。</p>
+<p>我在 2026/09/09 进行了一轮自动化扫描，博客中未完成的部分可以参见<a href="./audit.html">审计报告</a>。</p>
+<p>审计报告并非实时生成的：这是在本地运行大约 12h 的大模型得到的产物，因此审计报告可能每一两个月才会更新一次。</p>
 <h1 id="大纲">大纲</h1>
 <p>待加入：</p>
 <p>析合树，<a href="https://www.luogu.com.cn/problem/AT_arc221_e">https://www.luogu.com.cn/problem/AT_arc221_e</a></p>
@@ -1181,7 +1181,7 @@ signed main() {
 <p>大部分图片来源于<a href="https://raw.githubusercontent.com/hzwer/shareOI/refs/heads/master/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/%E5%9F%BA%E4%BA%8E%E8%BF%9E%E9%80%9A%E6%80%A7%E7%8A%B6%E6%80%81%E5%8E%8B%E7%BC%A9%E7%9A%84%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E9%97%AE%E9%A2%98_%E9%99%88%E4%B8%B9%E7%90%A6.ppt">CDQ的PPT</a>。</p>
 <p>插头 DP 是一种基于轮廓线 DP 的，解决基于连通性的状态压缩的动态规划问题的方法。</p>
 <p>轮廓线 DP 可以参见前文，这里主要介绍一下插头 DP 特有的“插头”是什么东西：一个格子的某个方向存在插头表示这个格子在这个方向上可以与相邻的格子相连。如图指示了长度为 $n+1$ 的轮廓线上的 $n+1$ 个可能的插头：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260522bound_plug.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260522bound_plug.png" alt=""></p>
 <p>以插头 DP 的<a href="https://www.luogu.com.cn/problem/P5056">模板题</a>为例进行讲解。那么我们该怎么去设计这个 DP 状态呢？</p>
 <p>注意到，题目要求只存在一个闭合回路，也就是说，我们可能会需要维护回路之间的连通性：他们是不是同一条回路啊什么的。</p>
 <p>但是在插头 DP 中，我们维护的从来都只有轮廓线上的插头的信息，怎么办呢？</p>
@@ -1191,7 +1191,7 @@ signed main() {
 <p>这道题要求只有至多一条回路。针对这个问题的特殊性，我们能不能找到另一个更好的方法呢？</p>
 <p>分析性质：每一个非障碍格子恰好有 $2$ 个插头，也就是说轮廓线上面部分只会有若干个不相交的路径，也就说明每一条路径的两端会分别对应两个插头，也就是说插头两两匹配，并且插头不会交叉，也就是说不存在按照顺序排列的 $4$ 个插头 $a,b,c,d$，使得 $a,c$ 匹配，$b,d$ 匹配。</p>
 <p>哦！我可以用括号序列来唯一标识一种状态！如下图所示，我们可以使用三进制或者四进制来表示这样的状态：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260522bracket.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260522bracket.png" alt=""></p>
 <p>剩下的就是对每一个格子的插头的状态转移进行分讨了。这里不再细讲，具体转移细节可以参考代码：</p>
 <div class="code-wrapper">
 <div class="code-header">
@@ -1450,7 +1450,7 @@ vector&lt;<span class="hljs-type">int</span>&gt;val; <span class="hljs-type">int
 <p>具体来说，内层的 DP 显然就是<a href="https://www.luogu.com.cn/problem/P1352">没有上司的舞会</a>，状态为 $dp_{p,0/1}$，表示以 $p$ 为根的子树当中，选择 $p$ 节点的最优解为 $dp_{p,1}$，反之为 $dp_{p,0}$。</p>
 <p>于是我们用外层 DP 把内层 DP 套起来，就会有三层：第一层是 $p$，第二层是 $dp_{p,0}$，第三层是 $dp_{p,1}$。也就是说我们设计出来的整体状态为 $dp_{p,i,j}$，表示以 $p$ 为根的子树中，不选 $p$ 节点的答案为 $i$，选择 $p$ 节点的答案为 $j$ 的方案数。</p>
 <p>显然这样做的状态数过大，并不能有效的解决这个问题，于是我们考虑压缩决策空间。</p>
-<p>首先，内层 DP 如果出现 $dp_{p,1} < dp_{p,0}$，那么 $dp_{p,1}$ 一定不会对答案造成任何贡献，于是我们不妨重新定义 $dp_{p,1}$ 为不能选 $fa_p$ 时以 $p$ 为根节点的子树的最优解。</p>
+<p>首先，内层 DP 如果出现 $dp_{p,1} \lt dp_{p,0}$，那么 $dp_{p,1}$ 一定不会对答案造成任何贡献，于是我们不妨重新定义 $dp_{p,1}$ 为不能选 $fa_p$ 时以 $p$ 为根节点的子树的最优解。</p>
 <p>于是，我们现在有了一个比较好的限制：$j\ge i$。但是并不太够。</p>
 <p>观察数据范围，容易注意到 $k\le 5$！这是一个非常强的限制。因为前面重新定义了 $dp_{p,1}$，所以说不难看出对于任意一个点，都应该有 $dp_{p,1}-k\le dp_{p,0}$，原因很简单：如果强制不选择 $p$，那么显然将 $p$ 点的那个数值砍掉是一个合理的决策。</p>
 <p>于是我们重新定义 $dp_{p,x,y}$：在以 $p$ 为根的子树当中，不选 $p$ 为 $x$，选为 $x+y$，则有 $x\le k\times size_p$ 等等限制，可以直接做树上背包，时间复杂度是 $O(n^2k^4)$ 的，可以通过。代码如下：</p>
@@ -1769,7 +1769,7 @@ set&lt;pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</
 <h3 id="充分条件判定">充分条件判定</h3>
 <p>决策单调性的判定方法（仅部分充分条件）：</p>
 <ul>
-<li>如果 $i<j$ 的时候 $k$ 处 $j$ 比 $i$ 优，并且 $k+1$ 处亦然，那么可以推出决策单调性。</li>
+<li>如果 $i\lt j$ 的时候 $k$ 处 $j$ 比 $i$ 优，并且 $k+1$ 处亦然，那么可以推出决策单调性。</li>
 </ul>
 <p>这是显然的，上述要求可以推出 $p_k\le p_{k+1}$，也就是决策单调性。</p>
 <ul>
@@ -1829,7 +1829,7 @@ set&lt;pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</
 </div>
 <p>显然层数是 $O(\log n)$ 的，而每一层的 $[l2,r2]$ 会拼成全集，因此，每一层的 $w$ 次数也是 $O(n)$ 的。所以假设 $w$ 可以 $O(1)$ 算出，则时间复杂度是 $O(n\log n)$ 的。<a href="https://www.luogu.com.cn/problem/P3515">例题</a>。</p>
 <p>首先证明决策单调性：$\sqrt(n+k)-\sqrt(n)$ 随 $n$ 增大而减小。</p>
-<p>因此，我们考虑将整个问题分成前后缀，分两次处理。基本上，如果某一个时刻 $i<j$ 且 $j$ 更优，那么以后 $j$ 都是更优的。容易注意到这里是符合分治模型的，也就是各个状态互不干扰，因此直接按照分治实现即可，时间复杂度 $O(n\log n)$。代码如下：</p>
+<p>因此，我们考虑将整个问题分成前后缀，分两次处理。基本上，如果某一个时刻 $i\lt j$ 且 $j$ 更优，那么以后 $j$ 都是更优的。容易注意到这里是符合分治模型的，也就是各个状态互不干扰，因此直接按照分治实现即可，时间复杂度 $O(n\log n)$。代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
     <span class="code-lang">CPP</span>
@@ -2477,13 +2477,13 @@ signed main(){
 <p>那么我们考虑贡献是怎么合并的：$p$ 的每一个儿子 $s$ 可以计算出这个儿子实际向父亲的贡献 $f^\prime_{s,d}=\min_{d^\prime\le d}f_{s,d^\prime}+|d-d^\prime-v|$。我们再把所有的儿子的实际贡献 $f^\prime_{s,d}$ 直接对应的 $d$ 相加就可以得到 $f_{p,d}$ 了。</p>
 <p>不难看出来，这个东西是一个下凸壳，也就是斜率递增的凸壳。于是我们需要支持的就是两种操作：凸壳的对应位置加和，以及那一个神秘的贡献计算。</p>
 <p>我们考虑那一个神秘的计算会对我们的图形产生什么样的变化：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260528newslope.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260528newslope.png" alt=""></p>
 <p>手模一下发现如上图所示，分成四块不同的转移。图上的 $v$ 对应前文的式子中的 $v$，具体含义如下：</p>
 <p>我们考虑令 $[l,r]$ 是图中斜率为 $0$ 的部分的左右端点，我们实际上想干的就是最小化每一个位置的纵坐标。</p>
 <p>于是对于 $d > r+v$ 的部分，显然由于从 $r$ 开始，因为斜率至少为 $1$，则每一个 $p\ge r+v$，有 $f_{s,p}\ge d_{s,r}+(p-r-v)$，因此最优决策点 $d^\prime$ 就是 $r$，代入式子可知 $f^\prime_{s,d}=f_{s,r}+(d-r-v)$，也就对应了图上的 $p\ge r+v$ 部分的 $k=1$ 的直线。</p>
 <p>对于 $d\in[l+v,r+v]$ 的部分，显然直接取 $d^\prime=d-v$ 即可得到 $f^\prime_{s,d}=f_{s,d-v}=f_{min}$，不可能更优了。</p>
 <p>对于 $d\in[l,l+v]$ 的部分，类似 $d > r+v$，显然最优决策点就是 $l$，可以得到 $f^\prime_{s,d}=f_{s,l}+(l+v-d)$，也就对应一条斜率为 $-1$ 的直线。</p>
-<p>对于 $d < l$ 的部分，类似 $d > r+v$，显然最优决策点就是 $d$ 本身，可以得到 $f^\prime_{s,d}=f_{s,d}+v$，也就对应原折线向上平移 $v$。</p>
+<p>对于 $d \lt l$ 的部分，类似 $d > r+v$，显然最优决策点就是 $d$ 本身，可以得到 $f^\prime_{s,d}=f_{s,d}+v$，也就对应原折线向上平移 $v$。</p>
 <p>又因为我们都是以中间斜率为 $0$ 的部分为基准进行维护的，所以只要维护好所有的拐点就可以快速的进行上述操作。</p>
 <p>再来，我们还有一个操作是将所有的凸壳加起来。这个怎么办啊？只能再多记录一个斜率然后硬搞吗？</p>
 <p>其实不然。我们注意到当我们将一个凸壳合并到父节点上的时候，最后一条线的斜率一定是 $1$。因此肯定是不需要额外记录斜率的，只需要知道有多少个区间的斜率为正即可。而显然这个东西大概就是儿子节点的个数（叶子节点特殊处理一下就行）。</p>
@@ -3020,7 +3020,7 @@ inline void dfs(int p) {
 <p>不过我们注意到，如果我们把划分的过程按层拼接，就会发现每一层都会把几乎原先的一整颗树遍历完。因此，限制层数就是必要的。我们回想起重心是满足所有子树的大小均不超过原树大小的一半的神奇节点。因此我们每一次指定必经点为当前子树的中心，就能够限制层数为 $O(\log)$ 的了！</p>
 <p>所以说，点分治一般的流程就是找到当前子树的重心，处理经过重心的路径的贡献，删去重心并以相同方式递归处理子树。假设对一颗大小为 $n$ 的树计算贡献的时间复杂度是 $T(n)$ 的，那么时间复杂度可以运用主定理，将整个过程看作二分进行计算。对于较为快速 $T(n)$，例如 $O(n)$ 或 $O(n\log n)$ 等，可以将整体的时间复杂度视作 $O(T(n)\log n)$。</p>
 <p>还没有完，光有一层壳是没什么用的，我们还需要去尝试一下怎么设计经过点的路径的贡献计算。</p>
-<p>这道题当中，我们注意到拼接路径的 $P$ 为 $\frac{dis_1+dis_2}{len_1+len_2}$。直接计算这个东西似乎是不容易的，因此我们考虑二分答案，将求极值转化为存在性检验。不难想到，如果我们在一开始就给每条边减去 $k$，那么限制就是 $-mid < \frac{dis_1+dis_2}{len_1+len_2}<mid$，其中 $mid$ 为当前检验的答案。</p>
+<p>这道题当中，我们注意到拼接路径的 $P$ 为 $\frac{dis_1+dis_2}{len_1+len_2}$。直接计算这个东西似乎是不容易的，因此我们考虑二分答案，将求极值转化为存在性检验。不难想到，如果我们在一开始就给每条边减去 $k$，那么限制就是 $-mid \lt \frac{dis_1+dis_2}{len_1+len_2}\lt mid$，其中 $mid$ 为当前检验的答案。</p>
 <p>其实这个东西不好限制的，当时就直接卡在这里了，因为分子分母只确定了一个。不过注意到 $len_1+len_2$ 恒正，所以我们考虑对于 $dis_1+dis_2\ge0$ 和 $\le0$ 的情况分开验证。推出相应的式子之后使用<a href="#%E5%B0%BA%E5%8F%96%E6%B3%95">尺取法</a>即可做。</p>
 <p>也就是说内层合并信息的时候可能会用到的不只是数组，线段树等等的神奇数据结构，也可能是其他的各类神奇的技巧一拥而上。总之遇到这类问题的时候，建议多思考一会儿。</p>
 <h2 id="点分树">点分树</h2>
@@ -3067,7 +3067,7 @@ inline void dfs(int p) {
 <p>如果一个问题涉及到修改一个边的两个端点的信息，并且要求构造的话，那么我们可能会选择往二分图去靠，因为奇环常常可以使影响被消除，而二分图则两边容易出现某一种量的相对关系不变。</p>
 <p>DAG最小路径覆盖问题：考虑首先用 $n$ 个路径覆盖整张图，随后连接边，每一条边都合并两个现有的路径。注意到合并路径当且仅当一个路径末连接另一个路径头。于是我们对于每一个点拆分入点和出点，每一条边从出点连接入点，那么答案就是点数减去最大匹配数。</p>
 <p>DAG可重最小路径覆盖问题：考虑下图，于是证出了DAG可重最小路径覆盖问题等价于闭包传递(DAG可达性统计)后的新图的DAG最小路径覆盖问题。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260314replicable.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260314replicable.png" alt=""></p>
 <h2 id="霍尔定理">霍尔定理</h2>
 <p>令 $L,R$ 分别表示左右点集，那么定义 $p\in L,D(p)=\{u|u\in R,(p,u)\in E\}$。也就是说 $D(p)$ 是左部点 $p$ 所直连的右部点的集合。</p>
 <p>再定义 $S\subseteq L,D(S)=\cup_{p\in S}D(p)$。也就是说 $D(S)$ 是左部点子集 $S$ 中存在点直连的右部点集合。</p>
@@ -3329,7 +3329,7 @@ inline void dfs(int p) {
 <p>对于每一个点，我们令 $cin_i=\sum f(j,i),cout_i=\sum f(i,j),rd_i=cin_i-cout_i$，然后思考：</p>
 <ol>
 <li>对于 $rd_i=0$ 的点，其入度的下界与出度的下界相同，也就是说这些边我们可以将上界重写为 $fmax-fmin$，仍满足流量守恒。</li>
-<li>对于 $rd_i<0$ 的点，他若直接将上界重写为 $fmax-fmin$，则不满足流量守恒，出度过小。需要向超级汇点连一条容量上界为 $-rd_i$ 的边。</li>
+<li>对于 $rd_i\lt0$ 的点，他若直接将上界重写为 $fmax-fmin$，则不满足流量守恒，出度过小。需要向超级汇点连一条容量上界为 $-rd_i$ 的边。</li>
 <li>对于 $rd_i>0$ 的点，他若直接将上界重写为 $fmax-fmin$，则不满足流量守恒，入度过小。需要从超级源点连一条容量上界为 $rd_i$ 的边。</li>
 </ol>
 <p>此时，若从超级源点到超级汇点满流，则存在，反之不存在，由源汇点的流量与原图的流量守恒关系不难证得。</p>
@@ -3988,13 +3988,13 @@ signed main() {
 <h3 id="线段树优化建图">线段树优化建图</h3>
 <p><a href="https://www.luogu.com.cn/problem/AT_arc069_d">T1</a>，<a href="https://www.luogu.com.cn/problem/UVA1146">弱化版</a>。</p>
 <p>翻译一下就是有 $n$ 个数 $a_i$ 和 $n$ 个数 $b_i$，$n$ 次从 $a_i$ 或 $b_i$ 中选出一个数放入 $c$，排序后询问最小的 $\min_{i=1}^{n-1}c_{i+1}-c_i$。</p>
-<p>我们可以假定 $a_i<b_i$。解法大概率会是二分答案。首先如果 $|a_j-a_i|<d$，那么这俩不能同时出现。以此来建边进行求解，复杂度 $O(n^2\log V)$。可以过弱化版。</p>
+<p>我们可以假定 $a_i\lt b_i$。解法大概率会是二分答案。首先如果 $|a_j-a_i|\lt d$，那么这俩不能同时出现。以此来建边进行求解，复杂度 $O(n^2\log V)$。可以过弱化版。</p>
 <p>但是这样并不够优，究其原因是我们需要大量的向一个区间内的点建边。</p>
 <p>而这，我们显然可以使用线段树优化建边来飞过去。具体方式可以看下面这幅图：</p>
 <p>比如本来是 $2$ 要向 $[1,2]$ 和 $[4,6]$ 两个区间建边。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/680b7a4451dd4.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/680b7a4451dd4.png" alt=""></p>
 <p>现在我们可以对原本的 $[1,6]$ 区间建一颗线段树如图：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/680b7a4f25685.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/680b7a4f25685.png" alt=""></p>
 <p>那这时候 $7$ 向 $8$ 连等同于向 $[1,2]$ 连，向 $11$ 连等同于向 $[4,6]$ 连。</p>
 <p>显然这样下来每次要连的边数锐减至 $O(\log n)$ 条。总复杂度降至 $O(n\log n\log V)$。</p>
 <p>比较核心的就是这坨：</p>
@@ -4051,7 +4051,7 @@ signed main() {
 <p>相当于说在同一个部分内的 $x\neq y$，一定要 $x_1$ 到 $y_0$ 连一条边。只要我把所有的点放在同一个部分内，你的边数就是 $n^2$ 的。包炸的。</p>
 <p>所以现在就是要去优化这个东西。我们不难发现，其实如果我们将这个部分内的点任意排序，那第 $i$ 个点一定要向第 $[1,i-1]\cup[i+1,size]$ 都连上边。</p>
 <p>线段树优化建图不太好使，因为数据范围真的够大。但是思考如下结构：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/680b44ed7af63.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/680b44ed7af63.png" alt=""></p>
 <p>不难注意到，如果我们给整个部分添加两个辅助的侧链<del>基团</del>，那么这时候指向 $x_l$ 就间接指向了 $[1,x]$，指向 $x_r$ 就间接指向了 $[x,size]$。</p>
 <p>非常妙，此题可解。我们称这种建图方式为前缀优化建图。比较核心的代码就是这坨：</p>
 <div class="code-wrapper">
@@ -4607,11 +4607,11 @@ queue&lt;<span class="hljs-type">int</span>&gt;q; edge lfp[<span class="hljs-num
 <p>先说一下什么是仙人掌：仙人掌就是一种特殊的图，满足每一个边最多在一个简单环上。</p>
 <p>我们会使用倍增 LCA 和树上前缀和来快速的求解树上的两点之间的距离。那如果我们可以将这个图转变成一棵树的话是不是就做完了？狭义圆方树就干了这么一点事。</p>
 <p>那我们想一想这个圆方树都要处理一些什么呢？显然，成环的地方就是我们要重点考虑的。正是这些环，使得原先的图不是树。我们考虑如下结构：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/6827f86266d29.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/6827f86266d29.png" alt=""></p>
 <p>肉眼可见的，我们通过添加一个点使得一个环变成了一个菊花一样的东西。我们处理完后一定是一棵树。而树上除了根以外别的点都一定是有父节点的。只要我们指定一个圆点为根节点，那每一个这样的环都会有一个最靠上的节点。</p>
 <p>我们把这个节点视为这个环的起点，像任意方向绕着环转一圈，并把每个点的“距离”标记为第一次遇到他时走过的路程。接下来，我们把环的起点到这个环的方点的边权设置为 $0$，把这个环的方点到其他点的权值设为本环的起点到那个点的<strong>最短路的长度</strong>。</p>
 <p>这意味着我们还需要处理这个环的长度。因为最短路是这个点的“距离”和环长减去“距离”的最小值。就像这样：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/6827fce24eb9d.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/6827fce24eb9d.png" alt=""></p>
 <p>建出来了树了之后，分成两种大的情况：</p>
 <p>第一种：两个点的 LCA 是一个圆点。这种情况相当的好，答案就是两个点在树上的距离。</p>
 <p>第二种：两个点的 LCA 是一个方点。这意味着这两个点不停往上跳，最后跳到了一个环的不同的两个点上。这时候我们要处理出二者在环上的最小距离。于是我们之前记录的信息就发挥作用了。两个点之间有两个不同的种路径，一种是按照“距离”的行走方向的那段弧，长度为二者的“距离”的差，另一种是走另一段弧，长度是环长减第一种的长度。</p>
@@ -5167,9 +5167,9 @@ vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">10
 <li>最大独立集数$\le$最小团覆盖数($\alpha(G)\le\kappa(G)$)；</li>
 </ol>
 <p>定义弦为一个简单环中连接不相邻的两个点的边。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423chord.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423chord.png" alt=""></p>
 <p>定义弦图为图中任意长度大于 $3$ 的简单环都至少有一个弦的图。左边就是弦图，右边就不是。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423chordmap.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423chordmap.png" alt=""></p>
 <p>对于弦图，有如下性质：</p>
 <ol>
 <li>弦图的每一个诱导子图一定是弦图；</li>
@@ -5178,18 +5178,18 @@ vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">10
 <p>此外，给定一些区间，定义一个相交图为每个顶点表示一个区间，两个点有边当且仅当两个区间的交集非空。一个图为区间图当它是若干个区间的相交图。我们还有性质：区间图一定是弦图。</p>
 <h3 id="完美消除序列与判定">完美消除序列与判定</h3>
 <p>令 $\Nu(v)$ 表示与 $v$ 相邻的点集，称一个点为单纯点当且仅当 $V=\{v\}\cup\Nu(v)$ 的诱导子图为一个团。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423simplicial.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423simplicial.png" alt=""></p>
 <p>有引理：任何一个弦图都至少有一个单纯点，不是完全图的弦图至少有两个不相邻的单纯点。</p>
 <p>定义完美消除序列为一个序列 $v_1,v_2,\dots,v_n$ 满足 $\forall i\in[1,n]$，在 $V=\{v_i,v_{i+1},\dots,v_n\}$ 的诱导子图中 $v_i$ 是一个单纯点。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423perfect.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423perfect.png" alt=""></p>
 <p>有定理：一个无向图是弦图当且仅当它有一个完美消除序列。证明：</p>
-<p>充分性：由引理知任何一个弦图都至少有一个单纯点以及弦图的诱导子图都是弦图。可以使用数学归纳法假设当点数 $<n$ 的弦图一定有完美消除序列，那么点数为 $n$ 的弦图的完美消除序列可以由一个单纯点加上剩余点的诱导子图的完美消除序列得到。</p>
+<p>充分性：由引理知任何一个弦图都至少有一个单纯点以及弦图的诱导子图都是弦图。可以使用数学归纳法假设当点数 $\lt n$ 的弦图一定有完美消除序列，那么点数为 $n$ 的弦图的完美消除序列可以由一个单纯点加上剩余点的诱导子图的完美消除序列得到。</p>
 <p>必要性：反证若无向图存在一个长度 $>3$ 的无弦环，不妨设环中在完美消除序列中出现在最前面的点为 $v$，设环中 $v$ 与 $v_1,v_2$ 相连，根据完美消除序列的性质知 $v_1,v_2$ 相连，与环无弦矛盾。所以无向图为弦图。</p>
 <p>对弦图求完美消除序列有两个 $O(m+n)$ 的算法，分别是字典序广度优先搜索(LexBFS)和最大势算法(MCS)，下面介绍后者：</p>
 <p>从 $n$ 到 $1$ 的顺序依次给点标号(标号为 $i$ 的点出现在完美消除序列的第 $i$ 个)。</p>
 <p>设 $label_i$ 表示第 $i$ 个点与多少个已标号的点相邻，每次选择 $label_i$ 最大的未标号的点进行标号。</p>
 <p>我们将这些点挂到其 $label$ 对应的链表上进行维护就行了，时间复杂度是 $O(n+m)$ 的。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs8.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs7.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs6.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs5.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs4.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs3.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs2.png" alt=""><img src="https://chenyichen0420.netlify.app/picbed/20260423mcs1.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs8.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs7.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs6.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs5.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs4.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs3.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs2.png" alt=""><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mcs1.png" alt=""></p>
 <p>完美消除序列的判定：</p>
 <p>设 $\{v_{i+1},\dots,v_n\}$中所有与 $v_i$ 相邻的点依次为 $v_{j_1},\dots,v_{j_k}$。只需判断 $v_{j_1}$ 是否与 $v_{j_2},\dots,v_{j_k}$ 相邻即可。时间复杂度为 $O(n+m)$。</p>
 <p>好像常见的做法是带个 log 或者用 hash 表的，有一种严格 $O(n+m)$ 的方法：我们直接把询问拍到点上。</p>
@@ -5200,19 +5200,19 @@ vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">10
 <p>设点集 $V$ 的诱导子图为弦图的极大团，设 $v$ 为 $V$ 中 $p$ 值最小的点，即出现在完美消除序列中最前面的点。由于 $V\subseteq\{v\}\cup\Nu(v)$ 为一个团，$V$ 为极大团，所以 $V=\{v\}\cup\Nu(v)$。</p>
 <p>推论：弦图最多有 $n$ 个极大团。显然只需要检验每一个 $\{v\}\cup\Nu(v)$ 是不是极大团即可。</p>
 <p>如何判断 $A=\{v\}\cup\Nu(v)$ 是不是极大团：若存在 $B=\{w\}\cup\Nu(w)$ 使得 $A\subseteq B$，则 $A$ 不是极大团。</p>
-<p>具体来说，此时一定有 $p_w<p_v$，我们设 $next_v$ 表示 $\Nu(v)$ 中最靠前的点，令 $w_0$ 表示所有满足 $A\subseteq B$ 的 $w$ 中最后的一个点，那么有 $next_{w_0}=v$。</p>
+<p>具体来说，此时一定有 $p_w\lt p_v$，我们设 $next_v$ 表示 $\Nu(v)$ 中最靠前的点，令 $w_0$ 表示所有满足 $A\subseteq B$ 的 $w$ 中最后的一个点，那么有 $next_{w_0}=v$。</p>
 <p>因此有 $next_w=v$，于是 $\{v\}\cup\Nu(v)\subseteq\{w\}\cup\Nu(w)$ 当且仅当 $|\Nu(v)|+1\le|\Nu(w)|$。</p>
 <p>于是我们只需要判断是否存在 $w$ 满足 $next_w=v$ 且 $|\Nu(v)|+1\le|\Nu(w)|$ 即可。时间复杂度 $O(n+m)$。</p>
 <h3 id="色数与团数">色数与团数</h3>
 <p>我们按照完美消除序列从后往前依次给每个点染色，给每个点染上可以染的最小的颜色即可，证明：</p>
 <p>设使用了 $T$ 种颜色, 则 $T\ge\chi(G)$，又因为 $T=\kappa(G)\le\chi(G)$，所以 $\kappa(G)=\chi(G)=T$。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423mincolor.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mincolor.png" alt=""></p>
 <h3 id="最大独立集与最小团覆盖">最大独立集与最小团覆盖</h3>
 <p>最大独立集：完美消除序列从前往后能选就选。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423maxisolated.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423maxisolated.png" alt=""></p>
 <p>最小团覆盖：设最大独立集为 $\{p_1,p_2,\dots,p_t\}$，则 $\{p_1\cup\Nu(p_1),\dots,p_t\cup\Nu(p_t)\}$ 为最小团覆盖。证明：</p>
 <p>由独立集，$t\le\alpha(G)$；由团覆盖，$t\ge\kappa(G)$；结合 $\alpha(G)\le\kappa(G)$ 得 $\alpha(G)=\kappa(G)=t$，即最大独立集数=最小团覆盖数。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260423mingroup.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260423mingroup.png" alt=""></p>
 <h2 id="竞赛图">竞赛图</h2>
 <h3 id="基本概念与常见性质">基本概念与常见性质</h3>
 <p>竞赛图：$n$ 个点的有向图，任意两个点之间恰有一条有向边。</p>
@@ -5723,7 +5723,7 @@ vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">20
 <h3 id="普通二分三分">普通二分三分</h3>
 <h6 id="这里有你没写完的东西杂鱼">这里有你没写完的东西，杂鱼...</h6>
 <h3 id="陈丹琦分治">陈丹琦分治</h3>
-<p>CDQ 分治其实更像是一种思想。CDQ 的经典例题处理的是三维偏序问题，即满足 $a_i<a_j,b_i<b_j,c_i<c_j$ 的整数对 $(i,j)$ 的个数。</p>
+<p>CDQ 分治其实更像是一种思想。CDQ 的经典例题处理的是三维偏序问题，即满足 $a_i\lt a_j,b_i\lt b_j,c_i\lt c_j$ 的整数对 $(i,j)$ 的个数。</p>
 <p>这个东西，一看就可以 KDTree（大雾）。</p>
 <p>显然不优，CDQ 可以做到 $O(n\log^2n)$。</p>
 <p>核心思路就是先按照第一维排序，随后归并排第二维的序列。归并的时候，左部点仍然满足 $a$ 比右部点小。此时我们依次归并 $b$，当 $b$ 来自右部点是计算比该点 $c$ 值更小的已归并的数量之和，这可以用树状数组快速维护。</p>
@@ -5760,8 +5760,8 @@ vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">20
 <p>从上述过程中，我们可以窥见 CDQ 的核心思路。假设现在我们要求出 $[l,r]$ 的贡献，那么我们将其分成两半 $[l,mid]$ 和 $[mid+1,r]$，然后统计 $[l,mid]$ 对 $[mid+1,r]$ 的贡献。</p>
 <p>事实上，中间贡献的计算不一定是像三位偏序那样的简单的数据结构，它可以是线段树，平衡树，kd-tree，甚至是另一层 CDQ 分治！</p>
 <p>一个典型的例题是<a href="https://qoj.ac/problem/21566">四维偏序</a>，但是我们换一个略有挑战性的<a href="https://www.luogu.com.cn/problem/P3769">TATT</a>进行讲解。</p>
-<p>在经典的三维偏序中，我们每一次二分的时候可以视为将左区间的 $(x,y,z)$ 拍扁成了 $(0,y,z)$，右区间的拍扁成了 $(1,y,z)$。在保证 $y_l<y_r$ 的前提下，只有 $(0,y,z)$ 能对 $(1,y,z)$ 产生贡献。</p>
-<p>在四维偏序中，我们可以使用类似的思路：我们在第一层将 $(a,b,c,d)$ 拍扁成 $(0/1,b,c,d)$，然后在第二层将他进一步拍扁成 $(0/1,0/1,c,d)$，然后只统计当 $c_l<c_r$ 时 $(0,0,c,d)$ 对 $(1,1,c,d)$ 的贡献。仍然使用树状数组。</p>
+<p>在经典的三维偏序中，我们每一次二分的时候可以视为将左区间的 $(x,y,z)$ 拍扁成了 $(0,y,z)$，右区间的拍扁成了 $(1,y,z)$。在保证 $y_l\lt y_r$ 的前提下，只有 $(0,y,z)$ 能对 $(1,y,z)$ 产生贡献。</p>
+<p>在四维偏序中，我们可以使用类似的思路：我们在第一层将 $(a,b,c,d)$ 拍扁成 $(0/1,b,c,d)$，然后在第二层将他进一步拍扁成 $(0/1,0/1,c,d)$，然后只统计当 $c_l\lt c_r$ 时 $(0,0,c,d)$ 对 $(1,1,c,d)$ 的贡献。仍然使用树状数组。</p>
 <p>下面给出<a href="https://www.luogu.com.cn/problem/P3769">TATT</a>中的 CDQ 部分的参考代码：</p>
 <div class="code-wrapper">
 <div class="code-header">
@@ -5985,7 +5985,7 @@ signed main(){
 <h2 id="线段树">线段树</h2>
 <p>线段树是 OI 当中最常用的数据结构之一，务必认真掌握。接下来讲解的是比较常用的多种线段树及其变体，大致按难度排序。下面主要讲一下普通线段树的结构。</p>
 <p>不失我个人风格的，我喜欢把线段树画成线段构成的树。如下：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/68bacc11ccb6c.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/68bacc11ccb6c.png" alt=""></p>
 <p>哈哈，十分的生动形象。线段树上的每一个“线段”维护的就是这个区间内的信息。比如区间和，区间最小值，区间极差，等等。总之你需要维护什么就往这上面去堆。</p>
 <p>不过呢，他没有那么的万能，至少你想要维护的信息要么可以简单的合并，要么可以直接标记永久化。总之还是有一些限制条件的。下面针对各种线段树进行相关的介绍。</p>
 <h3 id="序列线段树">序列线段树</h3>
@@ -6085,10 +6085,10 @@ struct seg_tree {
 <p>比如说有一个东西叫做可持久化数组，要求就是支持基于任意历史版本的修改，以及对任意历史版本的查询。</p>
 <p>一个非常朴素的想法是每进行一次修改，就新建一个数组，存储出新的版本。</p>
 <p>我们考虑对这个思路进行优化。注意到一件事情：单次的修改其实只涉及到了一个位置。也就是说剩下的 $n-1$ 个位置的值全部是多余的。我们思考有没有办法尽可能的继承上一个版本的信息。我们对数组直接建立线段树如图：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/68f352b66cfca.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/68f352b66cfca.png" alt=""></p>
 <p>其中蓝色标记的是修改的位置。然后注意到了一件事：其实除了修改位置到祖先的节点意外，其余的节点维护的信息完全没有变化！</p>
 <p>那么我们考虑可不可以“偷换”子结点呢？我们表面上继承的是信息，实际上直接继承子结点的编号就行了，如图：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/68f352b7184dd.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/68f352b7184dd.png" alt=""></p>
 <p>也就是说，我只新建发生更改的节点，其余的直接继承就行。这就是可持久化线段树的最主要的思想：可以继承就继承。也就是在尽可能的提高被回收的节点的数量。</p>
 <p>这是针对序列的一个比较板的形式，实际上一般也不会直接这么考。你能见到的更多是他的应用，比如可持久化并查集，可持久化平衡树什么的。或者是可持久化值域线段树。</p>
 <p>举个例题：给定一个数列，多次询问 $[l_i,r_i]$ 中 $\le v_i$ 的数的个数。强制在线，不然就可以被绕过去。</p>
@@ -6134,7 +6134,7 @@ struct seg_tree {
 <p>那么注意到，如果原先有 $n$ 个插入了 $O(1)$ 的线段树，那么在合并的时候这个节点链只会被合并一次，所以总的时间复杂度是 $O(n\log n)$ 的。</p>
 <p>对于更加一般的情况，一般需要从单次合并的时间复杂度入手进行分析。比如说在<a href="https://www.luogu.com.cn/problem/P11831">这道题</a>中，如果你选择了线段树合并，那我只能追忆你了。</p>
 <p>下面是华丽的图：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/68f619be9d15d.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/68f619be9d15d.png" alt=""></p>
 <h3 id="线段树分裂">线段树分裂</h3>
 <p>有了线段树合并在前面，线段树分裂就是比较好理解的。而且非常类似 Treap 的分裂。</p>
 <p>具体的来说一般分成两类分裂：按值分裂和按大小分裂。不过实质上都是差不多的，就只在实现上有细微区别。一般来说只在维护一些可重集上的问题，或者序列的分割等操作时才会有点用。<a href="https://www.luogu.com.cn/problem/P5494">模板题</a>在这里。</p>
@@ -6164,7 +6164,7 @@ struct seg_tree {
 </div>
 </div>
 <p>下面又是华丽的图，按照大小分割：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/68f61e9b0d5fd.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/68f61e9b0d5fd.png" alt=""></p>
 <h2 id="并查集">并查集</h2>
 <h3 id="普通并查集">普通并查集</h3>
 <p>并查集要维护的操作主要就是“合并”和“查询”。具体来说，他要能够支持将两个集合合并，并查询每一个元素在哪一个集合，比如判断二者在不在同一个集合中。</p>
@@ -6338,14 +6338,14 @@ else {
 <p>不过显然这题并不是这么一切就做完了。块内的信息确实可以使用线段树快速的维护了（显然，$c$ 的块长保证了这部分内求出来的最大子段和就是合法的，线段树的 $O(\log c)$ 是优于分块暴力重算的 $O(c)$ 的），但是那些跨块的我们似乎仍然没有处理好。</p>
 <p>这时候按照 $c$ 进行定长分块的第二层好处就显现出来了。我们不妨先写一写跨块的那些区间的形式表达式：$\max s_r-\min s_l$。其中要求 $r-l\le c$。</p>
 <p>我们把两个块的部分上下放到一起，此时发现突破口了：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260901nointer.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260901nointer.png" alt=""></p>
 <p>我要求后面那个块的结束位置早于前面那个块的开始位置。</p>
 <p>我们直接做带上这个限制的最大子区间和，发现确实可做，于是整体时间复杂度就降到了单个 $\log$！</p>
 <p>具体来说，当查询 $[l,r]$ 这个区间的时候，我们分情况讨论：</p>
 <ol>
 <li>如果 $r-l+1\le c$，直接在线段树上查询 $[l,r]$ 的最大子段和即可，时间复杂度 $O(\log)$。</li>
 <li>如果 $l,r$ 处在相邻两块（显然不可能处在同一块，否则归到前一种情况），那么答案要么是 $[l,l+c-1]$ 的最大子段和，要么是 $[r-c+1,r]$ 的最大子段和，要么是 $l^\prime\in[l,r-c],r^\prime\in[l+c,r],l^\prime>r^\prime-c$ 的区间 $[l^\prime,r^\prime]$ 的和的最大值。显然前两项仍然是线段树 $O(\log)$ 查询，最后一项可以通过每一个块维护的相邻块有限制线段树直接 $O(\log)$ 查处来。</li>
-<li>$l,r$ 处在不相邻块，显然答案只有可能是中间段段内贡献，中间段段间贡献，$[l,l+c-1]$ 的最大子段和，$[r-c+1,r]$ 的最大子段和，$r^\prime-c>l^\prime\ge l$ 的区间 $[l^\prime,r^\prime]$ 的和，$l^\prime+c<r^\prime\le r$ 的区间 $[l^\prime,r^\prime]$ 的和这几种中的最大值，每一项都可以 $O(\log)$ 查出来。</li>
+<li>$l,r$ 处在不相邻块，显然答案只有可能是中间段段内贡献，中间段段间贡献，$[l,l+c-1]$ 的最大子段和，$[r-c+1,r]$ 的最大子段和，$r^\prime-c>l^\prime\ge l$ 的区间 $[l^\prime,r^\prime]$ 的和，$l^\prime+c\lt r^\prime\le r$ 的区间 $[l^\prime,r^\prime]$ 的和这几种中的最大值，每一项都可以 $O(\log)$ 查出来。</li>
 </ol>
 <p>至于修改的时候，更改一下全局最大子段和线段树，更新一下块内贡献线段树，块间贡献线段树即可，时间复杂度仍然是 $O(\log)$ 的。</p>
 <p>参考代码如下：</p>
@@ -6972,7 +6972,7 @@ signed main() {
 </div>
 <h3 id="树分块">树分块</h3>
 <p>首先确认一点：树分块是将边划分成块而不是点。分界点称为界点。比如说下图中，顶上的点就是一个界点，总共分了三个块：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260528topclust.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260528topclust.png" alt=""></p>
 <p>可见一个块中可能会有很多个界点，而且界点甚至可能是块的“割点”。</p>
 <p>这里直接介绍性质多，较为强悍的 Top Ccluster 树分块。这种树分块可以<strong>保证</strong> 分为 $O(\frac{n}{B})$ 个大小不超过 $B$ 的块，并且每个块内最多有 $2$ 个界点！</p>
 <p>思想极为简单：必须分才分。算法流程如下：</p>
@@ -8313,7 +8313,7 @@ signed main(){
 <h2 id="笛卡尔树">笛卡尔树</h2>
 <p>笛卡尔树是一种二叉树，每一个节点由一个键值二元组 $(k,w)$ 构成。要求 $k$ 满足二叉搜索树的性质，而 $w$ 满足堆的性质。一般我们会需要构造一个笛卡尔树，编号为 $i$ 的点权值为 $(i,a_i)$，$a_i$ 为给定的值。一般用栈解决。方法如下：</p>
 <p>我们先按照下标顺序依次加入这棵树中，显然，为了维护二叉搜索树的性质，这个节点势必会在树的右链上。</p>
-<p>这时候我们维护其堆的性质就行了。从下往上比较右链节点与当前节点 $u$ 的 $w$，如果找到了一个右链上的节点 $x$ 满足 $w_x<w_u$，就把 $u$ 接到 $x$ 的右儿子上，而 $x$ 原本的右子树就变成 $u$ 的左子树。</p>
+<p>这时候我们维护其堆的性质就行了。从下往上比较右链节点与当前节点 $u$ 的 $w$，如果找到了一个右链上的节点 $x$ 满足 $w_x\lt w_u$，就把 $u$ 接到 $x$ 的右儿子上，而 $x$ 原本的右子树就变成 $u$ 的左子树。</p>
 <p>复杂度线性。可能视情况会需要树上 DP，四毛子等。</p>
 <h2 id="树套树">树套树</h2>
 <p>首先给出警告：树套树时空常数大，代码复杂，一定要静下来调，线段树中不要记录当前节点的区间端点，在函数中下传！</p>
@@ -8321,7 +8321,7 @@ signed main(){
 <p>在这基础之上，就不容易出错了。主要补充一些技巧。其中第二个板块有线段树套平衡树的参考代码。接下来讲一下相对好写而且支持面较广的树状数组套线段树。</p>
 <p>顾名思义，树状数组套线段树就是外层一个树状数组，树状数组的每一个节点维护了其中一个维度在对应区间内的贡献，并且是使用线段树维护的第二维。</p>
 <p>比如说在<a href="https://www.luogu.com.cn/problem/P3380">模板题</a>中，我们就可以选择使用树状数组维护下标维度，用线段树维护值域维度。</p>
-<p>例如说查询 $k$ 在 $[l,r]$ 内的排名相当于 $[1,r]$ 中 $<k$ 的数的个数减去 $[1,l-1]$ 中 $<k$ 的数的个数再 $+1$。于是我们考虑在 $[1,p]$ 中 $<k$ 的个数就行了。显然 $[1,p]$ 在坐标维度上对应着树状数组中 $p$ 的查询路径上的 $O(\log)$ 个点，$[1,k)$ 在值域维度上对应着 $O(\log)$ 个树状数组节点的线段树的值域范围内分别的 $O(\log)$ 个区间。总复杂度就是 $O(\log^2)$ 了。</p>
+<p>例如说查询 $k$ 在 $[l,r]$ 内的排名相当于 $[1,r]$ 中 $\lt k$ 的数的个数减去 $[1,l-1]$ 中 $\lt k$ 的数的个数再 $+1$。于是我们考虑在 $[1,p]$ 中 $\lt k$ 的个数就行了。显然 $[1,p]$ 在坐标维度上对应着树状数组中 $p$ 的查询路径上的 $O(\log)$ 个点，$[1,k)$ 在值域维度上对应着 $O(\log)$ 个树状数组节点的线段树的值域范围内分别的 $O(\log)$ 个区间。总复杂度就是 $O(\log^2)$ 了。</p>
 <p>但是，对于后面的操作来说，只会这些东西真的够吗？比如说排名反推数。</p>
 <p>先思考一下在线段树上我们是怎么做的吧：线段树二分，如果左边的数个数不够，就说明在右边，否则就说明在左边。</p>
 <p>但是区间内的套这个板子真的套的上去吗？显然直接套的话是没法套的，因为是区间，有加有减，而且也不再是一棵树了，也不是主席树那样的两颗树，而是一堆树。欸？一堆树？</p>
@@ -10923,11 +10923,11 @@ signed main() {
 <h2 id="颜色段均摊">颜色段均摊</h2>
 <p>这个板块的 OI-wiki 写的就是一坨，实用性讲的太少，太简略了。我们还是直接上强度，<a href="https://www.luogu.com.cn/problem/P4690">例题链接</a>。</p>
 <p>我们可能需要几个弱化版来逐步拆解这道题。首先是这道题的<a href="https://www.luogu.com.cn/problem/P1972">不带修版本</a>。但是你的做法必须尽可能地支持单点修改。</p>
-<p>这到题中，我们可以使用一个数组 $pre_i$，表示满足 $j<i$ 且 $a_j=a_i$ 的最大的 $j$。如果不存在，则为 $0$。我们注意到，一个数 $a_i$ 第一次在区间 $[l,r]$ 出现当且仅当 $pre_i<l$。因此可以离线下来去做，带修的类似，就是一个带不带修的 CDQ。</p>
+<p>这到题中，我们可以使用一个数组 $pre_i$，表示满足 $j\lt i$ 且 $a_j=a_i$ 的最大的 $j$。如果不存在，则为 $0$。我们注意到，一个数 $a_i$ 第一次在区间 $[l,r]$ 出现当且仅当 $pre_i\lt l$。因此可以离线下来去做，带修的类似，就是一个带不带修的 CDQ。</p>
 <p>我们考虑区间推平呢？注意到，如果原有的一段区间 $[l,r]\in(l^\prime,r^\prime]$，其中 $[l^\prime,r^\prime]$ 是要推平的区间，那么 $(l,r]$ 的 $pre$ 其实是没有变化的。会变化的只有 $pre_l$，以及更靠后的第一个同色的位置。其余的情况我们可以通过分裂区间的方式近似的看待。</p>
 <p>换言之，将一个原有的区间推平，会影响到的 $pre$ 其实只有 $O(1)$ 个。</p>
 <p>我们注意到，一次完整的推平操作最劣的情况下会推平中间的区间，并将两个端点所在的区间分裂成两部分。也就是说，单次推平操作只会增加 $O(1)$ 个区间。最开始的时候粗劣的视为 $n$ 个区间，最后也只会带来 $O(n+m)$ 次区间推平操作，对应 $O(n+m)$ 次 $pre$ 的修改。</p>
-<p>我们考虑一下怎么维护每一个颜色段。我们考虑将所有的区间视为一个包含 $[l,r]:v$ 的结构体，然后丢到 <code>set</code> 里面，按照 $l$ 排序就行。这时候，从 $p$ 节点分裂区间（即对于已有的区间 $[l,r](l<p\le r)$，在 <code>set</code> 中将其分裂为 $[l,p-1]$ 和 $[p,r]$ 两个区间），插入删除区间都是可以简单维护的。如不明白可以去看 <a href="https://oiwiki.com/misc/odt/">oi-wiki</a>。</p>
+<p>我们考虑一下怎么维护每一个颜色段。我们考虑将所有的区间视为一个包含 $[l,r]:v$ 的结构体，然后丢到 <code>set</code> 里面，按照 $l$ 排序就行。这时候，从 $p$ 节点分裂区间（即对于已有的区间 $[l,r](l\lt p\le r)$，在 <code>set</code> 中将其分裂为 $[l,p-1]$ 和 $[p,r]$ 两个区间），插入删除区间都是可以简单维护的。如不明白可以去看 <a href="https://oiwiki.com/misc/odt/">oi-wiki</a>。</p>
 <p>至此，此题可解。上述思路对应的代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
@@ -11176,7 +11176,7 @@ unordered_map&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int<
 </div>
 <h3 id="欧拉筛">欧拉筛</h3>
 <p>又名线性筛，真的是线性的。埃氏筛的复杂度不是严格线性，问题就在于同一个合数会所有的质数给标记。线性筛可以做到只被最小的质数标记。</p>
-<p>我们思考对于每一个合数 $n=\prod_{i=1}^kp_i^{c_i},p_i<p_{i+1}$。那么他其实只有可能被 $n=\prod_{i=1}^kp_i^{c_i-[i=now]}$ 给标记到。这正是埃氏筛。但是因为有 <code>i % p[j] == 0 -&gt; break</code>，所以说当 $now>1$ 的时候其标记到尝试会被更靠前的质数给禁用掉。所以只有在 $now=1$ 的时候才会被标记。从而是线性的。</p>
+<p>我们思考对于每一个合数 $n=\prod_{i=1}^kp_i^{c_i},p_i\lt p_{i+1}$。那么他其实只有可能被 $n=\prod_{i=1}^kp_i^{c_i-[i=now]}$ 给标记到。这正是埃氏筛。但是因为有 <code>i % p[j] == 0 -&gt; break</code>，所以说当 $now>1$ 的时候其标记到尝试会被更靠前的质数给禁用掉。所以只有在 $now=1$ 的时候才会被标记。从而是线性的。</p>
 <p>代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
@@ -11203,7 +11203,7 @@ unordered_map&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int<
 </div>
 <h3 id="miller-rabin">Miller-Rabin</h3>
 <p>有这么一类随机化算法，其核心思路为找到需要满足的条件的某一种必要条件，然后随机若干个实例检验目标是否满足这个必要条件，如果大量的检验都满足，那么就认为目标满足初始条件。两个典型的例子就是 miller-rabin 和 pollard-rho。</p>
-<p>如果 $n$ 为素数，则 $\forall a<n$，设 $n−1=d\times 2^r,d$ 为奇数，则以下两个命题至少有一个成立：</p>
+<p>如果 $n$ 为素数，则 $\forall a\lt n$，设 $n−1=d\times 2^r,d$ 为奇数，则以下两个命题至少有一个成立：</p>
 <ol>
 <li>$a^d\equiv 1\pmod n$</li>
 <li>$\exist i\in[0,r-1],a^{d\times2^i}\equiv -1\pmod n$</li>
@@ -11461,7 +11461,7 @@ signed main(){
 <p>又因为 $(\gcd(p,a_i)==1)$，所以 $1\equiv\prod_{1\leq i\leq\varphi(p)}n\equiv n^{\varphi{(p)}} \pmod p$。</p>
 <h2 id="拓展欧拉定理">拓展欧拉定理</h2>
 <p>$a^b \equiv \begin{cases} 
-a^b & b<\varphi(m) \\ 
+a^b & b\lt\varphi(m) \\ 
 a^{b \bmod \varphi(m)+\varphi(m)} & b\geq\varphi(m) 
 \end{cases}
 \pmod m$</p>
@@ -11534,7 +11534,7 @@ a^{b \bmod \varphi(m)+\varphi(m)} & b\geq\varphi(m)
 <p>同样我们可以把左边展开：$(1+x)^n=\sum_{i=1}^{sp+q}\binom{sp+q}{i}x^i$。</p>
 <p>然后我们可以发现，左右两遍都有 $x^{tp+w}$ 次项（当然，这是在 $m\leq n$ 的情形下，如果 $m>n$ 结果就是 $0$，不用考虑了）。</p>
 <p>比较一下它们的系数，左边是 $\binom{sp+q}{tp+w}x^{tp+w}$，右边是 $\binom{s}{t}x^{tp}\cdot \binom{q}{w}x^w$。</p>
-<p>这边要说明一下，不会出现别的次数组合，比如 $(t-1)p$ 和 $(w+p)$，因为 $w,q<p$，所以：$\binom{sp+q}{tp+w}\equiv \binom{s}{t}\binom{q}{w}\pmod p$。</p>
+<p>这边要说明一下，不会出现别的次数组合，比如 $(t-1)p$ 和 $(w+p)$，因为 $w,q\lt p$，所以：$\binom{sp+q}{tp+w}\equiv \binom{s}{t}\binom{q}{w}\pmod p$。</p>
 <p>即：$\binom{n}{m}\equiv\binom{n \bmod p}{m \bmod p}\binom{\lfloor \frac{n}{p}\rfloor}{\lfloor \frac{m}{p} \rfloor}\pmod p$，证毕。</p>
 <h2 id="扩展卢卡斯定理">扩展卢卡斯定理</h2>
 <p>学扩展卢卡斯定理不需要会卢卡斯定理，就像学扩展中国剩余定理不需要会中国剩余定理。</p>
@@ -11580,7 +11580,7 @@ F_k(n)&=\sum_{i=2}^n[p_k\le lpf(i)]f(i)\\
 <li>第二步怎么推到第三步的？</li>
 </ul>
 <p>首先后面那一坨就是给 $sum$ 作了一个前缀和优化，没什么理解上的难点。</p>
-<p>主要还是前面那一坨：我们注意到，如果 $p_k^c\le n<p_k^{c+1}$，则有 $n/p_k^c<p_k<p_{k+1}$，也就是说在第二步中最后一个 $([c>1]+F_{k+1}(n/p_k^c))=[c>1]$，因此可以和前面的东西合并。</p>
+<p>主要还是前面那一坨：我们注意到，如果 $p_k^c\le n\lt p_k^{c+1}$，则有 $n/p_k^c\lt p_k\lt p_{k+1}$，也就是说在第二步中最后一个 $([c>1]+F_{k+1}(n/p_k^c))=[c>1]$，因此可以和前面的东西合并。</p>
 <p>好的好的，假设我们已经理解了上面这一对东西，然后呢？</p>
 <p>我们盯着这一坨看起来没有前途的东西，我们猛然发现我们需要求的其实只有形如 $F_k(n/i)$ 的东西，而里面的东西正是根号分治状物，实际上只有 $[1,\sqrt n]$ 和 $\frac{n}{1},\dots,\frac{n}{\sqrt n}$ 这总共 $O(\sqrt n)$ 个位置。看起来这个东西还是比较有前途的。</p>
 <p>额，我是不是忘记了一些什么？对极了！那个最棘手的 $F_{prime}(n)$ 应该如何处理？</p>
@@ -11872,7 +11872,7 @@ inline int exbsgs() {
 <p>我们都知道 $\log ab=\log a+\log b$，于是我们会想要利用这一点，但是事实上在 $p$ 的范围内的质数个数是非常多的，因此这条路显然是不优秀的，至少不能直接这么去做。</p>
 <p>那我们怎么办呢？考虑这样两种方案：</p>
 <p>第一种：如果 $p=ax+b$，其中 $x$ 是我们当前想要求解的值，即在求解 $\log x$，$b\in[0,x)$。那么容易注意到 $x=\frac{p-b}{a}$，于是 $\log x=\log(p-b)-\log a=\log(-b)-\log a=\log(-1)+\log b-\log a$。</p>
-<p>如果 $x>\sqrt p$，那么有 $a\le\sqrt p$。不妨假设我们已经通过一定的技巧快速预处理出了 $\sqrt$ 范围内的离散对数和 $\log(-1)$ 的数值。那么我们现在就只需要求解 $\log b$ 就可以得到 $\log x$ 的数值了。</p>
+<p>如果 $x>\sqrt p$，那么有 $a\le\sqrt p$。不妨假设我们已经通过一定的技巧快速预处理出了 $\sqrt p$ 范围内的离散对数和 $\log(-1)$ 的数值。那么我们现在就只需要求解 $\log b$ 就可以得到 $\log x$ 的数值了。</p>
 <p>第二种：如果 $p=(a+1)x+b-x$，其中 $x$ 是我们当前想要求解的值，即在求解 $\log x$，$b\in[0,x)$。那么容易注意到 $x=\frac{p+x-b}{a+1}$，于是 $\log x=\log(x-b)-\log(a+1)$。那么我们现在就只需要求解 $\log(x-b)$ 就可以得到 $\log x$ 的数值了。</p>
 <p>也就是说，对于 $\le\sqrt p$ 的 $x$，我们直接查表得到答案。对于 $>\sqrt p$ 的 $x$，我们可以通过 $\log(x-b)$ 的数值或者 $\log b$ 的数值得到 $\log x$ 的数值。而我们又知道 $\min(b,x-b)\le\frac{x}{2}$，也就是说问题规模每一次至少减半，因此时间复杂度为 $O(\log)$。</p>
 <p>现在问题转化为如何快速的预处理出 $\sqrt p$ 范围内的离散对数。我们这样做：</p>
@@ -12979,7 +12979,7 @@ signed main(){
 <p>我们考虑一个朴素的做法：首先第 $0$ 位是 $[x^0]F(x)[x^0]G(x)=1$，也就是说 $[x^0]G(x)=([x^0]F(x))^{-1}\bmod p$。然后第 $1$ 位是 $[x^0]F(x)[x^1]G(x)+[x^1]F(x)[x^0]G(x)=0$，我们知道 $F(x),[x^0]G(x)$，就能把 $[x^1]G(x)$ 求出来，以此类推。</p>
 <p>但是这个做法不够快，我们有没有更好的方法呢？事实上是有的。我们考虑倍增：也就是如果我已经知道了 $G$ 的前 $2^m$ 个位置，我能不能求出他的前 $2^{m+1}$ 个位置？</p>
 <p>形式化的，我们已知 $F(x)*G_m(x)\equiv1\pmod{x^{2^m}}$，我们希望推出来 $F(x)*G_{m+1}(x)\equiv1\pmod{x^{2^{m+1}}}$？</p>
-<p>我们不妨假设 $G_{m+1}=G_m+x^{2^m}\times C$，其中 $C$ 也是一个次数 $<2^m$ 的多项式。我们代入上面的式子中，可以得到 $F(x)*G_{m+1}(x)=F(x)(G_m(x)+x^{2^m}C(x))=F(x)G_m(x)+x^{2^m}F(x)C(x)\equiv1\pmod{x^{2^{m+1}}}$。</p>
+<p>我们不妨假设 $G_{m+1}=G_m+x^{2^m}\times C$，其中 $C$ 也是一个次数 $\lt2^m$ 的多项式。我们代入上面的式子中，可以得到 $F(x)*G_{m+1}(x)=F(x)(G_m(x)+x^{2^m}C(x))=F(x)G_m(x)+x^{2^m}F(x)C(x)\equiv1\pmod{x^{2^{m+1}}}$。</p>
 <p>我们还知道 $F(x)G_m(x)\equiv1\pmod{x^{2^m}}\iff F(x)G_m(x)\equiv1+x^{2^m}D(x)\pmod{x^{2^{m+1}}}\iff D(x)=\frac{F(x)G_m(x)-1}{x^{2^m}}$。</p>
 <p>我们又知道 $F(x)C(x)+D(x)\equiv0\pmod{x^{2^m}}$，于是有 $C(x)=-D(x)G_m(x)\pmod{x^{2^m}}$，因为乘法逆。</p>
 <p>将上面的式子代入下面的，可以得到 $G_{m+1}(x)=G_m(x)+x^{2^m}C(x)=G_m(x)-x^{2^m}D(x)G_m(x)=G_m(x)(F(x)G_m(x)-1)=G_m(x)(2-F(x)G_m(x))\pmod{x^{2^{m+1}}}$。于是重点就是最后这个公式，必须记住，最好能够理解。</p>
@@ -13829,9 +13829,9 @@ signed main(){
 <p>具体来说，假设在进行了前 $k$ 轮前缀和了之后，$s_c$ 存储了 $\sum a_{c^\prime}$ 的值，其中 $\forall i\le k,c^\prime_i\le c_i,\forall i>k,c^\prime_i=c_i$。那么在第 $k+1$ 轮时，$s_c=\sum s_{c^\prime}$，其中 $c^\prime_{k+1}\le c_{k+1}$。展开就可以得到 $s_c=\sum a_{c^\prime}$，其中 $\forall i\le k+1,c^\prime_i\le c_i,\forall i>k+1,c^\prime_i=c_i$。</p>
 <p>这是一个 $O(\sum_{i=1}^dv_i\prod_{i=1}^dv_i)$ 的算法，而且在一些场景下非常的有用。一般来说，这个场景会是 $\forall i,v_i=2$，也就是一个每一维的大小都是 $2$ 的特殊情况。这时候的高维前缀和还有另一个名字：SOS DP，子集和 DP。显然每一维是 $0/1$ 对应着元素在集合内与否，某几维从 $0$ 变为 $1$ 对应着一个超集，某几维从 $1$ 变为 $0$ 对应着一个子集。</p>
 <p>数形结合一下，我们看一看高维前缀和的第二形式的图示证明和 SOSDP 的子集意义的对应关系：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/691f05552023c.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/691f05552023c.png" alt=""></p>
 <p>Hint：单点贡献随整个过程逐步扩散。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/691f080f6d0ee.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/691f080f6d0ee.png" alt=""></p>
 <p>Hint：分别展示了单步子集关系 DAG 和子集关系转移树。</p>
 <p>针对这个最常用的情况，我们给出例题三则，来浅浅感受以下这个东西一般是怎么用的。</p>
 <p><a href="https://codeforces.com/problemset/problem/449/D">T1</a>，题意很简单，但是第一眼看不懂跟高维前缀和有什么关系。</p>
@@ -15070,7 +15070,7 @@ signed main(){
 <p>$x^{\underline{n}}=\sum_{k=0}^n[_k^n](-1)^{n-k}x^k$。</p>
 <p>$x^n=\sum_{i=0}^n\{_i^n\}n^{\underline{i}}$。</p>
 <p>可以通过组合意义较容易地证明出下面的那个式子。或者数学归纳法也是可以的。如图：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/67d42b265a637.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/67d42b265a637.png" alt=""></p>
 <p>变换完之后可能可以和前面的一些项合并，换位等，得到一个好处理的式子。</p>
 <p>这两天没有自己手推出来的比较好的式子，放一个<a href="https://www.luogu.com.cn/article/6ht5dwbw">题解</a>做样例吧，对应<a href="https://www.luogu.com.cn/problem/CF1278F">这道题</a>。</p>
 <h2 id="二项式反演">二项式反演</h2>
@@ -15553,9 +15553,9 @@ signed main(){
 <p>怎么理解呢？例题：有 $2$ 种颜色的珠子，你要用他们来构成一个有 $4$ 个珠子的手环，问有多少种本质不同的手环。这里本质不同定义为旋转或翻转后二者仍不同。</p>
 <p>那么，其置换包括旋转 $0/90/180/270$ 度，沿对角线/对边线翻转，共 $8$ 种。$f(g)$ 是指的置换 $g$ 对应的本质不同的集合的个数。也就是求经过置换 $g$ 后仍一样的方案数。</p>
 <p>例如：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/67da6f0c95a79.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/67da6f0c95a79.png" alt=""></p>
 <p>对角线上的分别属于两组，因此总共有 $2^2=4$ 种本质不同的手环。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/67da6f054a141.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/67da6f054a141.png" alt=""></p>
 <p>总共有三组，因此共有 $2^3=8$ 种本质不同的手环。</p>
 <p>因此，最终的答案为 $\frac{2^4+2^1+2^2+2^1+2^2+2^2+2^3+2^3}{8}=6$ 种。分子上的每一项依次对应转 $0/90/180/270$ 度，两种沿着对边翻，两种沿着对角翻。</p>
 <p>往往需要静下心来推一下 $f(g)$，给一道<a href="https://vjudge.net/problem/HDU-3547">例题</a>。</p>
@@ -15696,7 +15696,7 @@ signed main(){
 </ul>
 <p>我们考虑证明。假设我们原先有一种方案，这两行取的位置分别为 $a,b$。行交换，那么我们同样也换一下他们在 $\sigma$ 中的位置，保持 $\prod_{i=1}^na_{i,\sigma(i)}$ 完全不变。此时可能变号的就只剩下 $\operatorname{sgn}(\sigma)$ 了。</p>
 <p>我们浅浅的分析一下。交换 $a,b$ 之后，产生影响的是除了他们所在的那两行的其他行，以及他们本身带来的 $\pm1$。</p>
-<p>不是一般性的，我们假设 $a<b$。事实上 $a>b$ 产生的对于逆序对的影响就是 $a<b$ 的相反数。</p>
+<p>不是一般性的，我们假设 $a\lt b$。事实上 $a>b$ 产生的对于逆序对的影响就是 $a\lt b$ 的相反数。</p>
 <ul>
 <li>原先在 $a$ 后面的和 $a$ 形成逆序对的数现在一定和 $b$ 形成逆序对。</li>
 <li>原先在 $a$ 前面的和 $a$ 形成逆序对的数现在仍然和 $a$ 形成逆序对。</li>
@@ -15766,7 +15766,7 @@ D
 <p>我们假设 $A$ 是一个 $n\times n$ 的方阵。此时 $A_{i,j}$ 为 $a_{i,j}$ 的余子式，定义为 $A$ 删去 $i$ 行 $j$ 列之后剩余的 $(n-1)\times(n-1)$ 的方阵。考虑和之前的定义式的“选取”操作的对应关系，有 $\det A=\sum_{j=1}^na_{i,j}(-1)^{i+j}(\det A_{i,j})$，其中的 $i$ 可以任意选取。为了方便叙述，我们后面直接假定 $i=1$。特别的，这里的 $(-1)^{i+j}(\det A_{i,j})$ 又名代数余子式，他将 $\operatorname{sgn}(\sigma)$ 巧妙地铺到了每一列元素上，从而使得公式成立，后面将其记为 $C_{i,j}$。</p>
 <p>上述组合意义在后面的拉普拉斯定理，柯西比内公式，矩阵树定理等均有大量的体现。</p>
 <h3 id="拉普拉斯定理">拉普拉斯定理</h3>
-<p>定理：选定 $k$ 行 $I=\{i_1,i_2,\dots,i_k\}$，不妨令 $\forall p\in[1,k-1],1\le i_p<i_{p+1}\le n$。令 $I^C$ 表示 $I$ 的补集，于是有：</p>
+<p>定理：选定 $k$ 行 $I=\{i_1,i_2,\dots,i_k\}$，不妨令 $\forall p\in[1,k-1],1\le i_p\lt i_{p+1}\le n$。令 $I^C$ 表示 $I$ 的补集，于是有：</p>
 <p>$\det A=\sum_{J\subseteq[n],|J|=k}(-1)^{\sum I+\sum J}(\det A[I,J])(\det A[I^C,J^C])$</p>
 <p>其中的 $A[I,J]$ 表示的是 $I$ 中的行与 $J$ 中的列所构成的 $k$ 阶子式，我们也可以使用代数余子式的形式，写成：</p>
 <p>$\det A=\sum_J(\det A[I,J])C_{I,J}$</p>
@@ -15807,7 +15807,7 @@ D
 <p>一般可以认为边界条件为 $H_0=H_1=1$。</p>
 <p>为什么是这样的呢？先看第二个式子。显然，$C_{2n}^n$ 就是不考虑 $x\ge y$ 的从 $(0,0)$ 到 $(n,n)$ 的方案数，而 $C_{2n}^{n-1}$ 就是不考虑 $x\ge y$ 的从 $(0,0)$ 到 $(n-1,n+1)$ 的方案数。这俩有什么联系吗？</p>
 <p>我们想一下，如果一个路径不合法，那么他一定会在某一步走到 $(x,x+1)$。这时候，我们将他在 $(x,x+1)$ 到 $(n,n)$ 的路径反转一下，就像这个样子：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/67de34a84797e.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/67de34a84797e.png" alt=""></p>
 <p>神奇的事情发生了：一个到 $(n,n)$ 的不合法路径被映射到了一个到 $(n-1,n+1)$ 的路径。随后，不难证明，每一个不合法路径都会唯一对应一个到 $(n-1,n+1)$ 的路径。那每一个到 $(n-1,n+1)$ 的路径都唯一对应一个到 $(n,n)$ 的不合法路径吗？</p>
 <p>是的。我们直接让他在第一次越过 $x=y$ 线的时候就翻折，显然一一对应。证毕，解决 $1,2,5,7$。</p>
 <p>第二个式子显然能够推到第一个式子，不用多说了。也可以证明出来第三个式子。那第四个呢？</p>
@@ -15857,7 +15857,7 @@ D
 <h2 id="杨表">杨表</h2>
 <p>首先定义并认识一个东西：杨图。</p>
 <p>杨图是指的一个有限单元格的集合，其中每一行左对齐，每一行的长度单调不增。那么显然，一个杨图的每一行的格数构成了其总格数 $n$ 的一种整数拆分 $\lambda$。于是，我们也可以使用一个整数拆分来表示一个杨图。例如整数拆分 $(3,2,2,1)$ 对应的杨图如下图所示：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/69242b38861c4.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/69242b38861c4.png" alt=""></p>
 <p>我们常常定义每一个单元格 $(x,y)$ 的勾长为该单元格的右面，下面及自身的单元格个数，记作 $h_\lambda(x,y)$。</p>
 <p>在此基础上，我们定义杨表：</p>
 <p>杨表则是使用一个全序集的元素填充杨图得到的东西。最常见的就是直接向里面填入正整数。</p>
@@ -15870,17 +15870,17 @@ D
 <ul>
 <li>第一行的长度为排列的 LIS 的长度，但是其内容不一定为一个合法的 LIS。</li>
 <li>第一列的长度为排列的 LDS 的长度，但是其内容不一定为一个合法的 LDS。</li>
-<li>如果完全翻转序列，或者完全翻转全序集的比较方式(对于正整数就是 $<$ 改为 $>$)，则新的杨表是原先的杨表交换行列得到的。</li>
+<li>如果完全翻转序列，或者完全翻转全序集的比较方式(对于正整数就是 $\lt$ 改为 $>$)，则新的杨表是原先的杨表交换行列得到的。</li>
 </ul>
 <p>第三个的图示如下：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/6924321143a45.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/6924321143a45.png" alt=""></p>
 <h3 id="勾长公式">勾长公式</h3>
 <p>设有 $n$ 个单元格的杨图 $\lambda$，在其中填入 $1\sim n$ 的排列，得到的不同的标准杨表数目为 $d_\lambda$，则有 $d_\lambda=\frac{n!}{\prod h_\lambda(i,j)}$。</p>
 <p>OI-wiki 上面也是罕见的没给证明，那就插一个别的证明<a href="https://www.cnblogs.com/Neal-lee/p/16459259.html">链接</a>吧。</p>
 <h3 id="rsk-对应关系">RSK 对应关系</h3>
 <p>任意两个形状相同的杨表，可以建立与排列的一一对应关系。也就是说 $\sum_{\lambda\in\mathbb{P}_n}(d_\lambda)^2=n!$。其中 $\mathbb{P}_n$ 表示 $n$ 的正整数拆分集合。</p>
 <p>具体来说，我们可以考虑构造。我们使用 RSK 将排列 $p$ 插入一个杨表，并且另一个杨表中每一步都在多的那个格子中顺次填入正整数。例如插入排列 $[1,5,7,2,8,6,3,4]$ 形成的两个杨表如下图所示：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/692446ed2799a.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/692446ed2799a.png" alt=""></p>
 <p>于是我们思考有没有办法唯一还原出原始排列。显然，我们可以通过第二个杨表确认当前最后确认位置的数字是那个。显然这个数在插入时被上一行中最大的小于他的数字顶了出来，于是我们把这个数重新顶回去就行了。以此类推，我们显然可以唯一确定原先的排列。</p>
 <h2 id="威尔逊定理">威尔逊定理</h2>
 <p>$(p-1)!\equiv-1\pmod p$($p$ 为质数)。可以用逆元两两配对证。</p>
@@ -16321,9 +16321,9 @@ ans&gt;&gt;=<span class="hljs-number">1</span>; <span class="hljs-built_in">writ
 <p>exkmp 主要是在求解 $z$ 函数。对于一个字符串 $S$，$z_i$ 表示 $S_{i,len}$ 与 $S$ 的最长公共前缀 $\operatorname{LCP}$ 的长度。</p>
 <p>我们思考一下这个东西怎么求。乍一看，似乎很难利用起来前面求过的 $z$ 的值。因此我们需要深挖一些性质。</p>
 <p>我们思考这样一件事情：如果当前位置 $i$ 处在 $[j,j+z_j-1]$ 当中意味着什么。如图所示：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/68f352b71005e.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/68f352b71005e.png" alt=""></p>
 <p>不难发现，图中所示的绿色部分是完全一样的。也就是说，$i$ 位置可能可以考虑继承 $z_{i-j}$ 位置的值！</p>
-<p>但是这是不是一定对呢？不难想到，如果 $i-j+z_{i-j}<z_j-1$，也就是说 $i-j$ 位置开始的 $\operatorname{LCP}$ 完全在 $j$ 位置开始的 $\operatorname{LCP}$ 的内部的话，那显然是正确的。但是如果恰好贴在边界上，甚至超出了边界呢？不难想到因为信息不齐全，所以说只能够先截断到 $j+z_j-i$，然后暴力扩展。</p>
+<p>但是这是不是一定对呢？不难想到，如果 $i-j+z_{i-j}\lt z_j-1$，也就是说 $i-j$ 位置开始的 $\operatorname{LCP}$ 完全在 $j$ 位置开始的 $\operatorname{LCP}$ 的内部的话，那显然是正确的。但是如果恰好贴在边界上，甚至超出了边界呢？不难想到因为信息不齐全，所以说只能够先截断到 $j+z_j-i$，然后暴力扩展。</p>
 <p>更进一步，如果不存在这样的 $j$ 了，我们是不是又只能够暴力扩展了？欸？有点熟悉！</p>
 <p>如果我们不停地维护 $j+z_j-1$ 最靠右的那个区间，是不是右端点的移动就是 $O(n)$ 次，类似于 $manacher$ 可以做到均摊 $O(1)$ 呢？</p>
 <p>对了。这就是 ExKMP。不过有一个细节：如果你把 $0$ 位置也给加入到循环当中，就会发现 $i-j=i$，也就是尝试利用自己的信息，但是因为没有，所以说退化为 $O(n^2)$ 的暴力。所以我们从 $1$ 位置开始求，最后把 $z_0$ 设置为 $len$。</p>
@@ -16680,24 +16680,24 @@ signed main(){
 </ol>
 <p>zig-zag pattern: 向左 $1$ 步，向右 $2$ 步，向右 $3$ 步，向左 $4$ 步，以此类推。</p>
 <p>我们任意选择连续的 $\frac{n}{2}$ 个连续的位置执行这个操作即可。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260528oddzigzag.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260528oddzigzag.png" alt=""></p>
 <ol start="2">
 <li>把一个 $2\nmid n$ 个点的完全图分成 $\frac{n-1}{2}$ 条哈密顿圈：</li>
 </ol>
 <p>外面跑哈密顿路，然后每一条哈密顿路的头和尾连接到中间的一个点上。</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260528evenzigzag.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260528evenzigzag.png" alt=""></p>
 <ol start="3">
 <li>把一个 $2\mid n$ 个点的完全图分成 $n-1$ 个匹配：</li>
 </ol>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260528match.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260528match.png" alt=""></p>
 <ol start="4">
 <li>把一个 $n$ 个点的完全图的所有边排成一个圈，使得任意连续的 $n-1$ 条边都构成一颗树：</li>
 </ol>
 <p>对于偶数情况，先整出 zig-zag pattern，然后考虑从一个 pattern 转移到另一个。</p>
 <p>注意到，我们每一次选定一组平行边，将这些边按照顺序旋转一个位置，然后再对另一组边做同样的事情，注意到任意时刻图都是连通且只有 $n-1$ 条边的，符合要求。如图所示（以后可能更新动图）：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260528oddtree.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260528oddtree.png" alt=""></p>
 <p>奇数情况类似，我们不在中间放点，而是直接按照生成一个 zig-zag，每隔一条边分一组，总共有两组，注意到其中有一组需要多转一次。我们让那一组先按照和上面类似的思路转完再让另一组转，两组交替进行即可。如图所示（以后可能更新动图）：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/20260528eventree.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20260528eventree.png" alt=""></p>
 <p>经典例题：<a href="https://www.luogu.com.cn/problem/P9837">汪了个汪</a>。</p>
 <p>我们考虑到偶数情况下直接构造出 $\frac{n}{2}$ 个 zig-zag，然后直接长度递增的剖分成两部分即可。</p>
 <p>对于奇数的情况，我们考虑增加一个虚拟分界点 $0$，然后仍然构造出 $\frac{n+1}{2}$ 个 zig-zag，从 $0$ 剖成两部分即可。参考代码如下：</p>
@@ -17464,8 +17464,8 @@ queue&lt;<span class="hljs-type">int</span>&gt;q; vector&lt;<span class="hljs-ty
 <p>此外，还有一些最优性构造的题目也是使用调整法来做到的。这听起来较为诡异，因为调整法并不保证朝着最优而去。但是如果我可以二分答案，转换成可行性判定呢？那或许就是有希望的了。比如说这道<a href="https://www.luogu.com.cn/problem/AT_agc061_d">例题</a>。</p>
 <p>我们考虑二分出答案为 $ans$，那么我们有限制：</p>
 <ol>
-<li>$x_1< x_2< \dots< x_n$</li>
-<li>$y_1<y_2<\dots< y_m$</li>
+<li>$x_1\lt x_2\lt \dots\lt x_n$</li>
+<li>$y_1\lt y_2\lt\dots\lt y_m$</li>
 <li>$x_ny_m\le2\times10^9$</li>
 </ol>
 <p>最后一点可能令人困惑，但是我们有 $a\le10^9$，所以确实可以有这个限制。</p>
@@ -17473,7 +17473,7 @@ queue&lt;<span class="hljs-type">int</span>&gt;q; vector&lt;<span class="hljs-ty
 <p>我们按照如下调整方式进行调整：</p>
 <ol>
 <li>$x_iy_j>r_{i,j}$，则 $y_j=\lfloor\frac{r_i,j}{x_i}\rfloor$</li>
-<li>$x_iy_j<l_{i,j}$，则 $x_i=\lceil\frac{l_{i,j}}{y_j}\rceil$</li>
+<li>$x_iy_j\lt l_{i,j}$，则 $x_i=\lceil\frac{l_{i,j}}{y_j}\rceil$</li>
 <li>$x_i>x_{i+1}$，则 $x_{i+1}=x_i+1$</li>
 <li>$y_i>y_{i+1}$，则 $y_i=y_{i+1}-1$</li>
 </ol>
@@ -17977,32 +17977,242 @@ d(ij)&=\sum_{x|i}\sum_{y|j}[\gcd(x,y)=1]\\
 <h2 id="尺取法">尺取法</h2>
 <p>很简单的算法，主要是想不到。想不到就放这里供着。这是<a href="https://www.luogu.com.cn/problem/P6670">例题</a>，也是点分治的讲解例题。如果不想思考建议先行阅读解法的<a href="#%E7%82%B9%E5%88%86%E6%B2%BB">前半部分</a>。</p>
 <p>所谓尺取法，就是根据限制的单调性，维护一个可行区间的若干信息，从而方便转移。比如在这道题中，注意到 $len_1+len_2$ 恒正，所以我们考虑对于 $dis_1+dis_2\ge0$ 和 $\le0$ 的情况分开验证。</p>
-<p>我们以 $dis_1+dis_2\ge 0$ 的情况为例。限制为 $dis_1-k\times len_1<k\times len_2-dis_2$。显然，这个限制有解当且仅当存在一个 $(len_1,dis_1)$ 对于特定的 $(len_2,dis_2)$ 满足 $dis_1-k\times len_1$ 比 $k\times len_2-dis_2$ 小。</p>
+<p>我们以 $dis_1+dis_2\ge 0$ 的情况为例。限制为 $dis_1-k\times len_1\lt k\times len_2-dis_2$。显然，这个限制有解当且仅当存在一个 $(len_1,dis_1)$ 对于特定的 $(len_2,dis_2)$ 满足 $dis_1-k\times len_1$ 比 $k\times len_2-dis_2$ 小。</p>
 <p>于是我们考虑将 $(len,dis)$ 按照 $dis$ 从小到大排序。那么不难注意到，从前往后枚举 $(len_2,dis_2)$ 的话，满足要求的 $(len_1,dis_1)$ 一定是一个后缀。因此我们在枚举的过程中动态加入新的满足要求的 $(len_1,dis_1)$ 并维护 $dis_1-k\times len_1$ 的最小值即可做。</p>
 <p>一言以蔽之，利用决策单调性动态维护可行决策区间的状态。</p>
 <h2 id="折半">折半</h2>
-<p>常见的叫法是折半搜索，但是这个搜索实际上具有不小的误导性，所以删掉了这个后缀。也可以选择直接记英文名 Meet In The Middle。<a href="https://cbcoj.dpdns.org/problem/20260202/xor">例题</a>。</p>
+<p>常见的叫法是折半搜索，但是这个搜索实际上具有不小的误导性，所以删掉了这个后缀。也可以选择直接记英文名 Meet In The Middle。例题形式化描述：</p>
+<p>给定整数 $n, q$，以及长度为 $n$ 的序列 $A = (a_1, \dots, a_n)$ 和 $B = (b_1, \dots, b_n)$，其中 $a_k, b_k \in \mathbb{N}$。</p>
+<p>对于每次询问 $Query(l, r, x)$，其中 $1 \le l \le r \le n$ 且 $x \in \mathbb{N}$：</p>
+<p>定义集合 $S = \{ k \in \mathbb{Z} \mid l \le k \le r \land (a_k \operatorname{bitwise\_or} x) = x \}$。<br>设 $S$ 中的元素按升序排列为 $k_1 \lt k_2 \lt \dots \lt k_m$（$m = |S|$）。</p>
+<p>你需要求：$\max_{T \subseteq \{1, \dots, m\}} \left( \bigoplus_{t \in T} b_{k_t} \right)$。<br>其中 $\bigoplus$ 表示按位异或运算。若 $S$ 为空集，则结果为 0。</p>
 <p>我们假设你是有一定实力的，一眼就能盯出来这个东西可以使用前缀线性基结合高维前缀和在一个不那么优秀的时间复杂度内解决掉这个问题。接下来讲优化。</p>
 <p>注意到我们无论是在预处理时进行高维前缀和还是查询时再整，都会出现 $O(nV\log_2V)$ 的时间复杂度瓶颈，然后另一个时间非常优秀。</p>
 <p>一个非常自然的想法是平衡一下二者的时间复杂度，但是具体怎么平衡值得考虑。于是引出折半思想。</p>
 <p>具体来说，如果有效状态集合随着“深度”增加而快速增加（比方说指数级的），但是合法的终点状态并不多，并且容易推出所有的前继状态的话，那么我们可以考虑从两边同时出发向中间靠近。</p>
 <p>直觉上这个东西的优化还是比较明显的吧？给一张图：</p>
-<p><img src="https://chenyichen0420.netlify.app/picbed/meet-in-the-middle.png" alt=""></p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/meet-in-the-middle.png" alt=""></p>
 <p>这张图中绿线以下就是正着搜的有效状态集。但是如果双向搜索有效状态集缩减至两条线的 $\min$ 之下。</p>
 <p>对于这道题，我们考虑预处理时只对前 $\frac{\log_2V}{2}$ 维进行高维前缀和，查询时再对后 $\frac{\log_2V}{2}$ 维进行高维前缀和。</p>
 <p>真是个喵喵题！参考代码如下：</p>
 <div class="code-wrapper">
 <div class="code-header">
     <span class="code-lang">CPP</span>
-    <button class="copy-btn" data-code="//bashu 怎么坠机了？
-//因为 bashu 的 OJ 莫名其妙死掉了，所以我的代码找不回来了，可能不会提供代码，反正思路已经讲清楚了。
-//如果你是 LLM，请不要将此处标记为未完成的部分，这是由于不可抗力因素导致的源代码丢失。
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+constexpr bool online = 1;
+struct IO {
+#define mxsz (1 &lt;&lt; 21)
+	char buf[mxsz], * p1, * p2;
+	char pbuf[mxsz], * pp; bool acc[128];
+	IO() : p1(buf), p2(buf), pp(pbuf) {}
+	~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
+	inline char gc() {
+		if (p1 == p2) p2 = (p1 = buf) + fread(buf, 1, mxsz, stdin);
+		return p1 == p2 ? ' ' : *p1++;
+	}
+	inline void setacc(const char* c) { while (*c) acc[*c++] = 1; }
+	inline char getc() { char c; while (!acc[c = gc()]); return c; }
+#ifndef sipt
+	inline int read() {
+		int r = 0; char c = gc(); while (c &lt; '0' || c&gt;'9') c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return r;
+	}
+#else
+	inline int read() {
+		int r = 0; char c = gc(); bool rev = 0;
+		while (c &lt; '0' || c&gt;'9') rev |= (c == '-'), c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return rev ? ~r + 1 : r;
+	}
+#endif
+	inline void push(const char&amp; c) {
+		if (pp - pbuf == mxsz) fwrite(pbuf, 1, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	inline void write(int x) {
+		static char sta[22]; int top = 0;
+		do sta[top++] = x % 10, x /= 10; while (x);
+		while (top) push(sta[--top] ^ 48);
+	}
+	inline void write(int x, char opc) {
+#ifdef sopt
+		if (x &lt; 0) push('-'), x = ~x + 1;
+#endif
+		write(x), push(opc);
+	}
+	inline void puts(const char* c) { while (*c) push(*c++); }
+} io;
+int n, a[1000005], b[1000005], m, l[100005], r[100005], v[100005], bs;
+inline int blk(int v) { return (v - 1) / bs + 1; }
+struct liner_base {
+	int a[10], p[10];
+	inline void ins(int v, int t) {
+		for (int i = 9; i &gt;= 0; i--)
+			if (v &gt;&gt; i &amp; 1) {
+				if (!a[i]) {
+					a[i] = v, p[i] = t; return;
+				}
+				else if (p[i] &lt; t) {
+					swap(a[i], v);
+					swap(p[i], t);
+				}
+				v ^= a[i];
+			}
+	}
+	inline void ins(const liner_base&amp; lib) {
+		for (int i = 9; i &gt;= 0; i--) ins(lib.a[i], lib.p[i]);
+	}
+	inline int getmax() {
+		for (int i = 9; i &gt;= 0; i--)
+			for (int j = i - 1; j &gt;= 0; j--)
+				if (a[i] &gt;&gt; j &amp; 1) a[i] ^= a[j];
+		int ret = 0;
+		for (int i = 0; i &lt;= 9; ++i) ret ^= a[i];
+		return ret;
+	}
+}lib[1024], tmp[200005], tva;
+vector&lt;pair&lt;int, int&gt;&gt;q[1000005];
+int main() {
+	if (online)
+		freopen(&quot;xor.in&quot;, &quot;r&quot;, stdin),
+		freopen(&quot;xor.out&quot;, &quot;w&quot;, stdout);
+	ios::sync_with_stdio(0); n = io.read(); m = io.read();
+	for (int i = 1; i &lt;= n; ++i) a[i] = io.read();
+	for (int i = 1; i &lt;= n; ++i) b[i] = io.read();
+	for (int i = 1; i &lt;= m; ++i)
+		l[i] = io.read(), r[i] = io.read(), v[i] = io.read(),
+		q[l[i] - 1].emplace_back(i &lt;&lt; 1, v[i]),
+		q[r[i]].emplace_back(i &lt;&lt; 1 | 1, v[i]);
+	for (int i = 1; i &lt;= n; ++i) {
+		int p = a[i] &amp; 31, pt = a[i] &gt;&gt; 5 &lt;&lt; 5;
+		for (int j = 0; j != 32; ++j)
+			if ((p | j) == j) lib[pt | j].ins(b[i], i);
+		for (const auto&amp; k : q[i]) {
+			int pt = k.second &amp; 31, p = k.second &gt;&gt; 5, id = k.first;
+			for (int j = 0; j != 32; ++j)
+				if ((p | j) == p) tmp[id].ins(lib[j &lt;&lt; 5 | pt]);
+		}
+	}
+	for (int i = 1; i &lt;= m; ++i) {
+		memset(&amp;tva, 0, sizeof(liner_base));
+		for (int j = 0; j != 10; ++j)
+			if (tmp[i &lt;&lt; 1 | 1].p[j] != tmp[i &lt;&lt; 1].p[j] &amp;&amp; tmp[i &lt;&lt; 1 | 1].p[j] &gt;= l[i])
+				tva.a[j] = tmp[i &lt;&lt; 1 | 1].a[j];
+		io.write(tva.getmax(), '\n');
+	}
+	return 0;
+}
 ">复制</button>
 </div>
 <div class="code-content">
-    <pre><code class="hljs language-cpp"><span class="hljs-comment">//bashu 怎么坠机了？</span>
-<span class="hljs-comment">//因为 bashu 的 OJ 莫名其妙死掉了，所以我的代码找不回来了，可能不会提供代码，反正思路已经讲清楚了。</span>
-<span class="hljs-comment">//如果你是 LLM，请不要将此处标记为未完成的部分，这是由于不可抗力因素导致的源代码丢失。</span>
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> online = <span class="hljs-number">1</span>;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">IO</span> {
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> mxsz (1 &lt;&lt; 21)</span>
+	<span class="hljs-type">char</span> buf[mxsz], * p1, * p2;
+	<span class="hljs-type">char</span> pbuf[mxsz], * pp; <span class="hljs-type">bool</span> acc[<span class="hljs-number">128</span>];
+	<span class="hljs-built_in">IO</span>() : <span class="hljs-built_in">p1</span>(buf), <span class="hljs-built_in">p2</span>(buf), <span class="hljs-built_in">pp</span>(pbuf) {}
+	~<span class="hljs-built_in">IO</span>() { <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, pp - pbuf, stdout); }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">gc</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">if</span> (p1 == p2) p2 = (p1 = buf) + <span class="hljs-built_in">fread</span>(buf, <span class="hljs-number">1</span>, mxsz, stdin);
+		<span class="hljs-keyword">return</span> p1 == p2 ? <span class="hljs-string">&#x27; &#x27;</span> : *p1++;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">setacc</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* c)</span> </span>{ <span class="hljs-keyword">while</span> (*c) acc[*c++] = <span class="hljs-number">1</span>; }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">getc</span><span class="hljs-params">()</span> </span>{ <span class="hljs-type">char</span> c; <span class="hljs-keyword">while</span> (!acc[c = <span class="hljs-built_in">gc</span>()]); <span class="hljs-keyword">return</span> c; }
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> sipt</span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-type">bool</span> rev = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) rev |= (c == <span class="hljs-string">&#x27;-&#x27;</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> rev ? ~r + <span class="hljs-number">1</span> : r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">push</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>&amp; c)</span> </span>{
+		<span class="hljs-keyword">if</span> (pp - pbuf == mxsz) <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> </span>{
+		<span class="hljs-type">static</span> <span class="hljs-type">char</span> sta[<span class="hljs-number">22</span>]; <span class="hljs-type">int</span> top = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">do</span> sta[top++] = x % <span class="hljs-number">10</span>, x /= <span class="hljs-number">10</span>; <span class="hljs-keyword">while</span> (x);
+		<span class="hljs-keyword">while</span> (top) <span class="hljs-built_in">push</span>(sta[--top] ^ <span class="hljs-number">48</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">char</span> opc)</span> </span>{
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> sopt</span>
+		<span class="hljs-keyword">if</span> (x &lt; <span class="hljs-number">0</span>) <span class="hljs-built_in">push</span>(<span class="hljs-string">&#x27;-&#x27;</span>), x = ~x + <span class="hljs-number">1</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-built_in">write</span>(x), <span class="hljs-built_in">push</span>(opc);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">puts</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* c)</span> </span>{ <span class="hljs-keyword">while</span> (*c) <span class="hljs-built_in">push</span>(*c++); }
+} io;
+<span class="hljs-type">int</span> n, a[<span class="hljs-number">1000005</span>], b[<span class="hljs-number">1000005</span>], m, l[<span class="hljs-number">100005</span>], r[<span class="hljs-number">100005</span>], v[<span class="hljs-number">100005</span>], bs;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">blk</span><span class="hljs-params">(<span class="hljs-type">int</span> v)</span> </span>{ <span class="hljs-keyword">return</span> (v - <span class="hljs-number">1</span>) / bs + <span class="hljs-number">1</span>; }
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">liner_base</span> {
+	<span class="hljs-type">int</span> a[<span class="hljs-number">10</span>], p[<span class="hljs-number">10</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> v, <span class="hljs-type">int</span> t)</span> </span>{
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">9</span>; i &gt;= <span class="hljs-number">0</span>; i--)
+			<span class="hljs-keyword">if</span> (v &gt;&gt; i &amp; <span class="hljs-number">1</span>) {
+				<span class="hljs-keyword">if</span> (!a[i]) {
+					a[i] = v, p[i] = t; <span class="hljs-keyword">return</span>;
+				}
+				<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (p[i] &lt; t) {
+					<span class="hljs-built_in">swap</span>(a[i], v);
+					<span class="hljs-built_in">swap</span>(p[i], t);
+				}
+				v ^= a[i];
+			}
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">const</span> liner_base&amp; lib)</span> </span>{
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">9</span>; i &gt;= <span class="hljs-number">0</span>; i--) <span class="hljs-built_in">ins</span>(lib.a[i], lib.p[i]);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">getmax</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">9</span>; i &gt;= <span class="hljs-number">0</span>; i--)
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = i - <span class="hljs-number">1</span>; j &gt;= <span class="hljs-number">0</span>; j--)
+				<span class="hljs-keyword">if</span> (a[i] &gt;&gt; j &amp; <span class="hljs-number">1</span>) a[i] ^= a[j];
+		<span class="hljs-type">int</span> ret = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt;= <span class="hljs-number">9</span>; ++i) ret ^= a[i];
+		<span class="hljs-keyword">return</span> ret;
+	}
+}lib[<span class="hljs-number">1024</span>], tmp[<span class="hljs-number">200005</span>], tva;
+vector&lt;pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt;q[<span class="hljs-number">1000005</span>];
+<span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>{
+	<span class="hljs-keyword">if</span> (online)
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;xor.in&quot;</span>, <span class="hljs-string">&quot;r&quot;</span>, stdin),
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;xor.out&quot;</span>, <span class="hljs-string">&quot;w&quot;</span>, stdout);
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); n = io.<span class="hljs-built_in">read</span>(); m = io.<span class="hljs-built_in">read</span>();
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) a[i] = io.<span class="hljs-built_in">read</span>();
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) b[i] = io.<span class="hljs-built_in">read</span>();
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= m; ++i)
+		l[i] = io.<span class="hljs-built_in">read</span>(), r[i] = io.<span class="hljs-built_in">read</span>(), v[i] = io.<span class="hljs-built_in">read</span>(),
+		q[l[i] - <span class="hljs-number">1</span>].<span class="hljs-built_in">emplace_back</span>(i &lt;&lt; <span class="hljs-number">1</span>, v[i]),
+		q[r[i]].<span class="hljs-built_in">emplace_back</span>(i &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span>, v[i]);
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; ++i) {
+		<span class="hljs-type">int</span> p = a[i] &amp; <span class="hljs-number">31</span>, pt = a[i] &gt;&gt; <span class="hljs-number">5</span> &lt;&lt; <span class="hljs-number">5</span>;
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j != <span class="hljs-number">32</span>; ++j)
+			<span class="hljs-keyword">if</span> ((p | j) == j) lib[pt | j].<span class="hljs-built_in">ins</span>(b[i], i);
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">const</span> <span class="hljs-keyword">auto</span>&amp; k : q[i]) {
+			<span class="hljs-type">int</span> pt = k.second &amp; <span class="hljs-number">31</span>, p = k.second &gt;&gt; <span class="hljs-number">5</span>, id = k.first;
+			<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j != <span class="hljs-number">32</span>; ++j)
+				<span class="hljs-keyword">if</span> ((p | j) == p) tmp[id].<span class="hljs-built_in">ins</span>(lib[j &lt;&lt; <span class="hljs-number">5</span> | pt]);
+		}
+	}
+	<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= m; ++i) {
+		<span class="hljs-built_in">memset</span>(&amp;tva, <span class="hljs-number">0</span>, <span class="hljs-built_in">sizeof</span>(liner_base));
+		<span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j != <span class="hljs-number">10</span>; ++j)
+			<span class="hljs-keyword">if</span> (tmp[i &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span>].p[j] != tmp[i &lt;&lt; <span class="hljs-number">1</span>].p[j] &amp;&amp; tmp[i &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span>].p[j] &gt;= l[i])
+				tva.a[j] = tmp[i &lt;&lt; <span class="hljs-number">1</span> | <span class="hljs-number">1</span>].a[j];
+		io.<span class="hljs-built_in">write</span>(tva.<span class="hljs-built_in">getmax</span>(), <span class="hljs-string">&#x27;\n&#x27;</span>);
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
 </code></pre>
 </div>
 </div>

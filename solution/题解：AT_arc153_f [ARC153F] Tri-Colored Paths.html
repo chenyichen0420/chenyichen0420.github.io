@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：AT_arc153_f [ARC153F] Tri-Colored Paths</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>细节决定成败。</p>
+<p>首先 $n\le 4$ 的一定要自己手玩一下，你会发现一些边界，这些东西需要特判掉。</p>
+<p>考虑剩下的情况，我们正难则反，考虑统计不合法的部分的数量。</p>
+<p>容易想到不合法大致有两种情况：</p>
+<ol>
+<li>整张图只有不超过两个颜色。</li>
+<li>删掉某一个点后变成了若干纯色连通块。</li>
+</ol>
+<p>我们考虑计算这些东西。</p>
+<p>直觉上，对于一个环，其上面只能出现两种颜色，否则必然会失败。然而三元环显然是反例，不过好在这是唯一的反例。因此特判 $n=m=3$ 的情况，输出 $0$。</p>
+<p>此外，如果一个三元环向外连接了一条边，那么我们可以让外面的所有边和这个三元环内的对边的颜色一致。此时还能再贡献 $6$ 种情况。显然我们只需要枚举检查有多少个只向外连接一条边的三元环。线性的时空复杂度。</p>
+<p>剩下的情况下，每一个环为了保证有解，向外连了边的必须保证内部出现至多两种颜色。</p>
+<p>然而如果没有向外连边呢？此时整张图的所有点在同一个点双内。只要 $n\ge 5$，就必须满足出现至多两种颜色。$n=4$ 的又有两个边界情况：$m=6$ 和 $m=5$，下图示意了 $m=6$ 的情况下的一种三色构造：</p>
+<p><img src="https://blog.cbcoj.dpdns.org/picbed/20261103tricolor.png" alt=""></p>
+<p>对于第一种情况，直接点双缩点建立圆方树跑一个 $dp_{i,S}$ 表示以 $i$ 为根的子树内部出现过 $S$ 这个集合内的颜色的方案数，直接暴力转移即可。线性的时空复杂度。</p>
+<p>对于第二种情况，考虑直接枚举删除了哪个节点。假设删掉之后剩下了 $c$ 个连通块，要求就是每一种颜色至少出现一次的方案数，显然就是 $3^c-3\times2^c+3$ 种。线性的时空复杂度。</p>
+<p>总上此题可解，参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr bool online=0;
+constexpr int mod=998244353;
+struct IO {
+#define mxsz (1 &lt;&lt; 20)
+	char buf[mxsz], * p1, * p2;
+	char pbuf[mxsz], * pp;
+	IO() : p1(buf), p2(buf), pp(pbuf) {}
+	~IO() { fwrite(pbuf, 1, pp - pbuf, stdout); }
+	inline char gc() {
+		if (p1 == p2) p2 = (p1 = buf) + fread(buf, 1, mxsz, stdin);
+		return p1 == p2 ? ' ' : *p1++;
+	}
+#ifndef sipt
+	inline int read() {
+		int r = 0; char c = gc(); while (c &lt; '0' || c&gt;'9') c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return r;
+	}
+#else
+	inline int read() {
+		int r = 0; char c = gc(); bool rev = 0;
+		while (c &lt; '0' || c&gt;'9') rev |= (c == '-'), c = gc();
+		while (c &gt;= '0' &amp;&amp; c &lt;= '9') r = r * 10 + (c ^ 48), c = gc();
+		return rev ? ~r + 1 : r;
+	}
+#endif
+	inline void push(const char&amp; c) {
+		if (pp - pbuf == mxsz) fwrite(pbuf, 1, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	inline void write(int x) {
+		static char sta[22]; int top = 0;
+		do sta[top++] = x % 10, x /= 10; while (x);
+		while (top) push(sta[--top] ^ 48);
+	}
+	inline void write(int x, char opc) {
+#ifdef sopt
+		if (x &lt; 0) push('-'), x = ~x + 1;
+#endif
+		write(x), push(opc);
+	}
+} io;
+int c,t,n,m,pid,dp[600005][8],tmp[8],p2[1000005],p3[1000005],ans;
+vector&lt;int&gt;son[300005],ns[600005]; stack&lt;int&gt;s;
+int dfn[300005],low[300005],dfc,fa[600005],ec[600005];
+inline void tarjan(int p,int f){
+	dfn[p]=low[p]=++dfc; s.emplace(p);
+	for(int sp:son[p])
+		if(!dfn[sp]){
+			tarjan(sp,p); low[p]=min(low[p],low[sp]);
+			if(low[sp]&gt;=dfn[p]){
+				pid++; fa[pid]=p;
+				ns[p].emplace_back(pid);
+				ns[pid].emplace_back(p);
+				while(s.top()!=sp)
+					ns[pid].emplace_back(s.top()),
+					ns[s.top()].emplace_back(pid),
+					fa[s.top()]=pid,s.pop();
+				ns[pid].emplace_back(s.top());
+				ns[s.top()].emplace_back(pid);
+				fa[s.top()]=pid;s.pop();
+			}
+		}
+		else if(sp!=f) low[p]=min(low[p],dfn[sp]);
+}
+inline int qpow(int a,int b){
+	int ret=1;
+	for(;b;b&gt;&gt;=1,a=a*a%mod)
+		(b&amp;1)&amp;&amp;(ret=ret*a%mod);
+	return ret;
+}
+inline void dfs(int p,int f){
+	for(int sp:ns[p]) if(sp!=f) dfs(sp,p);
+	if(p&gt;n){
+		dp[p][1]=dp[p][2]=dp[p][4]=1;
+		dp[p][3]=dp[p][5]=dp[p][6]=p2[ec[p]]-2;
+	}
+	else{
+		dp[p][0]=1;
+		ans+=p3[ns[p].size()];
+		ans-=p2[ns[p].size()]*3;
+		ans+=3;
+	}
+	for(int sp:ns[p]) if(sp!=f){
+		memcpy(tmp,dp[p],sizeof tmp);
+		memset(dp[p],0,sizeof dp[0]);
+		for(int i=0;i!=8;++i)
+			for(int j=0;j!=8;++j)
+				dp[p][i|j]=(dp[p][i|j]+tmp[i]*dp[sp][j])%mod;
+	}
+}
+signed main(){
+	if(online)
+		freopen(&quot;mindmap.in&quot;,&quot;r&quot;,stdin),
+		freopen(&quot;mindmap.out&quot;,&quot;w&quot;,stdout);
+	ios::sync_with_stdio(0);
+	for(int i=p2[0]=p3[0]=1;i&lt;=1e6;++i)
+		p2[i]=p2[i-1]*2%mod,p3[i]=p3[i-1]*3%mod;
+	for(t=1;t;t--){
+		pid=n=io.read(); m=io.read(); dfc=ans=0;
+		for(int i=1;i&lt;=n;++i) son[i].clear();
+		for(int i=1;i&lt;=n*2;++i) ns[i].clear();
+		for(int i=1,l,r;i&lt;=m;++i)
+			l=io.read(),r=io.read(),
+			son[l].emplace_back(r),
+			son[r].emplace_back(l);
+		if(n==3&amp;&amp;m==3){
+			io.write(0,'\n');
+			continue;
+		}
+		if(n==4&amp;&amp;m==6){
+			io.write(534,'\n');
+			continue;
+		}
+		if(n==4&amp;&amp;m==5){
+			io.write(144,'\n');
+			continue;
+		} 
+		for(int i=1;i&lt;=n*2;++i) ec[i]=0;
+		for(int i=1;i&lt;=n;++i) dfn[i]=low[i]=0;
+		tarjan(1,0); while(s.size()) s.pop();
+		for(int i=1;i&lt;=n;++i)
+			for(int j:son[i])
+				if(dfn[i]&gt;dfn[j]) ec[fa[i]]++;
+		memset(dp,0,sizeof dp); dfs(1,0);
+		ans=(ans+dp[1][1]+dp[1][2]+dp[1][3]+dp[1][4]+dp[1][5]+dp[1][6])%mod;
+		for(int i=n+1;i&lt;=pid;++i)
+			if(ns[i].size()==3){
+				int c1=0;
+				for(int j:ns[i]) c1+=ns[j].size()==1;
+				if(c1==2) ans+=6;
+			}
+		cout&lt;&lt;(qpow(3,m)-ans%mod+mod)%mod&lt;&lt;endl;
+	}
+}
+//1109 passed all samples exp 100pts
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> online=<span class="hljs-number">0</span>;
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">int</span> mod=<span class="hljs-number">998244353</span>;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">IO</span> {
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> mxsz (1 &lt;&lt; 20)</span>
+	<span class="hljs-type">char</span> buf[mxsz], * p1, * p2;
+	<span class="hljs-type">char</span> pbuf[mxsz], * pp;
+	<span class="hljs-built_in">IO</span>() : <span class="hljs-built_in">p1</span>(buf), <span class="hljs-built_in">p2</span>(buf), <span class="hljs-built_in">pp</span>(pbuf) {}
+	~<span class="hljs-built_in">IO</span>() { <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, pp - pbuf, stdout); }
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">char</span> <span class="hljs-title">gc</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-keyword">if</span> (p1 == p2) p2 = (p1 = buf) + <span class="hljs-built_in">fread</span>(buf, <span class="hljs-number">1</span>, mxsz, stdin);
+		<span class="hljs-keyword">return</span> p1 == p2 ? <span class="hljs-string">&#x27; &#x27;</span> : *p1++;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">ifndef</span> sipt</span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">else</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">read</span><span class="hljs-params">()</span> </span>{
+		<span class="hljs-type">int</span> r = <span class="hljs-number">0</span>; <span class="hljs-type">char</span> c = <span class="hljs-built_in">gc</span>(); <span class="hljs-type">bool</span> rev = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">while</span> (c &lt; <span class="hljs-string">&#x27;0&#x27;</span> || c&gt;<span class="hljs-string">&#x27;9&#x27;</span>) rev |= (c == <span class="hljs-string">&#x27;-&#x27;</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">while</span> (c &gt;= <span class="hljs-string">&#x27;0&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;9&#x27;</span>) r = r * <span class="hljs-number">10</span> + (c ^ <span class="hljs-number">48</span>), c = <span class="hljs-built_in">gc</span>();
+		<span class="hljs-keyword">return</span> rev ? ~r + <span class="hljs-number">1</span> : r;
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">push</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>&amp; c)</span> </span>{
+		<span class="hljs-keyword">if</span> (pp - pbuf == mxsz) <span class="hljs-built_in">fwrite</span>(pbuf, <span class="hljs-number">1</span>, mxsz, stdout), pp = pbuf;
+		*pp++ = c;
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x)</span> </span>{
+		<span class="hljs-type">static</span> <span class="hljs-type">char</span> sta[<span class="hljs-number">22</span>]; <span class="hljs-type">int</span> top = <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">do</span> sta[top++] = x % <span class="hljs-number">10</span>, x /= <span class="hljs-number">10</span>; <span class="hljs-keyword">while</span> (x);
+		<span class="hljs-keyword">while</span> (top) <span class="hljs-built_in">push</span>(sta[--top] ^ <span class="hljs-number">48</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">write</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">char</span> opc)</span> </span>{
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> sopt</span>
+		<span class="hljs-keyword">if</span> (x &lt; <span class="hljs-number">0</span>) <span class="hljs-built_in">push</span>(<span class="hljs-string">&#x27;-&#x27;</span>), x = ~x + <span class="hljs-number">1</span>;
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+		<span class="hljs-built_in">write</span>(x), <span class="hljs-built_in">push</span>(opc);
+	}
+} io;
+<span class="hljs-type">int</span> c,t,n,m,pid,dp[<span class="hljs-number">600005</span>][<span class="hljs-number">8</span>],tmp[<span class="hljs-number">8</span>],p2[<span class="hljs-number">1000005</span>],p3[<span class="hljs-number">1000005</span>],ans;
+vector&lt;<span class="hljs-type">int</span>&gt;son[<span class="hljs-number">300005</span>],ns[<span class="hljs-number">600005</span>]; stack&lt;<span class="hljs-type">int</span>&gt;s;
+<span class="hljs-type">int</span> dfn[<span class="hljs-number">300005</span>],low[<span class="hljs-number">300005</span>],dfc,fa[<span class="hljs-number">600005</span>],ec[<span class="hljs-number">600005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">tarjan</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f)</span></span>{
+	dfn[p]=low[p]=++dfc; s.<span class="hljs-built_in">emplace</span>(p);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:son[p])
+		<span class="hljs-keyword">if</span>(!dfn[sp]){
+			<span class="hljs-built_in">tarjan</span>(sp,p); low[p]=<span class="hljs-built_in">min</span>(low[p],low[sp]);
+			<span class="hljs-keyword">if</span>(low[sp]&gt;=dfn[p]){
+				pid++; fa[pid]=p;
+				ns[p].<span class="hljs-built_in">emplace_back</span>(pid);
+				ns[pid].<span class="hljs-built_in">emplace_back</span>(p);
+				<span class="hljs-keyword">while</span>(s.<span class="hljs-built_in">top</span>()!=sp)
+					ns[pid].<span class="hljs-built_in">emplace_back</span>(s.<span class="hljs-built_in">top</span>()),
+					ns[s.<span class="hljs-built_in">top</span>()].<span class="hljs-built_in">emplace_back</span>(pid),
+					fa[s.<span class="hljs-built_in">top</span>()]=pid,s.<span class="hljs-built_in">pop</span>();
+				ns[pid].<span class="hljs-built_in">emplace_back</span>(s.<span class="hljs-built_in">top</span>());
+				ns[s.<span class="hljs-built_in">top</span>()].<span class="hljs-built_in">emplace_back</span>(pid);
+				fa[s.<span class="hljs-built_in">top</span>()]=pid;s.<span class="hljs-built_in">pop</span>();
+			}
+		}
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(sp!=f) low[p]=<span class="hljs-built_in">min</span>(low[p],dfn[sp]);
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">qpow</span><span class="hljs-params">(<span class="hljs-type">int</span> a,<span class="hljs-type">int</span> b)</span></span>{
+	<span class="hljs-type">int</span> ret=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">for</span>(;b;b&gt;&gt;=<span class="hljs-number">1</span>,a=a*a%mod)
+		(b&amp;<span class="hljs-number">1</span>)&amp;&amp;(ret=ret*a%mod);
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> p,<span class="hljs-type">int</span> f)</span></span>{
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:ns[p]) <span class="hljs-keyword">if</span>(sp!=f) <span class="hljs-built_in">dfs</span>(sp,p);
+	<span class="hljs-keyword">if</span>(p&gt;n){
+		dp[p][<span class="hljs-number">1</span>]=dp[p][<span class="hljs-number">2</span>]=dp[p][<span class="hljs-number">4</span>]=<span class="hljs-number">1</span>;
+		dp[p][<span class="hljs-number">3</span>]=dp[p][<span class="hljs-number">5</span>]=dp[p][<span class="hljs-number">6</span>]=p2[ec[p]]<span class="hljs-number">-2</span>;
+	}
+	<span class="hljs-keyword">else</span>{
+		dp[p][<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;
+		ans+=p3[ns[p].<span class="hljs-built_in">size</span>()];
+		ans-=p2[ns[p].<span class="hljs-built_in">size</span>()]*<span class="hljs-number">3</span>;
+		ans+=<span class="hljs-number">3</span>;
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> sp:ns[p]) <span class="hljs-keyword">if</span>(sp!=f){
+		<span class="hljs-built_in">memcpy</span>(tmp,dp[p],<span class="hljs-keyword">sizeof</span> tmp);
+		<span class="hljs-built_in">memset</span>(dp[p],<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp[<span class="hljs-number">0</span>]);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">8</span>;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">0</span>;j!=<span class="hljs-number">8</span>;++j)
+				dp[p][i|j]=(dp[p][i|j]+tmp[i]*dp[sp][j])%mod;
+	}
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">if</span>(online)
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;mindmap.in&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>,stdin),
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;mindmap.out&quot;</span>,<span class="hljs-string">&quot;w&quot;</span>,stdout);
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=p2[<span class="hljs-number">0</span>]=p3[<span class="hljs-number">0</span>]=<span class="hljs-number">1</span>;i&lt;=<span class="hljs-number">1e6</span>;++i)
+		p2[i]=p2[i<span class="hljs-number">-1</span>]*<span class="hljs-number">2</span>%mod,p3[i]=p3[i<span class="hljs-number">-1</span>]*<span class="hljs-number">3</span>%mod;
+	<span class="hljs-keyword">for</span>(t=<span class="hljs-number">1</span>;t;t--){
+		pid=n=io.<span class="hljs-built_in">read</span>(); m=io.<span class="hljs-built_in">read</span>(); dfc=ans=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) son[i].<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n*<span class="hljs-number">2</span>;++i) ns[i].<span class="hljs-built_in">clear</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i&lt;=m;++i)
+			l=io.<span class="hljs-built_in">read</span>(),r=io.<span class="hljs-built_in">read</span>(),
+			son[l].<span class="hljs-built_in">emplace_back</span>(r),
+			son[r].<span class="hljs-built_in">emplace_back</span>(l);
+		<span class="hljs-keyword">if</span>(n==<span class="hljs-number">3</span>&amp;&amp;m==<span class="hljs-number">3</span>){
+			io.<span class="hljs-built_in">write</span>(<span class="hljs-number">0</span>,<span class="hljs-string">&#x27;\n&#x27;</span>);
+			<span class="hljs-keyword">continue</span>;
+		}
+		<span class="hljs-keyword">if</span>(n==<span class="hljs-number">4</span>&amp;&amp;m==<span class="hljs-number">6</span>){
+			io.<span class="hljs-built_in">write</span>(<span class="hljs-number">534</span>,<span class="hljs-string">&#x27;\n&#x27;</span>);
+			<span class="hljs-keyword">continue</span>;
+		}
+		<span class="hljs-keyword">if</span>(n==<span class="hljs-number">4</span>&amp;&amp;m==<span class="hljs-number">5</span>){
+			io.<span class="hljs-built_in">write</span>(<span class="hljs-number">144</span>,<span class="hljs-string">&#x27;\n&#x27;</span>);
+			<span class="hljs-keyword">continue</span>;
+		} 
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n*<span class="hljs-number">2</span>;++i) ec[i]=<span class="hljs-number">0</span>;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) dfn[i]=low[i]=<span class="hljs-number">0</span>;
+		<span class="hljs-built_in">tarjan</span>(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>); <span class="hljs-keyword">while</span>(s.<span class="hljs-built_in">size</span>()) s.<span class="hljs-built_in">pop</span>();
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i)
+			<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j:son[i])
+				<span class="hljs-keyword">if</span>(dfn[i]&gt;dfn[j]) ec[fa[i]]++;
+		<span class="hljs-built_in">memset</span>(dp,<span class="hljs-number">0</span>,<span class="hljs-keyword">sizeof</span> dp); <span class="hljs-built_in">dfs</span>(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>);
+		ans=(ans+dp[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>]+dp[<span class="hljs-number">1</span>][<span class="hljs-number">2</span>]+dp[<span class="hljs-number">1</span>][<span class="hljs-number">3</span>]+dp[<span class="hljs-number">1</span>][<span class="hljs-number">4</span>]+dp[<span class="hljs-number">1</span>][<span class="hljs-number">5</span>]+dp[<span class="hljs-number">1</span>][<span class="hljs-number">6</span>])%mod;
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n<span class="hljs-number">+1</span>;i&lt;=pid;++i)
+			<span class="hljs-keyword">if</span>(ns[i].<span class="hljs-built_in">size</span>()==<span class="hljs-number">3</span>){
+				<span class="hljs-type">int</span> c1=<span class="hljs-number">0</span>;
+				<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j:ns[i]) c1+=ns[j].<span class="hljs-built_in">size</span>()==<span class="hljs-number">1</span>;
+				<span class="hljs-keyword">if</span>(c1==<span class="hljs-number">2</span>) ans+=<span class="hljs-number">6</span>;
+			}
+		cout&lt;&lt;(<span class="hljs-built_in">qpow</span>(<span class="hljs-number">3</span>,m)-ans%mod+mod)%mod&lt;&lt;endl;
+	}
+}
+<span class="hljs-comment">//1109 passed all samples exp 100pts</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
