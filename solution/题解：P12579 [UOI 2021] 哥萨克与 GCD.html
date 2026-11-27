@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P12579 [UOI 2021] 哥萨克与 GCD</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>纯观察。</p>
+<p>考虑进行图论建模。询问 $\sum_{i=l}^rb_i$ 就是询问 $s_r-s_{l-1}$，其中 $s_n=\sum_{i=1}^nb_i$，且已知 $s_0=0$。目标等价于确定所有的 $s$。</p>
+<p>于是我们会询问恰好 $n$ 次，每一次的边 $(l-1,r)$ 恰好形成了树，树边的代价就是 $\gcd(a_l,\dots,a_r)$，于是就是在问我们最小生成树的权值之和。</p>
+<p>考虑最终的图中有 $(0,n)$ 这条边一定是不劣的：直接按照 kruskal 的方法建图，不难发现 $(0,n)$ 这条边的边权一定是全局最小值。</p>
+<p>此时考虑，如果有一个生成树的树中有边 $(i,j)$，那么根据连通性将这个边调整为 $(0,j)$ 或者 $(i,n)$ 一定是不劣的。这是因为 $\gcd(a,b,\dots)=\gcd(a,\gcd(b,\dots))$，并且 $\gcd(a,b)\le a$，于是 $v(i,n),v(0,j)\le v(i,j)$。</p>
+<p>从而，我们得知最终的树一定只会包含 $(0,i)$ 和 $(i,n)$ 两种边。又因为 $v(0,i)$ 是单调递减的，$v(i,n)$ 是单调递增的，所以 $[1,n-1]$ 中的点一定是前面一部分和 $n$ 连，后面一部分和 $1$ 连。</p>
+<p>此外，我们还注意到，$v(0,i+1)=\gcd(v(0,i),a_{i+1})$，因此 $v(0,i)$ 一定只出现了 $a_1$ 的一个“因数下降链”。而由于每一次都是变成真因数，至少砍半，因此不同的 $v(0,i)$ 的数值一定也只有 $O(\log)$ 个。</p>
+<p>我们考虑使用线段树二分来快速查找 $v(0,i)$ 的极长连续段。具体来说，$v(0,j)=v(0,i)$ 等价于 $\gcd(a_{i+1},\dots,j)$ 是 $v(0,i)$ 的倍数。于是我们直接在线段树上面维护 $[l,r]$ 的区间 $\gcd$ 就可以实现线段树二分了。</p>
+<p>因此，我们可以 $O(\log^2)$ 的把两种数值的所有区间与值都给求出来，直接从前到后一遍扫过去累加最小值就行了。这一步只有 $O(\log n)$。</p>
+<p>而对于修改，就是一路向上重算区间 $\gcd$。由于求 $\gcd$ 还有一个 $\log$，所以时间复杂度也是 $O(\log^2)$ 的。</p>
+<p>综上，此题可解，时间复杂度 $O(n\log^2 n)$。实现的时候属于是做题做傻了，套了一个差分，不过也说明这道题可以支持区间加。参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+#define int long long
+constexpr bool online=0;
+int n,m,a[100005];
+inline int gcd(int l,int r){ return r?gcd(r,l%r):l; }
+struct seg_tree{
+	struct node{ int l,r,v; }re[100005&lt;&lt;2];
+	inline void build(int l,int r,int p){
+		re[p].l=l; re[p].r=r;
+		if(l==r)return void(re[p].v=abs(a[l+1]-a[l]));
+		build((l+r&gt;&gt;1)+1,r,p&lt;&lt;1|1);
+		build(l,(l+r&gt;&gt;1),p&lt;&lt;1);
+		re[p].v=gcd(re[p&lt;&lt;1].v,re[p&lt;&lt;1|1].v);
+	}
+	inline void set(int cp,int cv,int p){
+		if(re[p].l==re[p].r) return void(re[p].v=cv);
+		set(cp,cv,p&lt;&lt;1|(cp&gt;re[p&lt;&lt;1].r));
+		re[p].v=gcd(re[p&lt;&lt;1].v,re[p&lt;&lt;1|1].v);
+	}
+	inline int fnxts(int v,int p){
+		if(!(re[p].v%v)) return 0;
+		if(re[p].l==re[p].r) return re[p].l;
+		if(re[p&lt;&lt;1].v%v) return fnxts(v,p&lt;&lt;1);
+		return fnxts(v,p&lt;&lt;1|1);
+	}
+	inline int fnxt(int l,int v,int p){
+		if(re[p].l&gt;=l) return fnxts(v,p);
+		if(l&lt;=re[p&lt;&lt;1].r&amp;&amp;re[p&lt;&lt;1].v%v){
+			int ret=fnxt(l,v,p&lt;&lt;1);
+			if(ret) return ret;
+		}
+		return fnxt(l,v,p&lt;&lt;1|1);
+	}
+	inline int fpres(int v,int p){
+		if(!(re[p].v%v)) return 0;
+		if(re[p].l==re[p].r) return re[p].l;
+		if(re[p&lt;&lt;1|1].v%v) return fpres(v,p&lt;&lt;1|1);
+		return fpres(v,p&lt;&lt;1);
+	}
+	inline int fpre(int r,int v,int p){
+		if(re[p].r&lt;r) return fpres(v,p);
+		if(r&gt;re[p&lt;&lt;1|1].l&amp;&amp;re[p&lt;&lt;1|1].v%v){
+			int ret=fpre(r,v,p&lt;&lt;1|1);
+			if(ret) return ret;
+		}
+		return fpre(r,v,p&lt;&lt;1);
+	}
+}sgt;
+vector&lt;pair&lt;int,int&gt;&gt;va0,van;
+inline int solve(){
+	va0.clear(); van.clear();
+	for(int i=1,v=a[1];;){
+		va0.emplace_back(i,v);
+		if(v==1) break;
+		i=sgt.fnxt(i,v,1)+1;
+		v=__gcd(v,a[i]);
+	}
+	for(int i=n,v=a[n];;){
+		van.emplace_back(i,v);
+		if(v==1) break;
+		i=sgt.fpre(i,v,1);
+		v=__gcd(v,a[i]);
+	}
+	for(int i=1;i!=van.size();++i)
+		van[i-1].first=van[i].first+1;
+	if(!van.back().first) van.pop_back();
+	else van.back().first=1;
+	if(va0.back().first&gt;n) va0.pop_back();
+	reverse(van.begin(),van.end());
+	va0.emplace_back(n+1,1e12);
+	van.emplace_back(n+1,1e12);
+	van.emplace_back(n+2,1e12);
+	for(auto&amp;v:van) v.first--;
+	van[0].first++;
+	if(van[0].first==van[1].first)
+		van.erase(van.begin());
+	// for(const auto&amp;v:va0) cerr&lt;&lt;v.first&lt;&lt;&quot; &quot;&lt;&lt;v.second&lt;&lt;endl;
+	// for(const auto&amp;v:van) cerr&lt;&lt;v.first&lt;&lt;&quot; &quot;&lt;&lt;v.second&lt;&lt;endl;
+	int ret=0;
+	for(int p0=0,pn=0,ps=1;ps&lt;=n;){
+		if(va0[p0+1].first&lt;van[pn+1].first)
+			ret+=min(va0[p0].second,van[pn].second)*(va0[p0+1].first-ps),
+			p0++,ps=va0[p0].first;
+		else if(va0[p0+1].first&gt;van[pn+1].first)
+			ret+=min(va0[p0].second,van[pn].second)*(van[pn+1].first-ps),
+			pn++,ps=van[pn].first;
+		else
+			ret+=min(va0[p0].second,van[pn].second)*(van[pn+1].first-ps),
+			p0++,pn++,ps=van[pn].first;
+	}
+	return ret;
+}
+signed main(){
+	if(online)
+		freopen(&quot;gobinum.in&quot;,&quot;r&quot;,stdin),
+		freopen(&quot;gobinum.out&quot;,&quot;w&quot;,stdout);
+	ios::sync_with_stdio(0); cin&gt;&gt;n&gt;&gt;m;
+	/*
+	套娃问题先解决子问题：给定 a,b 如何求出最小代价
+	本质上就是每一次查询 s_r-s_{l-1}，求确定 s 的最小代价
+	确定 s 本质上就是在运行最小生成树，即用 \gcd 的代价连接一条边
+	但是我们应该如何做到 O(n\log n) 呢？
+
+	要点在于其边权的计算公式：\gcd(a_l,...,a_r)
+	由于 0 位置是确定的，而 \gcd(a_1,...,a_n) 一定是全局最小的
+	因此最优解一定是包括 0~n 这条边的
+	
+	完事了我们考虑，如果某一个解中有 (i,j) 这条边，其中 i,j 不是 0,n
+	那么替换成 (0,j) 或者 (i,n) 一定是不劣的
+	因此最优解一定只有 (0,j) 和 (i,n) 两种边！
+	因此每一个位置的代价就是 min(val(0,i),val(i,n))！
+	这子问题简直是精妙的！现在我们可以 O(n\log n) 回答这个子问题了！
+
+	考虑带修怎么做。
+	我会 O(\log) 求区间 gcd，带修也行
+	哦不是 log^2 的，因为 gcd 是 O(\log) 的
+	这是一个经典题，差分一下就行了，不复杂
+	然后我们注意到 val(0,i) 单调减，val(i,n) 单调增
+	所以我们可以二分切换边界，然后尝试快速求解 val 的前缀和一类的东西
+
+	还有一个显然的性质：最多出现 \log 种 val 的数值
+	所以直接在线段树上面硬做这个东西就是 \log^3 的，不知道能不能过
+
+	其实，我们好像有办法在 O(\log^2) 的时间复杂度内表示出来 val(0,i)
+	具体来说，我们仍然是线段树二分，但是用好这个性质：
+	如果 a 不是 b 的倍数，那么 \gcd(a,b)\neq b
+	因此只要我们预处理出来了区间 gcd 一类的东西
+	那么就可以快速判断区间内有没有出现切换
+	从而，我们将寻找极长段的时间复杂度压缩到了 O(\log^2)
+	而每一次修改的时间复杂度也不过是 O(\log^2) 的
+	至此此题可解，时间复杂度 O((n+m)\log^2n)
+	*/
+	for(int i=1;i&lt;=n;++i) cin&gt;&gt;a[i];
+	a[0]=a[n+1]=1; sgt.build(0,n,1); cout&lt;&lt;solve()&lt;&lt;'\n';
+	for(int i=1,l,r;i&lt;=m;++i){
+		cin&gt;&gt;l&gt;&gt;r,a[l]=r;
+		sgt.set(l,abs(a[l+1]-a[l]),1);
+		sgt.set(l-1,abs(a[l]-a[l-1]),1);
+		cout&lt;&lt;solve()&lt;&lt;&quot;\n&quot;;
+	}
+}
+//1005 passed all samples exp 100pts.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> online=<span class="hljs-number">0</span>;
+<span class="hljs-type">int</span> n,m,a[<span class="hljs-number">100005</span>];
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">gcd</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r)</span></span>{ <span class="hljs-keyword">return</span> r?<span class="hljs-built_in">gcd</span>(r,l%r):l; }
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">seg_tree</span>{
+	<span class="hljs-keyword">struct</span> <span class="hljs-title class_">node</span>{ <span class="hljs-type">int</span> l,r,v; }re[<span class="hljs-number">100005</span>&lt;&lt;<span class="hljs-number">2</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">build</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+		re[p].l=l; re[p].r=r;
+		<span class="hljs-keyword">if</span>(l==r)<span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(re[p].v=<span class="hljs-built_in">abs</span>(a[l<span class="hljs-number">+1</span>]-a[l]));
+		<span class="hljs-built_in">build</span>((l+r&gt;&gt;<span class="hljs-number">1</span>)<span class="hljs-number">+1</span>,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+		<span class="hljs-built_in">build</span>(l,(l+r&gt;&gt;<span class="hljs-number">1</span>),p&lt;&lt;<span class="hljs-number">1</span>);
+		re[p].v=<span class="hljs-built_in">gcd</span>(re[p&lt;&lt;<span class="hljs-number">1</span>].v,re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">set</span><span class="hljs-params">(<span class="hljs-type">int</span> cp,<span class="hljs-type">int</span> cv,<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(re[p].l==re[p].r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">void</span>(re[p].v=cv);
+		<span class="hljs-built_in">set</span>(cp,cv,p&lt;&lt;<span class="hljs-number">1</span>|(cp&gt;re[p&lt;&lt;<span class="hljs-number">1</span>].r));
+		re[p].v=<span class="hljs-built_in">gcd</span>(re[p&lt;&lt;<span class="hljs-number">1</span>].v,re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">fnxts</span><span class="hljs-params">(<span class="hljs-type">int</span> v,<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(!(re[p].v%v)) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">if</span>(re[p].l==re[p].r) <span class="hljs-keyword">return</span> re[p].l;
+		<span class="hljs-keyword">if</span>(re[p&lt;&lt;<span class="hljs-number">1</span>].v%v) <span class="hljs-keyword">return</span> <span class="hljs-built_in">fnxts</span>(v,p&lt;&lt;<span class="hljs-number">1</span>);
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">fnxts</span>(v,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">fnxt</span><span class="hljs-params">(<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> v,<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(re[p].l&gt;=l) <span class="hljs-keyword">return</span> <span class="hljs-built_in">fnxts</span>(v,p);
+		<span class="hljs-keyword">if</span>(l&lt;=re[p&lt;&lt;<span class="hljs-number">1</span>].r&amp;&amp;re[p&lt;&lt;<span class="hljs-number">1</span>].v%v){
+			<span class="hljs-type">int</span> ret=<span class="hljs-built_in">fnxt</span>(l,v,p&lt;&lt;<span class="hljs-number">1</span>);
+			<span class="hljs-keyword">if</span>(ret) <span class="hljs-keyword">return</span> ret;
+		}
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">fnxt</span>(l,v,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">fpres</span><span class="hljs-params">(<span class="hljs-type">int</span> v,<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(!(re[p].v%v)) <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+		<span class="hljs-keyword">if</span>(re[p].l==re[p].r) <span class="hljs-keyword">return</span> re[p].l;
+		<span class="hljs-keyword">if</span>(re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v%v) <span class="hljs-keyword">return</span> <span class="hljs-built_in">fpres</span>(v,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">fpres</span>(v,p&lt;&lt;<span class="hljs-number">1</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">fpre</span><span class="hljs-params">(<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> v,<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(re[p].r&lt;r) <span class="hljs-keyword">return</span> <span class="hljs-built_in">fpres</span>(v,p);
+		<span class="hljs-keyword">if</span>(r&gt;re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].l&amp;&amp;re[p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>].v%v){
+			<span class="hljs-type">int</span> ret=<span class="hljs-built_in">fpre</span>(r,v,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+			<span class="hljs-keyword">if</span>(ret) <span class="hljs-keyword">return</span> ret;
+		}
+		<span class="hljs-keyword">return</span> <span class="hljs-built_in">fpre</span>(r,v,p&lt;&lt;<span class="hljs-number">1</span>);
+	}
+}sgt;
+vector&lt;pair&lt;<span class="hljs-type">int</span>,<span class="hljs-type">int</span>&gt;&gt;va0,van;
+<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">solve</span><span class="hljs-params">()</span></span>{
+	va<span class="hljs-number">0.</span><span class="hljs-built_in">clear</span>(); van.<span class="hljs-built_in">clear</span>();
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,v=a[<span class="hljs-number">1</span>];;){
+		va<span class="hljs-number">0.</span><span class="hljs-built_in">emplace_back</span>(i,v);
+		<span class="hljs-keyword">if</span>(v==<span class="hljs-number">1</span>) <span class="hljs-keyword">break</span>;
+		i=sgt.<span class="hljs-built_in">fnxt</span>(i,v,<span class="hljs-number">1</span>)<span class="hljs-number">+1</span>;
+		v=__gcd(v,a[i]);
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n,v=a[n];;){
+		van.<span class="hljs-built_in">emplace_back</span>(i,v);
+		<span class="hljs-keyword">if</span>(v==<span class="hljs-number">1</span>) <span class="hljs-keyword">break</span>;
+		i=sgt.<span class="hljs-built_in">fpre</span>(i,v,<span class="hljs-number">1</span>);
+		v=__gcd(v,a[i]);
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i!=van.<span class="hljs-built_in">size</span>();++i)
+		van[i<span class="hljs-number">-1</span>].first=van[i].first<span class="hljs-number">+1</span>;
+	<span class="hljs-keyword">if</span>(!van.<span class="hljs-built_in">back</span>().first) van.<span class="hljs-built_in">pop_back</span>();
+	<span class="hljs-keyword">else</span> van.<span class="hljs-built_in">back</span>().first=<span class="hljs-number">1</span>;
+	<span class="hljs-keyword">if</span>(va<span class="hljs-number">0.</span><span class="hljs-built_in">back</span>().first&gt;n) va<span class="hljs-number">0.</span><span class="hljs-built_in">pop_back</span>();
+	<span class="hljs-built_in">reverse</span>(van.<span class="hljs-built_in">begin</span>(),van.<span class="hljs-built_in">end</span>());
+	va<span class="hljs-number">0.</span><span class="hljs-built_in">emplace_back</span>(n<span class="hljs-number">+1</span>,<span class="hljs-number">1e12</span>);
+	van.<span class="hljs-built_in">emplace_back</span>(n<span class="hljs-number">+1</span>,<span class="hljs-number">1e12</span>);
+	van.<span class="hljs-built_in">emplace_back</span>(n<span class="hljs-number">+2</span>,<span class="hljs-number">1e12</span>);
+	<span class="hljs-keyword">for</span>(<span class="hljs-keyword">auto</span>&amp;v:van) v.first--;
+	van[<span class="hljs-number">0</span>].first++;
+	<span class="hljs-keyword">if</span>(van[<span class="hljs-number">0</span>].first==van[<span class="hljs-number">1</span>].first)
+		van.<span class="hljs-built_in">erase</span>(van.<span class="hljs-built_in">begin</span>());
+	<span class="hljs-comment">// for(const auto&amp;v:va0) cerr&lt;&lt;v.first&lt;&lt;&quot; &quot;&lt;&lt;v.second&lt;&lt;endl;</span>
+	<span class="hljs-comment">// for(const auto&amp;v:van) cerr&lt;&lt;v.first&lt;&lt;&quot; &quot;&lt;&lt;v.second&lt;&lt;endl;</span>
+	<span class="hljs-type">int</span> ret=<span class="hljs-number">0</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> p0=<span class="hljs-number">0</span>,pn=<span class="hljs-number">0</span>,ps=<span class="hljs-number">1</span>;ps&lt;=n;){
+		<span class="hljs-keyword">if</span>(va0[p0<span class="hljs-number">+1</span>].first&lt;van[pn<span class="hljs-number">+1</span>].first)
+			ret+=<span class="hljs-built_in">min</span>(va0[p0].second,van[pn].second)*(va0[p0<span class="hljs-number">+1</span>].first-ps),
+			p0++,ps=va0[p0].first;
+		<span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(va0[p0<span class="hljs-number">+1</span>].first&gt;van[pn<span class="hljs-number">+1</span>].first)
+			ret+=<span class="hljs-built_in">min</span>(va0[p0].second,van[pn].second)*(van[pn<span class="hljs-number">+1</span>].first-ps),
+			pn++,ps=van[pn].first;
+		<span class="hljs-keyword">else</span>
+			ret+=<span class="hljs-built_in">min</span>(va0[p0].second,van[pn].second)*(van[pn<span class="hljs-number">+1</span>].first-ps),
+			p0++,pn++,ps=van[pn].first;
+	}
+	<span class="hljs-keyword">return</span> ret;
+}
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">if</span>(online)
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;gobinum.in&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>,stdin),
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;gobinum.out&quot;</span>,<span class="hljs-string">&quot;w&quot;</span>,stdout);
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n&gt;&gt;m;
+	<span class="hljs-comment">/*
+	套娃问题先解决子问题：给定 a,b 如何求出最小代价
+	本质上就是每一次查询 s_r-s_{l-1}，求确定 s 的最小代价
+	确定 s 本质上就是在运行最小生成树，即用 \gcd 的代价连接一条边
+	但是我们应该如何做到 O(n\log n) 呢？
+
+	要点在于其边权的计算公式：\gcd(a_l,...,a_r)
+	由于 0 位置是确定的，而 \gcd(a_1,...,a_n) 一定是全局最小的
+	因此最优解一定是包括 0~n 这条边的
+	
+	完事了我们考虑，如果某一个解中有 (i,j) 这条边，其中 i,j 不是 0,n
+	那么替换成 (0,j) 或者 (i,n) 一定是不劣的
+	因此最优解一定只有 (0,j) 和 (i,n) 两种边！
+	因此每一个位置的代价就是 min(val(0,i),val(i,n))！
+	这子问题简直是精妙的！现在我们可以 O(n\log n) 回答这个子问题了！
+
+	考虑带修怎么做。
+	我会 O(\log) 求区间 gcd，带修也行
+	哦不是 log^2 的，因为 gcd 是 O(\log) 的
+	这是一个经典题，差分一下就行了，不复杂
+	然后我们注意到 val(0,i) 单调减，val(i,n) 单调增
+	所以我们可以二分切换边界，然后尝试快速求解 val 的前缀和一类的东西
+
+	还有一个显然的性质：最多出现 \log 种 val 的数值
+	所以直接在线段树上面硬做这个东西就是 \log^3 的，不知道能不能过
+
+	其实，我们好像有办法在 O(\log^2) 的时间复杂度内表示出来 val(0,i)
+	具体来说，我们仍然是线段树二分，但是用好这个性质：
+	如果 a 不是 b 的倍数，那么 \gcd(a,b)\neq b
+	因此只要我们预处理出来了区间 gcd 一类的东西
+	那么就可以快速判断区间内有没有出现切换
+	从而，我们将寻找极长段的时间复杂度压缩到了 O(\log^2)
+	而每一次修改的时间复杂度也不过是 O(\log^2) 的
+	至此此题可解，时间复杂度 O((n+m)\log^2n)
+	*/</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;++i) cin&gt;&gt;a[i];
+	a[<span class="hljs-number">0</span>]=a[n<span class="hljs-number">+1</span>]=<span class="hljs-number">1</span>; sgt.<span class="hljs-built_in">build</span>(<span class="hljs-number">0</span>,n,<span class="hljs-number">1</span>); cout&lt;&lt;<span class="hljs-built_in">solve</span>()&lt;&lt;<span class="hljs-string">&#x27;\n&#x27;</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>,l,r;i&lt;=m;++i){
+		cin&gt;&gt;l&gt;&gt;r,a[l]=r;
+		sgt.<span class="hljs-built_in">set</span>(l,<span class="hljs-built_in">abs</span>(a[l<span class="hljs-number">+1</span>]-a[l]),<span class="hljs-number">1</span>);
+		sgt.<span class="hljs-built_in">set</span>(l<span class="hljs-number">-1</span>,<span class="hljs-built_in">abs</span>(a[l]-a[l<span class="hljs-number">-1</span>]),<span class="hljs-number">1</span>);
+		cout&lt;&lt;<span class="hljs-built_in">solve</span>()&lt;&lt;<span class="hljs-string">&quot;\n&quot;</span>;
+	}
+}
+<span class="hljs-comment">//1005 passed all samples exp 100pts.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>

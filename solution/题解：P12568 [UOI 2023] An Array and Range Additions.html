@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="color-scheme" content="light dark">
+    <title>题解：P12568 [UOI 2023] An Array and Range Additions</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.5.0/github-markdown.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <style>
+        /* ========== 全局主题变量 ========== */
+        :root {
+            color-scheme: light dark;
+            --bg-body: #f6f8fa;
+            --bg-card: #ffffff;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --border-light: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --code-header-bg: #f1f3f5;
+            --code-header-border: #e1e4e8;
+            --btn-bg: #ffffff;
+            --btn-border: #d0d7de;
+            --btn-hover-bg: #eaeef2;
+            --shadow: 0 1px 4px rgba(0,0,0,0.1);
+            --code-text: #24292f;
+            --line-numbers-color: #8c959f;
+            
+            --search-container-bg: #ffffff;
+            --search-result-hover: #eaeef2;
+            
+            
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0d1117;
+                --bg-card: #161b22;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --border-light: #30363d;
+                --code-bg: #0d1117;
+                --code-header-bg: #21262d;
+                --code-header-border: #30363d;
+                --btn-bg: #21262d;
+                --btn-border: #30363d;
+                --btn-hover-bg: #30363d;
+                --shadow: 0 1px 4px rgba(0,0,0,0.3);
+                --code-text: #c9d1d9;
+                --line-numbers-color: #8b949e;
+                
+                --search-container-bg: #161b22;
+                --search-result-hover: #21262d;
+                
+                
+            }
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            padding: 2rem;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+        }
+        
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto 1.5rem auto;
+            background-color: var(--search-container-bg);
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+        .search-box {
+            flex: 3;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            background-color: var(--btn-bg);
+            color: var(--text-primary);
+        }
+        .search-box:focus {
+            border-color: #0969da;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+        }
+        .search-results {
+            flex: 5;
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: var(--bg-body);
+            border-radius: 8px;
+            padding: 0.5rem;
+            display: none;
+        }
+        .search-results.active { display: block; }
+        .search-result-item {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+        }
+        .search-result-item:hover { background-color: var(--search-result-hover); }
+        .search-result-title {
+            font-weight: 600;
+            color: #0969da;
+        }
+        .search-result-snippet {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+        
+        
+        .markdown-body {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .markdown-body {
+            color: var(--text-primary) !important;
+        }
+        .code-content pre code,
+        .code-content pre code.hljs {
+            color: var(--code-text) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .line-numbers {
+            color: var(--line-numbers-color) !important;
+            background-color: var(--code-bg) !important;
+        }
+        .code-wrapper {
+            margin: 1rem 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+        }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--code-header-bg);
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--code-header-border);
+        }
+        .code-lang {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .copy-btn {
+            background-color: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 6px;
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+        .copy-btn:hover { background-color: var(--btn-hover-bg); }
+        .copy-btn.copied {
+            background: #2cbe4e;
+            border-color: #2cbe4e;
+            color: white;
+        }
+        .code-content pre {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            background-color: var(--code-bg) !important;
+            overflow-x: auto;
+            padding: 10px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .code-content pre code {
+            padding: 0 !important;
+            tab-size: 4;
+            -moz-tab-size: 4;
+        }
+        .footer {
+            max-width: 1200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-light);
+            padding: 1.5rem 0;
+        }
+        .footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .katex-display { overflow-x: auto; }
+        .katex-error {
+            color: #dc2626;
+            background: #fef2f2;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        @media (max-width: 768px) {
+            .markdown-body { padding: 1rem; }
+            .search-container { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body, {
+        delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}],
+        ignoredTags: ['pre', 'code', 'script', 'style', 'textarea'],
+        ignoredClasses: ['code-wrapper', 'line-numbers', 'copy-btn']
+    });"></script>
+</head>
+<body>
+<div class="">
+    <div class="main-content">
+        <div class="search-container">
+    <input type="text" class="search-box" placeholder="🔍 搜索文章标题或内容..." id="globalSearchInput">
+    <div class="search-results" id="searchResults"></div>
+</div>
+        <div class="markdown-body"><h2 id="思路分析">思路分析</h2>
+<p>真紫吗？</p>
+<p>我声称，一定存在一个最优解，满足所有被操作的区间存在一个顺序，使得左右端点都是<strong>严格</strong>单调递增的。</p>
+<p>其证明是显然的：如果出现左端点或者右端点相同，那么较长的区间可以缩一下长度。如果出现包含，例如 $l_1\le l_2\le r_2\le r_1$，那么可以调整成 $[l_1,r_2]$ 和 $[l_2,r_1]$ 两个不包含的区间。</p>
+<p>此时再看区间的权值。我们如果让第 $i$ 个区间的权值为 $2^i\times\inf$，则任意两个位置 $i,j$，只要包含他们的区间的集合是不同的，那么他们最终就一定不同。</p>
+<p>显然，由于所有的区间都是严格有序的，因此被某些区间同时包含的点一定是一个连续的区间。例外是没有被区间包含的部分。这一部分可能出现两段甚至多段。</p>
+<p>对于这种包含关系区间，显然限制就是单个区间内的数字不重复。</p>
+<p>紧接着，我们证明一个结论：没有被区间包含的部分只出现一个前缀和一个后缀仍然不劣。</p>
+<p>证明也是简单的。对于一个非前后缀的不操作区间，我们将其前面的操作区间的右端点扩展到自己的右端点，将其后面的操作区间的左端点扩展到自己的左端点，则自己变为被操作区间，且限制变弱，不会从有解变成无解。</p>
+<p>从而，我们将问题转化成了下面这个非常简单的题目：</p>
+<p>选择一段区间 $[l,r]$ 满足 $[1,l-1]\cup[r+1,n]$ 中没有重复的数字，问至少需要将 $[l,r]$ 拆分成多少个子区间才能保证任意一个区间内也没有重复的数字。</p>
+<p>假设需要拆分成 $a$ 个区间，那么由于两个区间可以交叉从而产生两个区间，故实际使用的个数为 $\lfloor\frac{a}{2}\rfloor+1$，特别的，$a=0$ 的时候应该按照 $0$ 计算。</p>
+<p>假设我们枚举了 $[l,r]$，那么中间可以贪心：我从左端点开始，不停扩展，直到出现重复数字就开下一段，直到分完。这是 $O(n^3)$ 的。</p>
+<p>考虑把暴力分区间优化一下。显然可以使用倍增，记录 $nxt_{p,i}$ 表示 $p$ 向右分 $2^i$ 个区间会分到哪里。这个东西是可以 $O(n\log n)$ 预处理出来的。这样就优化到了 $O(n^2\log n)$。</p>
+<p>最后考虑把枚举前后缀给优化掉。注意到前缀和后缀都相当于是进行一次“不操作”，因此我们直接断环为链，枚举从某一个位置开始先进行一次不操作之后，最少需要操作多少次才能够覆盖至少 $n$ 个位置。于是时间复杂度为 $O(n\log n)$。</p>
+<p>参考代码如下：</p>
+<div class="code-wrapper">
+<div class="code-header">
+    <span class="code-lang">CPP</span>
+    <button class="copy-btn" data-code="#include&lt;bits/stdc++.h&gt;
+using namespace std;
+// #define int long long
+constexpr bool online=0;
+int n,a[1000005],jmp[1000005][20],v[200005],vc,lap[200005],ans;
+struct seg_tree{
+	int v[1000005&lt;&lt;2];
+	inline void ins(int cp,int cv,int l,int r,int p){
+		int mid=l+r&gt;&gt;1; v[p]=min(v[p],cv);
+		if(l==r) return;
+		if(cp&lt;=mid) ins(cp,cv,l,mid,p&lt;&lt;1);
+		else ins(cp,cv,mid+1,r,p&lt;&lt;1|1);
+	}
+	inline int que(int ql,int qr,int l,int r,int p){
+		if(ql&lt;=l&amp;&amp;qr&gt;=r) return v[p];
+		int mid=l+r&gt;&gt;1,ret=1e9;
+		if(ql&lt;=mid) ret=min(ret,que(ql,qr,l,mid,p&lt;&lt;1));
+		if(qr&gt;mid) ret=min(ret,que(ql,qr,mid+1,r,p&lt;&lt;1|1));
+		return ret;
+	}
+}sgt;
+signed main(){
+	if(online)
+		freopen(&quot;modify.in&quot;,&quot;r&quot;,stdin),
+		freopen(&quot;modify.out&quot;,&quot;w&quot;,stdout);
+	ios::sync_with_stdio(0); cin&gt;&gt;n;
+	/*
+	一定存在最优操作序列满足左右端点序列均为严格递增序列，证明显然
+	考虑让第 i 段的数值为 2^i*inf，则任意一个划分出来的区间之间一定不重复出现数字
+	特别的，我可以留一段前缀或者后缀不进行任何操作
+
+	每一段内都一定不能出现相同的数字，不操作前缀和后缀按照一段进行理解
+	假设我们枚举有一段前后缀不进行操作，那么：
+	中间剩余的部分必须划分区间
+	需要划分的区间数如何计算：
+	每一个点找到其后第一次出现数字重复的位置，即为区间右端点（开）
+	于是对于每一个位置处理之后，使用 ST 可以快速跳转做到 O(\log)
+	然而枚举前后缀的时间复杂度超了
+
+	于是我们考虑“断环为链”。虽然并不是环，但是不操作前后缀被认为是等价的，所以可以认为是环
+	于是枚举前后缀变成了枚举后缀起点，找最大前缀起点，然后倍增操作
+	此时时间复杂度为 O(n\log n)，此题可解。
+
+	注意一些细节，例如：如果我有 c 个区间，那么我实际上需要操作多少次：
+	floor(c/2)+1，其证明是相对显然的：每一个区间最多将区间数+2,第一个区间只能做到+1
+
+	wasec，怎么快速求出其后第一次出现重复的位置？
+	对于左端点 p，我们找到这个数值下一次出现的位置 r
+	那么这个位置的 ans 就是 min(r,ans[p+1,r-1])！
+	证明显然，略去。
+	*/
+	for(int i=0;i!=n;++i) cin&gt;&gt;a[i],v[i]=a[i];
+	for(int i=0;i!=20;++i) jmp[n&lt;&lt;2][i]=n&lt;&lt;2;
+	sort(v,v+n); vc=unique(v,v+n)-v; ans=n;
+	for(int i=0;i!=n;++i) a[i]=lower_bound(v,v+vc,a[i])-v;
+	for(int i=0;i!=n&lt;&lt;2;++i) a[i]=a[i%n];
+	memset(sgt.v,0x0f,sizeof sgt.v);
+	for(int i=0;i!=vc;++i) lap[i]=n&lt;&lt;2;
+	for(int i=n*4-1;i&gt;=0;i--){
+		jmp[i][0]=min(lap[a[i]],sgt.que(i,lap[a[i]]-1,0,n&lt;&lt;2,1));
+		lap[a[i]]=i; sgt.ins(i,jmp[i][0],0,n&lt;&lt;2,1);
+		for(int j=1;j!=20;++j) jmp[i][j]=jmp[jmp[i][j-1]][j-1];
+	}
+	for(int i=0,rp,rc,j;i!=n;++i){
+		for(rp=jmp[i][0],rc=0,j=19;j&gt;=0;j--)
+			if(jmp[rp][j]&lt;i+n) rc|=1&lt;&lt;j,rp=jmp[rp][j];
+		if(rp!=i+n) rc++;
+		rc=rc/2+1; ans=min(ans,rc);
+	}
+	if(jmp[0][0]==n) ans=0;
+	cout&lt;&lt;ans&lt;&lt;endl;
+}
+//0845 passed all samples exp 100pts.
+">复制</button>
+</div>
+<div class="code-content">
+    <pre><code class="hljs language-cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;
+<span class="hljs-comment">// #define int long long</span>
+<span class="hljs-keyword">constexpr</span> <span class="hljs-type">bool</span> online=<span class="hljs-number">0</span>;
+<span class="hljs-type">int</span> n,a[<span class="hljs-number">1000005</span>],jmp[<span class="hljs-number">1000005</span>][<span class="hljs-number">20</span>],v[<span class="hljs-number">200005</span>],vc,lap[<span class="hljs-number">200005</span>],ans;
+<span class="hljs-keyword">struct</span> <span class="hljs-title class_">seg_tree</span>{
+	<span class="hljs-type">int</span> v[<span class="hljs-number">1000005</span>&lt;&lt;<span class="hljs-number">2</span>];
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">ins</span><span class="hljs-params">(<span class="hljs-type">int</span> cp,<span class="hljs-type">int</span> cv,<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-type">int</span> mid=l+r&gt;&gt;<span class="hljs-number">1</span>; v[p]=<span class="hljs-built_in">min</span>(v[p],cv);
+		<span class="hljs-keyword">if</span>(l==r) <span class="hljs-keyword">return</span>;
+		<span class="hljs-keyword">if</span>(cp&lt;=mid) <span class="hljs-built_in">ins</span>(cp,cv,l,mid,p&lt;&lt;<span class="hljs-number">1</span>);
+		<span class="hljs-keyword">else</span> <span class="hljs-built_in">ins</span>(cp,cv,mid<span class="hljs-number">+1</span>,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>);
+	}
+	<span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">int</span> <span class="hljs-title">que</span><span class="hljs-params">(<span class="hljs-type">int</span> ql,<span class="hljs-type">int</span> qr,<span class="hljs-type">int</span> l,<span class="hljs-type">int</span> r,<span class="hljs-type">int</span> p)</span></span>{
+		<span class="hljs-keyword">if</span>(ql&lt;=l&amp;&amp;qr&gt;=r) <span class="hljs-keyword">return</span> v[p];
+		<span class="hljs-type">int</span> mid=l+r&gt;&gt;<span class="hljs-number">1</span>,ret=<span class="hljs-number">1e9</span>;
+		<span class="hljs-keyword">if</span>(ql&lt;=mid) ret=<span class="hljs-built_in">min</span>(ret,<span class="hljs-built_in">que</span>(ql,qr,l,mid,p&lt;&lt;<span class="hljs-number">1</span>));
+		<span class="hljs-keyword">if</span>(qr&gt;mid) ret=<span class="hljs-built_in">min</span>(ret,<span class="hljs-built_in">que</span>(ql,qr,mid<span class="hljs-number">+1</span>,r,p&lt;&lt;<span class="hljs-number">1</span>|<span class="hljs-number">1</span>));
+		<span class="hljs-keyword">return</span> ret;
+	}
+}sgt;
+<span class="hljs-function"><span class="hljs-type">signed</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">if</span>(online)
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;modify.in&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>,stdin),
+		<span class="hljs-built_in">freopen</span>(<span class="hljs-string">&quot;modify.out&quot;</span>,<span class="hljs-string">&quot;w&quot;</span>,stdout);
+	ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-number">0</span>); cin&gt;&gt;n;
+	<span class="hljs-comment">/*
+	一定存在最优操作序列满足左右端点序列均为严格递增序列，证明显然
+	考虑让第 i 段的数值为 2^i*inf，则任意一个划分出来的区间之间一定不重复出现数字
+	特别的，我可以留一段前缀或者后缀不进行任何操作
+
+	每一段内都一定不能出现相同的数字，不操作前缀和后缀按照一段进行理解
+	假设我们枚举有一段前后缀不进行操作，那么：
+	中间剩余的部分必须划分区间
+	需要划分的区间数如何计算：
+	每一个点找到其后第一次出现数字重复的位置，即为区间右端点（开）
+	于是对于每一个位置处理之后，使用 ST 可以快速跳转做到 O(\log)
+	然而枚举前后缀的时间复杂度超了
+
+	于是我们考虑“断环为链”。虽然并不是环，但是不操作前后缀被认为是等价的，所以可以认为是环
+	于是枚举前后缀变成了枚举后缀起点，找最大前缀起点，然后倍增操作
+	此时时间复杂度为 O(n\log n)，此题可解。
+
+	注意一些细节，例如：如果我有 c 个区间，那么我实际上需要操作多少次：
+	floor(c/2)+1，其证明是相对显然的：每一个区间最多将区间数+2,第一个区间只能做到+1
+
+	wasec，怎么快速求出其后第一次出现重复的位置？
+	对于左端点 p，我们找到这个数值下一次出现的位置 r
+	那么这个位置的 ans 就是 min(r,ans[p+1,r-1])！
+	证明显然，略去。
+	*/</span>
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i) cin&gt;&gt;a[i],v[i]=a[i];
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=<span class="hljs-number">20</span>;++i) jmp[n&lt;&lt;<span class="hljs-number">2</span>][i]=n&lt;&lt;<span class="hljs-number">2</span>;
+	<span class="hljs-built_in">sort</span>(v,v+n); vc=<span class="hljs-built_in">unique</span>(v,v+n)-v; ans=n;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n;++i) a[i]=<span class="hljs-built_in">lower_bound</span>(v,v+vc,a[i])-v;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=n&lt;&lt;<span class="hljs-number">2</span>;++i) a[i]=a[i%n];
+	<span class="hljs-built_in">memset</span>(sgt.v,<span class="hljs-number">0x0f</span>,<span class="hljs-keyword">sizeof</span> sgt.v);
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i!=vc;++i) lap[i]=n&lt;&lt;<span class="hljs-number">2</span>;
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=n*<span class="hljs-number">4</span><span class="hljs-number">-1</span>;i&gt;=<span class="hljs-number">0</span>;i--){
+		jmp[i][<span class="hljs-number">0</span>]=<span class="hljs-built_in">min</span>(lap[a[i]],sgt.<span class="hljs-built_in">que</span>(i,lap[a[i]]<span class="hljs-number">-1</span>,<span class="hljs-number">0</span>,n&lt;&lt;<span class="hljs-number">2</span>,<span class="hljs-number">1</span>));
+		lap[a[i]]=i; sgt.<span class="hljs-built_in">ins</span>(i,jmp[i][<span class="hljs-number">0</span>],<span class="hljs-number">0</span>,n&lt;&lt;<span class="hljs-number">2</span>,<span class="hljs-number">1</span>);
+		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j=<span class="hljs-number">1</span>;j!=<span class="hljs-number">20</span>;++j) jmp[i][j]=jmp[jmp[i][j<span class="hljs-number">-1</span>]][j<span class="hljs-number">-1</span>];
+	}
+	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>,rp,rc,j;i!=n;++i){
+		<span class="hljs-keyword">for</span>(rp=jmp[i][<span class="hljs-number">0</span>],rc=<span class="hljs-number">0</span>,j=<span class="hljs-number">19</span>;j&gt;=<span class="hljs-number">0</span>;j--)
+			<span class="hljs-keyword">if</span>(jmp[rp][j]&lt;i+n) rc|=<span class="hljs-number">1</span>&lt;&lt;j,rp=jmp[rp][j];
+		<span class="hljs-keyword">if</span>(rp!=i+n) rc++;
+		rc=rc/<span class="hljs-number">2</span><span class="hljs-number">+1</span>; ans=<span class="hljs-built_in">min</span>(ans,rc);
+	}
+	<span class="hljs-keyword">if</span>(jmp[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]==n) ans=<span class="hljs-number">0</span>;
+	cout&lt;&lt;ans&lt;&lt;endl;
+}
+<span class="hljs-comment">//0845 passed all samples exp 100pts.</span>
+</code></pre>
+</div>
+</div>
+</div>
+        <div class="footer">
+            <p>© 2026 · 本文采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议</p>
+        </div>
+    </div>
+    
+</div>
+<script>
+(function() {
+    // 复制按钮
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const code = btn.getAttribute('data-code');
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const orig = btn.textContent;
+                btn.textContent = '已复制！';
+                btn.classList.add('copied');
+                setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+            }
+        });
+    });
+    
+    
+    let searchIndex = null;
+    const searchInput = document.getElementById('globalSearchInput');
+    const resultsDiv = document.getElementById('searchResults');
+    async function loadSearchIndex() {
+        try {
+            const resp = await fetch('./search_index.json');
+            if (resp.ok) searchIndex = await resp.json();
+            else console.warn('无法加载搜索索引');
+        } catch(e) { console.warn(e); }
+    }
+    function performSearch(keyword) {
+        if (!searchIndex || !keyword.trim()) {
+            resultsDiv.classList.remove('active');
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        const lower = keyword.toLowerCase();
+        const results = searchIndex.filter(item => item.title.toLowerCase().includes(lower) || (item.snippet && item.snippet.toLowerCase().includes(lower)));
+        if (results.length === 0) {
+            resultsDiv.innerHTML = '<div style="padding:0.5rem;text-align:center;">未找到</div>';
+            resultsDiv.classList.add('active');
+            return;
+        }
+        resultsDiv.innerHTML = results.map(item => '<div class="search-result-item" data-url="' + escapeHtml(item.url) + '"><div class="search-result-title">' + escapeHtml(item.title) + '</div><div class="search-result-snippet">' + escapeHtml((item.snippet || '').substring(0,150)) + ((item.snippet || '').length > 150 ? '…' : '') + '</div></div>').join('');
+        resultsDiv.classList.add('active');
+        document.querySelectorAll('.search-result-item').forEach(el => el.addEventListener('click', () => window.location.href = el.dataset.url));
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+    let timer;
+    searchInput.addEventListener('input', e => { clearTimeout(timer); timer = setTimeout(() => performSearch(e.target.value), 300); });
+    document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.classList.remove('active'); });
+    loadSearchIndex();
+})();
+</script>
+</body>
+</html>
